@@ -1,0 +1,5 @@
+"C:\Program Files\JetBrains\CLion 2021.3.3\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" C:\Users\croissants\CLionProjects\Engine
+-- Using Win32 for window creation
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/croissants/CLionProjects/Engine/cmake-build-debug
