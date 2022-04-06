@@ -22,6 +22,8 @@ add_subdirectory("deps/glfw-3.3.6")
 include_directories(deps/glfw-3.3.6/include)
 include_directories(deps/glad/include)
 
+include_directories(include)
+
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)

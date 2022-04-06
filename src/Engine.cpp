@@ -13,12 +13,11 @@ void Engine::operator()() { //launching the thread
 
 void Engine::run() {
     init();
-    std::cout << "running..." << std::endl;
     stage->run();
 }
 
 void Engine::init() {
-    // set up GL context
+    // set up GL context todo move this to constructor?
     stage->init();
 
     //set up defaults
@@ -33,14 +32,11 @@ void Engine::init() {
 Engine::Engine(const char *name, int x, int y, int width, int height)
         : scenes(new std::map<unsigned int, Scene *>),
           shaders(new std::map<unsigned int, Shader *>),
-          running(false),
-          id(counter++) {
-    std::cout << "Engine" << id << std::endl;
+          running(false) {
     stage = new Stage(name, x, y, width, height);
 }
 
 Engine::~Engine() {
-    std::cout << "~Engine" << id << std::endl;
     kill();
     delete scenes;
     delete shaders;
@@ -51,8 +47,6 @@ void Engine::kill() {
     glfwWindowShouldClose(stage->getWindow());
 }
 
-Stage *const Engine::getStage() const {
+Stage *Engine::getStage() const {
     return stage;
 }
-
-int Engine::counter = 0;

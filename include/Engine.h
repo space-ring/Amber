@@ -14,32 +14,28 @@
 class Engine {
 
 private:
-    Stage *stage;
     std::map<unsigned int, Scene *> *scenes;
     std::map<unsigned int, Shader *> *shaders;
     bool running;
 
     void init();
 
-
-    static int counter;
-    int id;
-
-
 public:
+
+    Stage *stage;
     Engine(const char *name, int x, int y, int width, int height);
 
     void operator()();
 
     virtual ~Engine();
 
+    /* Initialises all listed resources, scenes and stages. Enters main render loop */
     void run();
 
+    /* Requests for the window to shut down */
     void kill();
 
-    Stage *const getStage() const;
-
-
+    Stage *getStage() const;
 };
 
 

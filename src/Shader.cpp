@@ -72,9 +72,11 @@ const GLchar *const *DEFAULT_FRAGMENT = &default_fragment;
 Shader *Shader::DEFAULT = nullptr;
 
 Shader *Shader::getDefault() { //todo check for GL context
-    DEFAULT = DEFAULT
-              ? DEFAULT
-              : new Shader(DEFAULT_VERTEX, nullptr, nullptr, nullptr, DEFAULT_FRAGMENT, nullptr);
+    if (DEFAULT) {
+        return DEFAULT;
+    } else {
+        DEFAULT = new Shader(DEFAULT_VERTEX, nullptr, nullptr, nullptr, DEFAULT_FRAGMENT, nullptr);
+    }
     return DEFAULT;
 }
 
