@@ -22,8 +22,14 @@ private:
     void init();
 
 
+    static int counter;
+    int id;
+
+
 public:
     Engine(const char *name, int x, int y, int width, int height);
+
+    void operator()();
 
     virtual ~Engine();
 

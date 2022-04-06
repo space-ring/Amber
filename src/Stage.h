@@ -29,6 +29,8 @@ public:
     void show();
 
     void hide();
+
+    GLFWwindow *getWindow() const;
 };
 
 
