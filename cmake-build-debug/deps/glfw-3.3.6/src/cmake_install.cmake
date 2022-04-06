@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/croissants/CLionProjects/Engine/deps/glfw-3.3.6/src
+# Install script for directory: C:/Users/cdobr/CLionProjects/Engine-C/deps/glfw-3.3.6/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,10 +34,10 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/Program Files/JetBrains/CLion 2021.3.3/bin/mingw/bin/objdump.exe")
+  set(CMAKE_OBJDUMP "C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/objdump.exe")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/croissants/CLionProjects/Engine/cmake-build-debug/deps/glfw-3.3.6/src/libglfw3.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/deps/glfw-3.3.6/src/libglfw3.a")
 endif()
 

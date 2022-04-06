@@ -1,26 +1,45 @@
-
-# Consider dependencies only in project.
-set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
-
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
+  "C"
+  "CXX"
   )
+# The set of files for implicit dependencies of each language:
+set(CMAKE_DEPENDS_CHECK_C
+  "C:/Users/cdobr/CLionProjects/Engine-C/deps/glad/src/glad.c" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/deps/glad/src/glad.c.obj"
+  )
+set(CMAKE_C_COMPILER_ID "GNU")
 
-# The set of dependency files which are needed:
-set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "C:/Users/croissants/CLionProjects/Engine/deps/glad/src/glad.c" "CMakeFiles/Engine.dir/deps/glad/src/glad.c.obj" "gcc" "CMakeFiles/Engine.dir/deps/glad/src/glad.c.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/Engine.cpp" "CMakeFiles/Engine.dir/src/Engine.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/Engine.cpp.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/Mesh.cpp" "CMakeFiles/Engine.dir/src/Mesh.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/Mesh.cpp.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/Scene.cpp" "CMakeFiles/Engine.dir/src/Scene.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/Scene.cpp.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/Shader.cpp" "CMakeFiles/Engine.dir/src/Shader.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/Shader.cpp.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/Stage.cpp" "CMakeFiles/Engine.dir/src/Stage.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/Stage.cpp.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/Texture.cpp" "CMakeFiles/Engine.dir/src/Texture.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/Texture.cpp.obj.d"
-  "C:/Users/croissants/CLionProjects/Engine/src/io.cpp" "CMakeFiles/Engine.dir/src/io.cpp.obj" "gcc" "CMakeFiles/Engine.dir/src/io.cpp.obj.d"
+# The include file search paths:
+set(CMAKE_C_TARGET_INCLUDE_PATH
+  "../deps/glfw-3.3.6/include"
+  "../deps/glad/include"
+  "../include"
+  "../deps/glfw-3.3.6/src"
+  "../deps/glad/src"
+  )
+set(CMAKE_DEPENDS_CHECK_CXX
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/Engine.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/Engine.cpp.obj"
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/Mesh.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/Mesh.cpp.obj"
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/Scene.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/Scene.cpp.obj"
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/Shader.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/Shader.cpp.obj"
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/Stage.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/Stage.cpp.obj"
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/Texture.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/Texture.cpp.obj"
+  "C:/Users/cdobr/CLionProjects/Engine-C/src/io.cpp" "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/CMakeFiles/Engine.dir/src/io.cpp.obj"
+  )
+set(CMAKE_CXX_COMPILER_ID "GNU")
+
+# The include file search paths:
+set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../deps/glfw-3.3.6/include"
+  "../deps/glad/include"
+  "../include"
+  "../deps/glfw-3.3.6/src"
+  "../deps/glad/src"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "C:/Users/croissants/CLionProjects/Engine/cmake-build-debug/deps/glfw-3.3.6/src/CMakeFiles/glfw.dir/DependInfo.cmake"
+  "C:/Users/cdobr/CLionProjects/Engine-C/cmake-build-debug/deps/glfw-3.3.6/src/CMakeFiles/glfw.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

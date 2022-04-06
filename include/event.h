@@ -11,6 +11,17 @@ namespace scene_event {
 }
 
 namespace context_event {
+
+    enum event {
+        ENTER,
+        FOCUS,
+        KEY,
+        CHAR,
+        CLICK,
+        SCROLL,
+        MOTION
+    };
+
     struct enterEvent {
         GLFWwindow *window;
         int entered;
