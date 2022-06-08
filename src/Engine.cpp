@@ -5,11 +5,13 @@
 #include <iostream>
 #include "Engine.h"
 #include "Shader.h"
+#include "Mesh.h"
+#include "engineIO.h"
 
 
-void Engine::operator()() { //launching the thread
-    run();
-}
+//void Engine::operator()(const string& manifest) {
+//    run(manifest);
+//}
 
 void Engine::run() {
     init();
@@ -22,24 +24,27 @@ void Engine::init() {
 
     //set up defaults
     //SHADER
-//    shaders->insert(std::pair<int, Shader *>(0, Shader::getDefault()));
+    assets->addShader("", *Shader::getDefault()->build());
+//    MESH
+    assets->addMesh("", *Mesh::getDefault()->build());
+    //todo TEXTURE
 
-    //MESH
-    //TEXTURE
+    Shader* wire = assets->getShader("wire");
+    wire->build();
+
     stage->show();
+
+    running = true;
 }
 
-Engine::Engine(const char *name, int x, int y, int width, int height)
-        : scenes(new std::map<unsigned int, Scene *>),
-          shaders(new std::map<unsigned int, Shader *>),
-          running(false) {
+Engine::Engine(const string& name, int x, int y, int width, int height) {
     stage = new Stage(name, x, y, width, height);
 }
 
 Engine::~Engine() {
     kill();
     delete scenes;
-    delete shaders;
+    delete assets;
 }
 
 void Engine::kill() {
@@ -47,6 +52,18 @@ void Engine::kill() {
     glfwWindowShouldClose(stage->getWindow());
 }
 
-Stage *Engine::getStage() const {
+Stage* Engine::getStage() const {
     return stage;
+}
+
+Scene* Engine::getFrontScene() {
+    return frontScene;
+}
+
+void Engine::addScene(const string& id, Scene* scene) {
+    scenes->insert(std::pair<string, Scene*>(id, scene));
+}
+
+Scene* Engine::getFront() {
+    return frontScene;
 }

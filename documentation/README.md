@@ -8,7 +8,8 @@
 - [Stages](./Stages.md)
 - [Scenes](./Scenes.md)
 
-### Resources
+### Assets
+- [Asset Manager](./AssetManager.md)
 - [Meshes / Models](./Meshes.md)
 - [Textures](./Textures.md)
 - [Shaders](./Shaders.md)

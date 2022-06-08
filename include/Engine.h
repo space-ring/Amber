@@ -10,22 +10,35 @@
 #include "Scene.h"
 #include "graphics.h"
 #include "Shader.h"
+#include "Mesh.h"
+#include "Texture.h"
+#include "AssetManager.h"
+#include <thread>
 
+//todo default members for resources (vao = 0, etc)
+//todo initialise members that don't depend on constructor in class declaration
+//todo use references instead of pointers
+//todo circular dependencies with IO
 class Engine {
+    using string = std::string;
 
 private:
-    std::map<unsigned int, Scene *> *scenes;
-    std::map<unsigned int, Shader *> *shaders;
-    bool running;
+    std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
+    bool running = false;
+    Scene* frontScene = nullptr;
 
     void init();
 
+    Stage* stage;
+
 public:
 
-    Stage *stage;
-    Engine(const char *name, int x, int y, int width, int height);
+    AssetManager* assets = new AssetManager();
 
-    void operator()();
+    Engine(const string& name, int x, int y, int width, int height);
+
+    /* Make callable for thread launching */
+//    void operator()(const string& manifest = "");
 
     virtual ~Engine();
 
@@ -35,7 +48,14 @@ public:
     /* Requests for the window to shut down */
     void kill();
 
-    Stage *getStage() const;
+    Stage* getStage() const;
+
+    Scene* getFrontScene();
+
+    void addScene(const string& id, Scene* scene);
+
+    Scene* getFront();
+
 };
 
 

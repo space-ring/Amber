@@ -9,28 +9,54 @@
 #include <string>
 #include "graphics.h"
 
-using source = const char *const *; //todo scope?
+using shaderSource = const GLchar**; //todo scope?
+
+enum SupportedShaders {
+    VERTEX = GL_VERTEX_SHADER,
+    TESS_CONTROL = GL_TESS_CONTROL_SHADER,
+    TESS_EVALUATION = GL_TESS_EVALUATION_SHADER,
+    GEOMETRY = GL_GEOMETRY_SHADER,
+    FRAGMENT = GL_FRAGMENT_SHADER,
+    COMPUTE = GL_COMPUTE_SHADER
+};
 
 class Shader {
 private:
-    GLuint program, vertex, tessCtrl, tessEval, geometry, fragment, compute;
-    static Shader *DEFAULT;
+    static Shader* DEFAULT;
+
+    shaderSource vertexSource = nullptr,
+            tessCtrlSource = nullptr,
+            tessEvalSource = nullptr,
+            geometrySource = nullptr,
+            fragmentSource = nullptr,
+            computeSource = nullptr;
+
+    GLuint program = 0,
+            vertex = 0,
+            tessCtrl = 0,
+            tessEval = 0,
+            geometry = 0,
+            fragment = 0,
+            compute = 0;
+
+    GLuint addShader(SupportedShaders type, const GLchar** code);
 
 public:
-    Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment, GLuint compute);
+    static Shader* getDefault();
 
-    Shader(source vertex, source tessCtrl, source tessEval, source geometry, source fragment, source compute);
+    Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
+           GLuint compute);
+
+    Shader(shaderSource vertexSource, shaderSource tessCtrlSource, shaderSource tessEvalSource,
+           shaderSource geometrySource, shaderSource fragmentSource, shaderSource computeSource);
 
     virtual ~Shader();
 
-    static Shader *getDefault();
+    Shader* build();
 
-    GLuint getProgram() const;
+    void start();
 
+    void stop();
 };
-
-extern const GLchar *const *DEFAULT_VERTEX;
-extern const GLchar *const *DEFAULT_FRAGMENT;
-
 
 #endif //ENGINE_SHADER_H

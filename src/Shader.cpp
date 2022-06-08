@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 #include "Shader.h"
-#include "io.h"
+#include "engineIO.h"
 
-const char *default_vertex =
+const char* DEFAULT_VERTEX =
         "#version 430 core\n"
         "layout (location = 0) in vec3 v_position;\n"
         "layout (location = 1) in vec2 v_colour;\n"
@@ -35,7 +35,7 @@ const char *default_vertex =
         "}";
 
 
-const char *default_fragment =
+const char* DEFAULT_FRAGMENT =
         "#version 430 core\n"
         "\n"
         "in vec3 frag_position;\n"
@@ -66,18 +66,30 @@ const char *default_fragment =
         "    fragment = pixel * sum_filter;\n"
         "}";
 
-const GLchar *const *DEFAULT_VERTEX = &default_vertex;
-const GLchar *const *DEFAULT_FRAGMENT = &default_fragment;
 
-Shader *Shader::DEFAULT = nullptr;
+Shader* Shader::DEFAULT = nullptr;
 
-Shader *Shader::getDefault() { //todo check for GL context
-    if (DEFAULT) {
-        return DEFAULT;
-    } else {
-        DEFAULT = new Shader(DEFAULT_VERTEX, nullptr, nullptr, nullptr, DEFAULT_FRAGMENT, nullptr);
+Shader* Shader::getDefault() { //todo check for GL context
+    if (!DEFAULT) {
+        DEFAULT = loadShader(&DEFAULT_VERTEX, &DEFAULT_FRAGMENT);
     }
     return DEFAULT;
+}
+
+Shader::Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
+               GLuint compute)
+        : program(program), vertex(vertex), tessCtrl(tessCtrl),
+          tessEval(tessEval), geometry(geometry), fragment(fragment), compute(compute) {
+}
+
+Shader::Shader(shaderSource vertexSource, shaderSource tessCtrlSource,
+               shaderSource tessEvalSource, shaderSource geometrySource,
+               shaderSource fragmentSource, shaderSource computeSource)
+        : vertexSource(vertexSource), tessCtrlSource(tessCtrlSource),
+          tessEvalSource(tessEvalSource), geometrySource(geometrySource),
+          fragmentSource(fragmentSource), computeSource(computeSource),
+          program(0), vertex(0), tessCtrl(0), tessEval(0),
+          geometry(0), fragment(0), compute(0) {
 }
 
 Shader::~Shader() {
@@ -91,96 +103,115 @@ Shader::~Shader() {
     glDeleteShader(compute);
 }
 
-Shader::Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
-               GLuint compute)
-        : program(program), vertex(vertex), tessCtrl(tessCtrl),
-          tessEval(tessEval), geometry(geometry), fragment(fragment), compute(compute) {}
+void Shader::start() {
+    glUseProgram(program);
+}
 
-Shader::Shader(source vertex, source tessCtrl, source tessEval, source geometry, source fragment, source compute) :
-        program(0), vertex(0), tessCtrl(0), tessEval(0), geometry(0), fragment(0), compute(0) {
+void Shader::stop() {
+    glUseProgram(0);
+}
 
-    source sources[]{vertex, tessCtrl, tessEval, geometry, fragment, compute};
-    unsigned int types[]{GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER,
-                         GL_GEOMETRY_SHADER, GL_FRAGMENT_SHADER, GL_COMPUTE_SHADER};
-    unsigned int *shaders[]{&this->vertex, &this->tessCtrl, &this->tessEval,
-                            &this->geometry, &this->fragment, &this->compute};
-
-    bool compiled = true;
-    std::cout << "Creating shader" << std::endl;
-    int i;
-    for (i = 0; i < 6; ++i) {
-        if (sources[i]) {
-            //prepare the shader
-            *shaders[i] = glCreateShader(types[i]);
-            glShaderSource(*shaders[i], 1, sources[i], nullptr);
-            glCompileShader(*shaders[i]);
-            GLint flag;
-            glGetShaderiv(*shaders[i], GL_COMPILE_STATUS, &flag);
-            if (!flag) {
-                compiled = false;
-                GLint logSize = 0;
-                glGetShaderiv(*shaders[i], GL_INFO_LOG_LENGTH, &logSize);
-                std::vector<GLchar> log(logSize);
-                glGetShaderInfoLog(*shaders[i], logSize, nullptr, &log[0]);
-                std::string fault;
-                for (GLchar c: log) {
-                    std::cout << c;
-                    fault += c;
-                }
-                writeFile("./DEFAULT_" + std::to_string(i) + "_FAIL.txt", fault);
-                break;
-            }
-        }
-    }
-
-    if (!compiled) {
-        for (int j = 0; j < i; ++j) {
-            if (sources[i]) {
-                glDeleteShader(*shaders[i]);
-                *shaders[i] = 0;
-            }
-        }
-        return;
-    }
-
-    //todo Before linking setup
-    program = glCreateProgram();
-    for (unsigned int *shader: shaders) {
-        if (*shader) {
-            glAttachShader(program, *shader);
-        }
-    }
-
-    glLinkProgram(program);
-
-    //check link successful
-    GLint linked = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, &linked);
-    if (!linked) {
+GLuint Shader::addShader(SupportedShaders type, shaderSource code) {
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, code, nullptr);
+    glCompileShader(shader);
+    GLint flag;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &flag);
+    if (!flag) {
         GLint logSize = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logSize);
-
-        std::vector<GLchar> infoLog(logSize);
-        glGetProgramInfoLog(program, logSize, &logSize, &infoLog[0]);
-        std::string fault;
-        for (GLchar c: infoLog) {
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
+        std::vector<GLchar> log(logSize);
+        glGetShaderInfoLog(shader, logSize, nullptr, &log[0]);
+        // todo logging
+        std::cout << "Failed to compile shader " << type << std::endl;
+        int i = 0;
+        while (*(*code + i) != '\0') {
+            std::cout << *(*code + i++);
+        }
+        std::cout << std::endl;
+        for (GLchar c: log) {
             std::cout << c;
-            fault += c;
         }
-        writeFile("./DEFAULT_LINK_FAIL.txt", fault);
-
-        glDeleteProgram(program); // also detaches shaders
-
-        for (unsigned int *shader: shaders) {
-            if (*shader) {
-                glDeleteShader(*shader);
-                *shader = 0;
-            }
-        }
-        program = 0;
+        glDeleteShader(shader);
+        return 0;
     }
+
+    switch (type) {
+        case VERTEX:
+            vertex = shader;
+            break;
+        case TESS_CONTROL:
+            tessCtrl = shader;
+            break;
+        case TESS_EVALUATION:
+            tessEval = shader;
+            break;
+        case GEOMETRY:
+            geometry = shader;
+            break;
+        case FRAGMENT:
+            fragment = shader;
+            break;
+        case COMPUTE:
+            compute = shader;
+            break;
+    }
+
+    return shader;
 }
 
-GLuint Shader::getProgram() const {
-    return program;
+Shader* Shader::build() {
+    if (program) return this;
+
+    if (vertexSource) addShader(VERTEX, vertexSource);
+    if (tessCtrlSource) addShader(TESS_CONTROL, tessCtrlSource);
+    if (tessEvalSource) addShader(TESS_EVALUATION, tessEvalSource);
+    if (geometrySource) addShader(GEOMETRY, geometrySource);
+    if (fragmentSource) addShader(FRAGMENT, fragmentSource);
+    if (computeSource) addShader(COMPUTE, computeSource);
+
+    GLuint p = glCreateProgram();
+    glAttachShader(p, vertex);
+    glAttachShader(p, tessCtrl);
+    glAttachShader(p, tessEval);
+    glAttachShader(p, geometry);
+    glAttachShader(p, fragment);
+    glAttachShader(p, compute);
+
+    //todo pre-linkup setup e.g. transform feedback
+    glLinkProgram(p);
+
+    GLint flag;
+    glGetProgramiv(p, GL_LINK_STATUS, &flag);
+    if (!flag) {
+        GLint logSize = 0;
+        glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logSize);
+        std::vector<GLchar> log(logSize);
+        glGetProgramInfoLog(p, logSize, &logSize, &log[0]);
+        //todo logging
+        std::cout << "Error creating shader program" << std::endl;
+        for (GLchar c: log) {
+            std::cout << c;
+        }
+        glDeleteProgram(p);
+        glDeleteShader(vertex);
+        glDeleteShader(tessCtrl);
+        glDeleteShader(tessEval);
+        glDeleteShader(geometry);
+        glDeleteShader(fragment);
+        glDeleteShader(compute);
+        program = 0;
+        vertex = 0;
+        tessCtrl = 0;
+        tessEval = 0;
+        geometry = 0;
+        fragment = 0;
+        compute = 0;
+        return this;
+    }
+
+    program = p;
+    return this;
 }
+
+//todo separate programs and shaders?

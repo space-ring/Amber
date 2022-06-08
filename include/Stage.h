@@ -11,27 +11,26 @@
 #include <list>
 
 class Stage {
-
+    using string = std::string;
 private:
-    static Stage *mainStage;
-
-    const char *name;
+    static Stage* mainStage;
+    string name;
     int x, y, width, height;
-    GLFWwindow *window;
+    GLFWwindow* window;
 
     //handlers
-    std::list<context_event::focusHandler> *onFocusHandlers;
-    std::list<context_event::enterHandler> *onEnterHandlers;
-    std::list<context_event::keyHandler> *onKeyHandlers;
-    std::list<context_event::charHandler> *onCharHandlers;
-    std::list<context_event::clickHandler> *onClickHandlers;
-    std::list<context_event::scrollHandler> *onScrollHandlers;
-    std::list<context_event::motionHandler> *onMotionHandlers;
+    std::list<context_event::focusHandler>* onFocusHandlers;
+    std::list<context_event::enterHandler>* onEnterHandlers;
+    std::list<context_event::keyHandler>* onKeyHandlers;
+    std::list<context_event::charHandler>* onCharHandlers;
+    std::list<context_event::clickHandler>* onClickHandlers;
+    std::list<context_event::scrollHandler>* onScrollHandlers;
+    std::list<context_event::motionHandler>* onMotionHandlers;
 
     void render();
 
 public:
-    Stage(const char *name, int x, int y, int width, int height);
+    Stage(const string& name, int x, int y, int width, int height);
 
     virtual ~Stage();
 
@@ -47,12 +46,12 @@ public:
 
     void hide();
 
-    GLFWwindow *getWindow() const;
+    GLFWwindow* getWindow() const;
 
     // add events
-    void addOnFocus(context_event::focusHandler handler);
+    void addOnStageFocus(context_event::focusHandler handler);
 
-    void addonEnter(context_event::enterHandler handler);
+    void addOnStageEnter(context_event::enterHandler handler);
 
     void addOnKey(context_event::keyHandler handler);
 
@@ -80,19 +79,19 @@ public:
     void clearOnMotion();
 
     // on events
-    static void onFocus(GLFWwindow *window, int focused);
+    static void onFocus(GLFWwindow* window, int focused);
 
-    static void onEnter(GLFWwindow *window, int entered);
+    static void onEnter(GLFWwindow* window, int entered);
 
-    static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void onKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-    static void onChar(GLFWwindow *window, unsigned int codepoint);
+    static void onChar(GLFWwindow* window, unsigned int codepoint);
 
-    static void onClick(GLFWwindow *window, int button, int action, int mods);
+    static void onClick(GLFWwindow* window, int button, int action, int mods);
 
-    static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
+    static void onScroll(GLFWwindow* window, double xoffset, double yoffset);
 
-    static void onMotion(GLFWwindow *window, double xpos, double ypos);
+    static void onMotion(GLFWwindow* window, double xpos, double ypos);
 
 };
 

@@ -5,9 +5,40 @@
 #ifndef ENGINE_MESH_H
 #define ENGINE_MESH_H
 
+#include <vector>
+#include <string>
+#include "glm/glm.hpp"
+#include "graphics.h"
 
-class Mesh {
+struct Vertex { //todo don't use unions?
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 texUV;
+};
 
+class Mesh { //todo destroy
+private:
+    static Mesh* DEFAULT;
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+
+    /**
+     * vao Standard attributes:
+     * 0 = vertex positions
+     * 1 = vertex textures
+     * 2 = vertex normals
+     * 10 - 13 = instance transforms
+     * 14 - 17 = camera transforms
+     * 18 - 21 = perspective transforms
+     */
+    GLuint vao, vbo, ebo;
+
+public:
+    static Mesh* getDefault();
+
+    Mesh(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices);
+
+    Mesh* build();
 };
 
 

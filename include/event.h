@@ -5,6 +5,8 @@
 #ifndef ENGINE_EVENT_H
 #define ENGINE_EVENT_H
 
+#include "graphics.h"
+
 namespace scene_event {
 
 
@@ -23,17 +25,17 @@ namespace context_event {
     };
 
     struct enterEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         int entered;
     };
 
     struct focusEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         int focused;
     };
 
     struct keyEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         int key;
         int scancode;
         int action;
@@ -41,44 +43,44 @@ namespace context_event {
     };
 
     struct charEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         unsigned int codepoint;
     };
 
     struct motionEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         double xpos;
         double ypos;
     };
 
     struct clickEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         int button;
         int action;
         int mods;
     };
 
     struct scrollEvent {
-        GLFWwindow *window;
+        GLFWwindow* window;
         double xoffset;
         double yoffset;
     };
 
     //todo joystick, gamepad
 
-    typedef void (*focusHandler)(struct focusEvent);
+    typedef void (* focusHandler)(struct focusEvent);
 
-    typedef void (*enterHandler)(struct enterEvent);
+    typedef void (* enterHandler)(struct enterEvent);
 
-    typedef void (*keyHandler)(struct keyEvent);
+    typedef void (* keyHandler)(struct keyEvent);
 
-    typedef void (*charHandler)(struct charEvent);
+    typedef void (* charHandler)(struct charEvent);
 
-    typedef void (*clickHandler)(struct clickEvent);
+    typedef void (* clickHandler)(struct clickEvent);
 
-    typedef void (*scrollHandler)(struct scrollEvent);
+    typedef void (* scrollHandler)(struct scrollEvent);
 
-    typedef void (*motionHandler)(struct motionEvent);
+    typedef void (* motionHandler)(struct motionEvent);
 }
 
 
