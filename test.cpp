@@ -11,7 +11,6 @@ using namespace std;
 
 int main() {
 
-    string name = "Engine";
     auto* engine = new Engine("Engine", 100, 100, 500, 500);
     engine->assets->addManifest("test/manifest");
     //declare all resources, add them to engine;

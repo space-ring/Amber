@@ -9,7 +9,9 @@
 #include <string>
 #include "graphics.h"
 
-using shaderSource = const GLchar**; //todo scope?
+struct compoundShader { //todo const
+    std::string vertex, fragment, geometry, tessControl, tessEval, compute;
+};
 
 enum SupportedShaders {
     VERTEX = GL_VERTEX_SHADER,
@@ -24,12 +26,7 @@ class Shader {
 private:
     static Shader* DEFAULT;
 
-    shaderSource vertexSource = nullptr,
-            tessCtrlSource = nullptr,
-            tessEvalSource = nullptr,
-            geometrySource = nullptr,
-            fragmentSource = nullptr,
-            computeSource = nullptr;
+    compoundShader* sources; //todo delete
 
     GLuint program = 0,
             vertex = 0,
@@ -39,7 +36,7 @@ private:
             fragment = 0,
             compute = 0;
 
-    GLuint addShader(SupportedShaders type, const GLchar** code);
+    GLuint addShader(SupportedShaders type, const GLchar* const* code);
 
 public:
     static Shader* getDefault();
@@ -47,8 +44,7 @@ public:
     Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
            GLuint compute);
 
-    Shader(shaderSource vertexSource, shaderSource tessCtrlSource, shaderSource tessEvalSource,
-           shaderSource geometrySource, shaderSource fragmentSource, shaderSource computeSource);
+    Shader(compoundShader* sources);
 
     virtual ~Shader();
 

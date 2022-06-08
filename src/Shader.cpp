@@ -8,7 +8,10 @@
 #include "Shader.h"
 #include "engineIO.h"
 
-const char* DEFAULT_VERTEX =
+//todo separate programs and shaders?
+
+
+string DEFAULT_VERTEX =
         "#version 430 core\n"
         "layout (location = 0) in vec3 v_position;\n"
         "layout (location = 1) in vec2 v_colour;\n"
@@ -35,7 +38,7 @@ const char* DEFAULT_VERTEX =
         "}";
 
 
-const char* DEFAULT_FRAGMENT =
+string DEFAULT_FRAGMENT =
         "#version 430 core\n"
         "\n"
         "in vec3 frag_position;\n"
@@ -71,25 +74,19 @@ Shader* Shader::DEFAULT = nullptr;
 
 Shader* Shader::getDefault() { //todo check for GL context
     if (!DEFAULT) {
-        DEFAULT = loadShader(&DEFAULT_VERTEX, &DEFAULT_FRAGMENT);
+        compoundShader defaultSources{DEFAULT_VERTEX, DEFAULT_FRAGMENT};
+        DEFAULT = loadShader(defaultSources);
     }
     return DEFAULT;
 }
 
 Shader::Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
                GLuint compute)
-        : program(program), vertex(vertex), tessCtrl(tessCtrl),
+        : sources(new compoundShader{}), program(program), vertex(vertex), tessCtrl(tessCtrl),
           tessEval(tessEval), geometry(geometry), fragment(fragment), compute(compute) {
 }
 
-Shader::Shader(shaderSource vertexSource, shaderSource tessCtrlSource,
-               shaderSource tessEvalSource, shaderSource geometrySource,
-               shaderSource fragmentSource, shaderSource computeSource)
-        : vertexSource(vertexSource), tessCtrlSource(tessCtrlSource),
-          tessEvalSource(tessEvalSource), geometrySource(geometrySource),
-          fragmentSource(fragmentSource), computeSource(computeSource),
-          program(0), vertex(0), tessCtrl(0), tessEval(0),
-          geometry(0), fragment(0), compute(0) {
+Shader::Shader(compoundShader* sources) : sources(sources) {
 }
 
 Shader::~Shader() {
@@ -111,7 +108,7 @@ void Shader::stop() {
     glUseProgram(0);
 }
 
-GLuint Shader::addShader(SupportedShaders type, shaderSource code) {
+GLuint Shader::addShader(SupportedShaders type, const GLchar* const* code) {
     GLuint shader = glCreateShader(type);
     glShaderSource(shader, 1, code, nullptr);
     glCompileShader(shader);
@@ -163,12 +160,30 @@ GLuint Shader::addShader(SupportedShaders type, shaderSource code) {
 Shader* Shader::build() {
     if (program) return this;
 
-    if (vertexSource) addShader(VERTEX, vertexSource);
-    if (tessCtrlSource) addShader(TESS_CONTROL, tessCtrlSource);
-    if (tessEvalSource) addShader(TESS_EVALUATION, tessEvalSource);
-    if (geometrySource) addShader(GEOMETRY, geometrySource);
-    if (fragmentSource) addShader(FRAGMENT, fragmentSource);
-    if (computeSource) addShader(COMPUTE, computeSource);
+    if (!sources->vertex.empty()) {
+        const char* p = sources->vertex.c_str();
+        addShader(VERTEX, &p);
+    }
+    if (!sources->tessControl.empty()) {
+        const char* p = sources->tessControl.c_str();
+        addShader(TESS_CONTROL, &p);
+    }
+    if (!sources->tessEval.empty()) {
+        const char* p = sources->tessEval.c_str();
+        addShader(TESS_EVALUATION, &p);
+    }
+    if (!sources->geometry.empty()) {
+        const char* p = sources->geometry.c_str();
+        addShader(GEOMETRY, &p);
+    }
+    if (!sources->fragment.empty()) {
+        const char* p = sources->fragment.c_str();
+        addShader(FRAGMENT, &p);
+    }
+    if (!sources->compute.empty()) {
+        const char* p = sources->compute.c_str();
+        addShader(COMPUTE, &p);
+    }
 
     GLuint p = glCreateProgram();
     glAttachShader(p, vertex);
@@ -213,5 +228,3 @@ Shader* Shader::build() {
     program = p;
     return this;
 }
-
-//todo separate programs and shaders?

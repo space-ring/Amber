@@ -6,9 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-AssetManager::AssetManager() {
-
-}
+AssetManager::AssetManager() {}
 
 void AssetManager::addManifest(const string& manifest) {
     if (manifest.empty()) return;
@@ -26,18 +24,13 @@ void AssetManager::addManifest(const string& manifest) {
         pos = line.find('@');
 
         if (type == "mesh") {
-//            string path;
-//            path = line.substr(pos + 1);
             auto pair = std::pair<string, string>(name, line);
             meshPaths->insert(pair);
-
-//            engine->addMesh(name, loadMeshFile(path)->build());
 
         } else if (type == "shader") {
             string v, f, g, tc, te, c;
             string* stores[]{&v, &f, &g, &tc, &te, &c};
 
-            bool exit;
             for (string* s: stores) {
                 if (pos == string::npos) break;
                 pos = line.find('@');
@@ -45,9 +38,8 @@ void AssetManager::addManifest(const string& manifest) {
                 line = line.substr(pos + 1);
             }
 
-            compoundShader paths{v, tc, te, g, f, c};
+            compoundShader paths{v, f, g, tc, te, c};
             shaderPaths->insert(std::pair<string, compoundShader>(name, paths));
-//            engine->addShader(name, loadShaderFile(v, f, g, tc, te, c)->build());
         }
     }
     openfile.close();
@@ -81,14 +73,7 @@ Shader* AssetManager::getShader(const string& name) {
     if (!shaders->contains(name)) {
         if (shaderPaths->contains(name)) {
             compoundShader paths = shaderPaths->at(name);
-            addShader(name, *loadShaderFile(
-                    paths.vertex,
-                    paths.fragment,
-                    paths.geometry,
-                    paths.tessControl,
-                    paths.tessEval,
-                    paths.compute
-            ));
+            addShader(name, *loadShaderFile(paths));
         } else {
             return Shader::getDefault(); //todo don't insert default, manifest may be overridden at runtime (future feature)
         }
