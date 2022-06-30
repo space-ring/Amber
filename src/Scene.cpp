@@ -26,8 +26,3 @@ void Scene::removeLight(id index) {
     lights->erase(index);
 }
 
-Frame* Scene::capture(id camera, CaptureMethod& method) {
-    return nullptr;
-}
-
-

@@ -1,1 +1,4 @@
 mesh@box@test/box.obj
+format of shader manifests:
+ shader@program name@vertex@fragment@geometry@tess control@tess eval@compute
+shader@wire@test/wire.vert@test/wire.frag

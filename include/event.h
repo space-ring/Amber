@@ -6,15 +6,18 @@
 #define ENGINE_EVENT_H
 
 #include "graphics.h"
+#include "variadic.h"
+#include  <iostream>
 
 namespace scene_event {
 
 
 }
 
-namespace context_event {
+namespace window_event {
 
-    enum event {
+    enum class event_type {
+        CLOSE,
         ENTER,
         FOCUS,
         KEY,
@@ -24,64 +27,111 @@ namespace context_event {
         MOTION
     };
 
-    struct enterEvent {
-        GLFWwindow* window;
-        int entered;
+    struct Event {
+        const GLFWwindow* window;
+
+        Event(const GLFWwindow* window);
+
+        virtual ~Event() = default;
     };
 
-    struct focusEvent {
-        GLFWwindow* window;
-        int focused;
+    struct EnterEvent : Event {
+        const int entered;
+
+        EnterEvent(const GLFWwindow* window, int entered);
     };
 
-    struct keyEvent {
-        GLFWwindow* window;
-        int key;
-        int scancode;
-        int action;
-        int mods;
+    struct FocusEvent : Event {
+        const int focused;
+
+        FocusEvent(const GLFWwindow* window, int focused);
     };
 
-    struct charEvent {
-        GLFWwindow* window;
-        unsigned int codepoint;
+    struct CloseEvent : Event {
+
+        explicit CloseEvent(const GLFWwindow* window);
     };
 
-    struct motionEvent {
-        GLFWwindow* window;
-        double xpos;
-        double ypos;
+    struct KeyEvent : Event {
+        const int key;
+        const int scancode;
+        const int action;
+        const int mods;
+
+        KeyEvent(const GLFWwindow* window, int key, int scancode, int action, int mods);
     };
 
-    struct clickEvent {
-        GLFWwindow* window;
-        int button;
-        int action;
-        int mods;
+    struct CharEvent : Event {
+        const unsigned int codepoint;
+
+        CharEvent(const GLFWwindow* window, unsigned int codepoint);
     };
 
-    struct scrollEvent {
-        GLFWwindow* window;
-        double xoffset;
-        double yoffset;
+    struct MotionEvent : Event {
+        const double xpos;
+        const double ypos;
+
+        MotionEvent(const GLFWwindow* window, double xpos, double ypos);
+    };
+
+    struct ClickEvent : Event {
+        const int button;
+        const int action;
+        const int mods;
+
+        ClickEvent(const GLFWwindow* window, int button, int action, int mods);
+
+    };
+
+    struct ScrollEvent : Event {
+        const double xoffset;
+        const double yoffset;
+
+        ScrollEvent(const GLFWwindow* window, double xoffset, double yoffset);
     };
 
     //todo joystick, gamepad
 
-    typedef void (* focusHandler)(struct focusEvent);
+    //handlers
+    template<class T>
+    class EventHandler : public Variadic<void, const Event&> {
+        typedef std::function<void(const Event&)> base_handler;
+        typedef std::function<void(const T&)> derived_handler;
 
-    typedef void (* enterHandler)(struct enterEvent);
+    public:
+        static const long type;
 
-    typedef void (* keyHandler)(struct keyEvent);
+        static base_handler upcast(const derived_handler& handler, Event* p = nullptr) {
+            return [handler](const Event& event) -> void {
+                handler(static_cast<const T&>(event)); //downcast for call
+            };
+        }
 
-    typedef void (* charHandler)(struct charEvent);
+        EventHandler(const derived_handler& handler) :
+                Variadic<void, const Event&>(
+                        upcast(handler, static_cast<T*>(nullptr)) //check T : Event
+                ) {
+        }
 
-    typedef void (* clickHandler)(struct clickEvent);
+        void operator()(const Event& event) override {
+            function(event); //todo upcast if commenting this function throws error (return void)
+        }
+    };
 
-    typedef void (* scrollHandler)(struct scrollEvent);
+    extern long handler_counter;
+    template<class T>
+    const long EventHandler<T>::type = handler_counter++;
 
-    typedef void (* motionHandler)(struct motionEvent);
+    using GenericHandler = EventHandler<Event>;
+    using EnterHandler = EventHandler<EnterEvent>;
+    using FocusHandler = EventHandler<FocusEvent>;
+    using CloseHandler = EventHandler<CloseEvent>;
+    using KeyHandler = EventHandler<KeyEvent>;
+    using CharHandler = EventHandler<CharEvent>;
+    using MotionHandler = EventHandler<MotionEvent>;
+    using ClickHandler = EventHandler<ClickEvent>;
+    using ScrollHandler = EventHandler<ScrollEvent>;
+
 }
-
 
 #endif //ENGINE_EVENT_H

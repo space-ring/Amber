@@ -3,46 +3,54 @@
 //
 
 #include "AssetManager.h"
+#include "engineIO.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include "engineUtils.h"
 
 AssetManager::AssetManager() {}
 
-void AssetManager::addManifest(const string& manifest) {
+void AssetManager::buildAll() {
+    Shader::getDefault()->build();
+    for (const auto& shader: *shaderPaths) {
+        addShader(shader.first, *loadShaderFile(shader.second)->build());
+    }
+    Mesh::getDefault()->build();
+    for (const auto& mesh: *meshPaths) {
+        addMesh(mesh.first, *loadMeshFile(mesh.second)->build());
+    }
+//    for (auto texture: *textures) {
+//        texture.second->build();
+//    }
+}
+
+void AssetManager::addManifest(const string& path) {
+    string manifest = readFile(path);
     if (manifest.empty()) return;
     string line;
-    std::ifstream openfile(manifest);
-    size_t pos = 0;
-    while (std::getline(openfile, line)) {
-        string type, name;
-        pos = line.find('@');
-        type = line.substr(0, pos);
-        line = line.substr(pos + 1);
-        pos = line.find('@');
-        name = line.substr(0, pos);
-        line = line.substr(pos + 1);
-        pos = line.find('@');
+    std::stringstream ss(manifest);
+    while (std::getline(ss, line, '\n')) {
+        auto items = split(line, '@');
+        string type = items[0];
+        string name = items[1];
 
         if (type == "mesh") {
-            auto pair = std::pair<string, string>(name, line);
+            auto pair = std::pair<string, string>(name, items[2]);
             meshPaths->insert(pair);
 
         } else if (type == "shader") {
             string v, f, g, tc, te, c;
             string* stores[]{&v, &f, &g, &tc, &te, &c};
 
-            for (string* s: stores) {
-                if (pos == string::npos) break;
-                pos = line.find('@');
-                *s = line.substr(0, pos);
-                line = line.substr(pos + 1);
+            for (int i = 0; i < items.size() - 2; ++i) {
+                *stores[i] = items[i + 2];
             }
 
             compoundShader paths{v, f, g, tc, te, c};
             shaderPaths->insert(std::pair<string, compoundShader>(name, paths));
         }
     }
-    openfile.close();
 }
 
 void AssetManager::addShader(const string& name, const compoundShader& paths) {
@@ -72,11 +80,8 @@ void AssetManager::addTexture(const string& name, Texture& texture) {
 Shader* AssetManager::getShader(const string& name) {
     if (!shaders->contains(name)) {
         if (shaderPaths->contains(name)) {
-            compoundShader paths = shaderPaths->at(name);
-            addShader(name, *loadShaderFile(paths));
-        } else {
-            return Shader::getDefault(); //todo don't insert default, manifest may be overridden at runtime (future feature)
-        }
+            addShader(name, *loadShaderFile(shaderPaths->at(name)));
+        } else return Shader::getDefault();
     }
     return shaders->at(name);
 }
@@ -84,17 +89,32 @@ Shader* AssetManager::getShader(const string& name) {
 Mesh* AssetManager::getMesh(const string& name) {
     if (!meshes->contains(name)) {
         if (meshPaths->contains(name)) {
-            addMesh(name, meshPaths->at(name));
+            addMesh(name, *loadMeshFile(meshPaths->at(name)));
         } else return Mesh::getDefault();
     }
     return meshes->at(name);
 }
 
 Texture* AssetManager::getTexture(const string& name) {
+    return nullptr;
     if (!textures->contains(name)) {
         if (texturePaths->contains(name)) {
             addTexture(name, texturePaths->at(name));
         } else return nullptr; //todo texture
     }
     return textures->at(name);
+}
+
+AssetManager::~AssetManager() {
+    for (const auto& shader: *shaders) {
+        delete shader.second;
+    }
+    delete shaders;
+    delete Shader::getDefault();
+
+    for (const auto& mesh: *meshes) {
+        delete mesh.second;
+    }
+    delete meshes;
+    delete Mesh::getDefault();
 }

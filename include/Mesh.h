@@ -10,7 +10,7 @@
 #include "glm/glm.hpp"
 #include "graphics.h"
 
-struct Vertex { //todo don't use unions?
+struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texUV;
@@ -31,12 +31,14 @@ private:
      * 14 - 17 = camera transforms
      * 18 - 21 = perspective transforms
      */
-    GLuint vao, vbo, ebo;
+    GLuint vao=0, vbo=0, ebo=0;
 
 public:
     static Mesh* getDefault();
 
     Mesh(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices);
+
+    virtual ~Mesh();
 
     Mesh* build();
 };

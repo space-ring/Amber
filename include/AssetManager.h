@@ -25,6 +25,10 @@ private: //todo const maps?
 public:
     AssetManager();
 
+    virtual ~AssetManager();
+
+    void buildAll();
+
     void addManifest(const string& manifest);
 
     void addShader(const string& name, const compoundShader& paths);

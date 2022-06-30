@@ -12,7 +12,7 @@
 #include "Frame.h"
 #include "Mesh.h"
 #include "Model.h"
-#include "CaptureMethod.h"
+#include "variadic.h"
 
 using id = unsigned long;
 
@@ -33,8 +33,6 @@ public:
     void removeCamera(id index);
 
     void removeLight(id index);
-
-    Frame* capture(id camera, CaptureMethod& method);
 };
 
 

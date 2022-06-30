@@ -5,7 +5,6 @@
 #ifndef ENGINE_SHADER_H
 #define ENGINE_SHADER_H
 
-
 #include <string>
 #include "graphics.h"
 
@@ -26,7 +25,7 @@ class Shader {
 private:
     static Shader* DEFAULT;
 
-    compoundShader* sources; //todo delete
+    compoundShader* sources;
 
     GLuint program = 0,
             vertex = 0,

@@ -7,7 +7,7 @@
 
 //#define GLFW_DLL
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #endif //ENGINE_GRAPHICS_H

@@ -49,8 +49,7 @@ Mesh* Mesh::DEFAULT = nullptr;
 
 Mesh::Mesh(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices)
         : vertices(*vertices),
-          indices(*indices),
-          vao(0), vbo(0), ebo(0) {
+          indices(*indices) {
 }
 
 Mesh* Mesh::getDefault() {
@@ -90,5 +89,11 @@ Mesh* Mesh::build() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     return this;
+}
+
+Mesh::~Mesh() {
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 }
 

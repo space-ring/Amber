@@ -72,7 +72,7 @@ string DEFAULT_FRAGMENT =
 
 Shader* Shader::DEFAULT = nullptr;
 
-Shader* Shader::getDefault() { //todo check for GL context
+Shader* Shader::getDefault() { //todo upcast for GL context
     if (!DEFAULT) {
         compoundShader defaultSources{DEFAULT_VERTEX, DEFAULT_FRAGMENT};
         DEFAULT = loadShader(defaultSources);
@@ -98,6 +98,7 @@ Shader::~Shader() {
     glDeleteShader(geometry);
     glDeleteShader(fragment);
     glDeleteShader(compute);
+    delete sources;
 }
 
 void Shader::start() {

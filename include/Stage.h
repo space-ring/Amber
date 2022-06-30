@@ -9,27 +9,37 @@
 #include <string>
 #include "event.h"
 #include <list>
+#include <queue>
+#include <map>
 
 class Stage {
     using string = std::string;
+    template<class T>
+    using vector = std::vector<T>;
+
 private:
-    static Stage* mainStage;
     string name;
     int x, y, width, height;
-    GLFWwindow* window;
+    GLFWwindow* window = nullptr;
+    bool focused;
 
     //handlers
-    std::list<context_event::focusHandler>* onFocusHandlers;
-    std::list<context_event::enterHandler>* onEnterHandlers;
-    std::list<context_event::keyHandler>* onKeyHandlers;
-    std::list<context_event::charHandler>* onCharHandlers;
-    std::list<context_event::clickHandler>* onClickHandlers;
-    std::list<context_event::scrollHandler>* onScrollHandlers;
-    std::list<context_event::motionHandler>* onMotionHandlers;
+    std::map<
+            long,
+            vector<window_event::GenericHandler>*
+    >* handlers = new std::map<
+            long,
+            vector<window_event::GenericHandler>*
+    >;
 
     void render();
 
+    void poll();
+
+    void update();
+
 public:
+
     Stage(const string& name, int x, int y, int width, int height);
 
     virtual ~Stage();
@@ -48,51 +58,44 @@ public:
 
     GLFWwindow* getWindow() const;
 
-    // add events
-    void addOnStageFocus(context_event::focusHandler handler);
+    // add any handler
+    template<class T>
+    void addHandler(const window_event::EventHandler<T>& handler) {
+        if (!handlers->contains(handler.type)) {
+            handlers->insert(std::pair(handler.type, new vector<window_event::GenericHandler>));
+        }
+        auto* list = handlers->at(handler.type);
+        //upcast to change template parameter (T is any here)
+        list->push_back(window_event::GenericHandler::upcast(handler));
+    }
 
-    void addOnStageEnter(context_event::enterHandler handler);
+    void clearHandlers(long id);
 
-    void addOnKey(context_event::keyHandler handler);
+    // call any handler
+    /*
+     * handler is GenericHandler so event parameter enforces T:Event
+     * although handler(event) below enforces T:Event, keep template to find id.
+     * todo unless events hold id and handlers reference them
+     * using static cast to avoid accidental overheads
+     */
+    template<class T>
+    void onEvent(const T& event) {
+        long id = window_event::EventHandler<T>::type;
+        if (!handlers->contains(id)) return;
+        for (auto& handler: *handlers->at(id)) {
+            handler(static_cast<const window_event::Event&>(event));
+        }
+    }
 
-    void addOnChar(context_event::charHandler handler);
-
-    void addOnClick(context_event::clickHandler handler);
-
-    void addOnScroll(context_event::scrollHandler handler);
-
-    void addOnMotion(context_event::motionHandler handler);
-
-    // clear events
-    void clearOnFocus();
-
-    void clearOnEnter();
-
-    void clearOnKey();
-
-    void clearOnChar();
-
-    void clearOnClick();
-
-    void clearOnScroll();
-
-    void clearOnMotion();
-
-    // on events
-    static void onFocus(GLFWwindow* window, int focused);
-
-    static void onEnter(GLFWwindow* window, int entered);
-
-    static void onKey(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-    static void onChar(GLFWwindow* window, unsigned int codepoint);
-
-    static void onClick(GLFWwindow* window, int button, int action, int mods);
-
-    static void onScroll(GLFWwindow* window, double xoffset, double yoffset);
-
-    static void onMotion(GLFWwindow* window, double xpos, double ypos);
-
+    /*
+     * call to onEvent enforces T:Event
+     * using static cast to avoid accidental overheads
+     */
+    template<class T, class... Args>
+    static void onGLFWevent(GLFWwindow* window, Args... args) {
+        auto* stage = static_cast<Stage*>(glfwGetWindowUserPointer(window));
+        stage->template onEvent(static_cast<const window_event::Event&>(T(window, args...)));
+    }
 };
 
 

@@ -14,11 +14,15 @@
 #include "Texture.h"
 #include "AssetManager.h"
 #include <thread>
+#include <mutex>
+#include <queue>
 
 //todo default members for resources (vao = 0, etc)
-//todo initialise members that don't depend on constructor in class declaration
+//todo initialise members that don't depend on constructor in class declaration ^^^
 //todo use references instead of pointers
 //todo circular dependencies with IO
+//todo make everything public?
+
 class Engine {
     using string = std::string;
 
@@ -26,10 +30,12 @@ private:
     std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
     bool running = false;
     Scene* frontScene = nullptr;
+    Stage* stage = nullptr;
+    std::mutex Qmutex;
 
     void init();
 
-    Stage* stage;
+
 
 public:
 
@@ -56,7 +62,8 @@ public:
 
     Scene* getFront();
 
-};
+    const std::mutex& getQmutex() const;
 
+};
 
 #endif //ENGINE_ENGINE_H

@@ -5,6 +5,12 @@
 #ifndef ENGINE_TEXTURE_H
 #define ENGINE_TEXTURE_H
 
+#include "graphics.h"
+
+enum SupportedTextures {
+    TEXTURE_2D = GL_TEXTURE_2D
+};
+
 
 class Texture {
 
