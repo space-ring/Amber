@@ -29,27 +29,17 @@ namespace window_event {
 
     struct Event {
         const GLFWwindow* window;
-
-        Event(const GLFWwindow* window);
-
-        virtual ~Event() = default;
     };
 
     struct EnterEvent : Event {
         const int entered;
-
-        EnterEvent(const GLFWwindow* window, int entered);
     };
 
     struct FocusEvent : Event {
         const int focused;
-
-        FocusEvent(const GLFWwindow* window, int focused);
     };
 
     struct CloseEvent : Event {
-
-        explicit CloseEvent(const GLFWwindow* window);
     };
 
     struct KeyEvent : Event {
@@ -57,63 +47,59 @@ namespace window_event {
         const int scancode;
         const int action;
         const int mods;
-
-        KeyEvent(const GLFWwindow* window, int key, int scancode, int action, int mods);
     };
 
     struct CharEvent : Event {
         const unsigned int codepoint;
-
-        CharEvent(const GLFWwindow* window, unsigned int codepoint);
     };
 
     struct MotionEvent : Event {
         const double xpos;
         const double ypos;
-
-        MotionEvent(const GLFWwindow* window, double xpos, double ypos);
     };
 
     struct ClickEvent : Event {
         const int button;
         const int action;
         const int mods;
-
-        ClickEvent(const GLFWwindow* window, int button, int action, int mods);
-
     };
 
     struct ScrollEvent : Event {
         const double xoffset;
         const double yoffset;
-
-        ScrollEvent(const GLFWwindow* window, double xoffset, double yoffset);
     };
 
     //todo joystick, gamepad
 
     //handlers
     template<class T>
-    class EventHandler : public Variadic<void, const Event&> {
+    class EventHandler {
         typedef std::function<void(const Event&)> base_handler;
         typedef std::function<void(const T&)> derived_handler;
 
+        const derived_handler function;
+
     public:
         static const long type;
+        bool active{true};
 
         static base_handler upcast(const derived_handler& handler, Event* p = nullptr) {
             return [handler](const Event& event) -> void {
-                handler(static_cast<const T&>(event)); //downcast for call
+                handler(static_cast<const T&>(event)); //downcast for call, static since inh checked already
             };
         }
 
-        EventHandler(const derived_handler& handler) :
-                Variadic<void, const Event&>(
-                        upcast(handler, static_cast<T*>(nullptr)) //check T : Event
+        static const derived_handler& check(const derived_handler& h, Event* p = nullptr) {
+            return h;
+        }
+
+        explicit EventHandler(const derived_handler& handler) :
+                function(
+                        check(handler, static_cast<T*>(nullptr)) //check T : Event
                 ) {
         }
 
-        void operator()(const Event& event) override {
+        void operator()(const T& event) {
             function(event); //todo upcast if commenting this function throws error (return void)
         }
     };
@@ -131,7 +117,6 @@ namespace window_event {
     using MotionHandler = EventHandler<MotionEvent>;
     using ClickHandler = EventHandler<ClickEvent>;
     using ScrollHandler = EventHandler<ScrollEvent>;
-
 }
 
 #endif //ENGINE_EVENT_H

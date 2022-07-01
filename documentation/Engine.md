@@ -1,7 +1,9 @@
 # Engine
 
-Distributed as a static library.  
-Contains GLFW.
+A lightweight wrapper for GLFW.
 
-Talk about engine object, how to run, etc
+Composed of components:
+- [Assets](./AssetManager.md)
+- [Events](./EventManager.md)
 
+Later development seeks to allow sharing of components between Engine instances.

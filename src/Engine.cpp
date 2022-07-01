@@ -7,6 +7,8 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "engineIO.h"
+#include "Stage.h"
+#include "managers.h"
 
 void Engine::run() {
     init();
@@ -32,7 +34,9 @@ void Engine::init() {
 }
 
 Engine::Engine(const string& name, int x, int y, int width, int height) :
-        stage(new Stage(name, x, y, width, height)) {
+        assets(new AssetManager()),
+        events(new EventManager()),
+        stage(new Stage(this, name, x, y, width, height)) {
 }
 
 Engine::~Engine() {
@@ -40,10 +44,11 @@ Engine::~Engine() {
     kill();
 }
 
-void Engine::kill() {
+void Engine::kill() { //todo this is wrong
     if (!running) return;
     running = false;
     delete assets;
+    delete events;
     stage->terminate();
     delete stage;
 }
@@ -62,8 +67,4 @@ void Engine::addScene(const string& id, Scene* scene) {
 
 Scene* Engine::getFront() {
     return frontScene;
-}
-
-const std::mutex& Engine::getQmutex() const {
-    return Qmutex;
 }

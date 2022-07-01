@@ -4,11 +4,12 @@
 
 #include "Stage.h"
 #include "graphics.h"
+#include "EventManager.h"
 #include <iostream>
 #include <ctime>
 
-Stage::Stage(const string& name, int x, int y, int width, int height)
-        : name(name), x(x), y(y), width(width), height(height) {
+Stage::Stage(Engine* root, const string& name, int x, int y, int width, int height)
+        : root(root), name(name), x(x), y(y), width(width), height(height) {
 }
 
 void Stage::run() {
@@ -56,17 +57,17 @@ void Stage::init() {
     glfwSwapInterval(1);
     printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
-    glfwSetWindowUserPointer(window, this);
+    glfwSetWindowUserPointer(window, root);
 
     //events
-    glfwSetCursorEnterCallback(window, onGLFWevent<window_event::EnterEvent, int>);
-    glfwSetWindowCloseCallback(window, onGLFWevent<window_event::CloseEvent>);
-    glfwSetWindowFocusCallback(window, onGLFWevent<window_event::FocusEvent, int>);
-    glfwSetKeyCallback(window, onGLFWevent<window_event::KeyEvent, int, int, int, int>);
-    glfwSetCharCallback(window, onGLFWevent<window_event::CharEvent, unsigned int>);
-    glfwSetMouseButtonCallback(window, onGLFWevent<window_event::ClickEvent, int, int, int>);
-    glfwSetScrollCallback(window, onGLFWevent<window_event::ScrollEvent, double, double>);
-    glfwSetCursorPosCallback(window, onGLFWevent<window_event::MotionEvent, double, double>);
+    glfwSetCursorEnterCallback(window, EventManager::onGLFWevent<window_event::EnterEvent, int>);
+    glfwSetWindowCloseCallback(window, EventManager::onGLFWevent<window_event::CloseEvent>);
+    glfwSetWindowFocusCallback(window, EventManager::onGLFWevent<window_event::FocusEvent, int>);
+    glfwSetKeyCallback(window, EventManager::onGLFWevent<window_event::KeyEvent, int, int, int, int>);
+    glfwSetCharCallback(window, EventManager::onGLFWevent<window_event::CharEvent, unsigned int>);
+    glfwSetMouseButtonCallback(window, EventManager::onGLFWevent<window_event::ClickEvent, int, int, int>);
+    glfwSetScrollCallback(window, EventManager::onGLFWevent<window_event::ScrollEvent, double, double>);
+    glfwSetCursorPosCallback(window, EventManager::onGLFWevent<window_event::MotionEvent, double, double>);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -96,20 +97,9 @@ void Stage::hide() {
 }
 
 Stage::~Stage() {
-    for (auto& vector: *handlers) {
-        vector.second->clear();
-        delete vector.second;
-    }
-    delete handlers;
 }
 
 GLFWwindow* Stage::getWindow() const {
     return window;
-}
-
-void Stage::clearHandlers(long id) {
-    if (handlers->contains(id)) {
-        handlers->at(id)->clear();
-    }
 }
 

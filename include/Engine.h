@@ -6,13 +6,11 @@
 #define ENGINE_ENGINE_H
 
 #include <map>
-#include "Stage.h"
 #include "Scene.h"
 #include "graphics.h"
 #include "Shader.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "AssetManager.h"
 #include <thread>
 #include <mutex>
 #include <queue>
@@ -23,28 +21,28 @@
 //todo circular dependencies with IO
 //todo make everything public?
 
+class Stage;
+
+class EventManager;
+
+class AssetManager;
+
 class Engine {
     using string = std::string;
 
 private:
     std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
     bool running = false;
-    Scene* frontScene = nullptr;
-    Stage* stage = nullptr;
-    std::mutex Qmutex;
+    Scene* frontScene;
+    Stage* stage;
 
     void init();
 
-
-
 public:
-
-    AssetManager* assets = new AssetManager();
+    AssetManager* assets;
+    EventManager* events;
 
     Engine(const string& name, int x, int y, int width, int height);
-
-    /* Make callable for thread launching */
-//    void operator()(const string& manifest = "");
 
     virtual ~Engine();
 
@@ -61,8 +59,6 @@ public:
     void addScene(const string& id, Scene* scene);
 
     Scene* getFront();
-
-    const std::mutex& getQmutex() const;
 
 };
 
