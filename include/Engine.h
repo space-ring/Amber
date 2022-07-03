@@ -20,6 +20,7 @@
 //todo use references instead of pointers
 //todo circular dependencies with IO
 //todo make everything public?
+//todo singleton engine?
 
 class Stage;
 
@@ -31,9 +32,7 @@ class Engine {
     using string = std::string;
 
 private:
-    std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
     bool running = false;
-    Scene* frontScene;
     Stage* stage;
 
     void init();
@@ -53,12 +52,6 @@ public:
     void kill();
 
     Stage* getStage() const;
-
-    Scene* getFrontScene();
-
-    void addScene(const string& id, Scene* scene);
-
-    Scene* getFront();
 
 };
 

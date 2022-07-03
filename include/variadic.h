@@ -7,38 +7,20 @@
 
 #include <functional>
 
-//template<class Return, class... Args>
-//struct variadic {
-//    const std::function<Return(Args...)> render;
-//
-//    variadic(const std::function<Return(Args...)>& render) : render(render) {}
-//
-//    Return operator()(Args... args) { if (active) return render(args...); }
-//
-//    bool active{true};
-//};
-
-template<class Return, class... Args>
+template<class Derived, class Return, class... Args>
 class Variadic {
+    friend Derived;
+    using f = std::function<Return(Args...)>;
+
+    Variadic(const f& function) : function(function) {}
+
 protected:
-    const std::function<Return(Args...)> function;
+    const f function;
+
 public:
-    bool active{true};
-
-    Variadic(const std::function<Return(Args...)>& function) : function(function) {}
-
-    virtual Return operator()(Args... args) { if (active) return function(args...); };
+    Return operator()(Args... args) {
+        return static_cast<Derived*>(this)->call(args...);
+    }
 };
-//template<class... Args>
-//using renderMethod = variadic<void, Args...>;
-//
-//template<class Return, class... Args>
-//using eventHandler = variadic<Return, Args...>;
-
-//template<class Return, class... Args>
-//Return variadic<Return, Args...>::operator()(Args... args) { return render(args...); }
-//
-//template<class Return, class... Args>
-//variadic<Return, Args...>::variadic(const std::function<Return(Args...)>& render):render(render) {}
 
 #endif //ENGINE_VARIADIC_H

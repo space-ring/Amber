@@ -21,12 +21,12 @@ public:
     // add any handler
     template<class T>
     void addHandler(const window_event::EventHandler<T>& handler) {
-        if (!handlers->contains(handler.type)) {
+        if (!handlers->contains(handler.type))
             handlers->insert(std::pair(handler.type, new std::vector<window_event::GenericHandler>));
-        }
+
         auto* list = handlers->at(handler.type);
         //upcast to change template parameter (T is any here)
-        list->push_back(window_event::EventHandler(window_event::EventHandler<T>::upcast(handler)));
+        list->push_back(window_event::EventHandler<T>::upcast(handler));
     }
 
     void clearHandlers(long id);
@@ -35,21 +35,20 @@ public:
     /*
      * handler is GenericHandler so event parameter enforces T:Event
      * although handler(event) below enforces T:Event, keep template to find id.
+     * handler call is coerced (compile time)
      * todo unless events hold id and handlers reference them
-     * using static cast to avoid possible overheads (todo check)
      */
     template<class T>
     void onEvent(const T& event) {
         long id = window_event::EventHandler<T>::type;
         if (!handlers->contains(id)) return;
         for (auto& handler: *handlers->at(id)) {
-            handler((event));
+            handler(event);
         }
     }
 
     /*
      * call to onEvent enforces T:Event
-     * can't cast here before id is resolved in onEvent<T>
      */
     template<class T, class... Args>
     static void onGLFWevent(GLFWwindow* window, Args... args) {

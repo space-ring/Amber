@@ -31,7 +31,7 @@ private:
      * 14 - 17 = camera transforms
      * 18 - 21 = perspective transforms
      */
-    GLuint vao=0, vbo=0, ebo=0;
+    GLuint vao{0}, vbo{0}, ebo{0};
 
 public:
     static Mesh* getDefault();

@@ -79,23 +79,24 @@ namespace window_event {
 
         const derived_handler function;
 
+        static const derived_handler& check(const derived_handler& h) {
+            Event* p = static_cast<T*>(nullptr);
+            return h;
+        }
+
     public:
         static const long type;
         bool active{true};
 
-        static base_handler upcast(const derived_handler& handler, Event* p = nullptr) {
+        static base_handler upcast(const derived_handler& handler) { // existence of handler already checks T : Event
             return [handler](const Event& event) -> void {
                 handler(static_cast<const T&>(event)); //downcast for call, static since inh checked already
             };
         }
 
-        static const derived_handler& check(const derived_handler& h, Event* p = nullptr) {
-            return h;
-        }
-
-        explicit EventHandler(const derived_handler& handler) :
+        EventHandler(const derived_handler& handler) :
                 function(
-                        check(handler, static_cast<T*>(nullptr)) //check T : Event
+                        check(handler) //check T : Event
                 ) {
         }
 

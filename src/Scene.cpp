@@ -4,17 +4,18 @@
 
 #include "Scene.h"
 
-Scene::Scene() {}
+using id = unsigned long;
+using string = std::string;
 
 id Scene::addCamera(Camera* camera) {
     static id index = 0;
-    cameras->insert(std::pair<id, Camera*>(index, camera));
+    cameras->insert(std::pair(index, camera));
     return index++;
 }
 
 id Scene::addLight(Light* light) {
     static id index = 0;
-    lights->insert(std::pair<id, Light*>(index, light));
+    lights->insert(std::pair(index, light));
     return index++;
 }
 
@@ -24,5 +25,13 @@ void Scene::removeCamera(id index) {
 
 void Scene::removeLight(id index) {
     lights->erase(index);
+}
+
+Scene::~Scene() {
+    cameras->clear();
+    lights->clear();
+    delete cameras;
+    delete lights;
+    delete models;
 }
 

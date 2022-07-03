@@ -7,8 +7,6 @@
 
 
 class Frame {
-
 };
-
 
 #endif //ENGINE_FRAME_H

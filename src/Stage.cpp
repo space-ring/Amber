@@ -12,28 +12,6 @@ Stage::Stage(Engine* root, const string& name, int x, int y, int width, int heig
         : root(root), name(name), x(x), y(y), width(width), height(height) {
 }
 
-void Stage::run() {
-    std::time_t start = std::time(nullptr);
-    int frames = 0;
-
-    while (!glfwWindowShouldClose(window)) {
-        poll();
-        render();
-
-        ++frames;
-        std::time_t now = std::time(nullptr);
-        if (std::difftime(now, start) > 1 / 2) { //todo what is going on here
-            std::cout << frames << std::endl;
-            frames = 0;
-            start = std::time(nullptr);
-        }
-    }
-}
-
-void Stage::terminate() {
-    glfwTerminate();
-}
-
 void Stage::init() {
     // set up GL context
     if (!glfwInit()) {
@@ -75,6 +53,7 @@ void Stage::init() {
 
 void Stage::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (front) front->render();
     glfwSwapBuffers(window);
 }
 
@@ -97,9 +76,22 @@ void Stage::hide() {
 }
 
 Stage::~Stage() {
+    for (auto& scene: *scenes) {
+        delete scene.second;
+    }
+    delete scenes;
+    glfwTerminate();
 }
 
 GLFWwindow* Stage::getWindow() const {
     return window;
+}
+
+void Stage::addScene(const string& id, Scene* scene) {
+    scenes->insert(std::pair(id, scene));
+}
+
+void Stage::setFrontScene(const string& scene) {
+    if (scenes->contains(scene)) front = scenes->at(scene);
 }
 

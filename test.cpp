@@ -4,6 +4,7 @@
 #include "event.h"
 #include "Stage.h"
 #include "managers.h"
+#include "rendering.h"
 
 //todo use glfw library instead of sources (for this test.exe)
 
@@ -23,19 +24,16 @@ int main() {
             [&](const window_event::FocusEvent& e) {
                 g = (float) e.focused;
                 glClearColor(r, g, b, a);
-                engine->getStage()->focused = e.focused;
             }
     );
-
     engine->assets->addManifest("test/manifest");
-
-    engine->events->onEvent(window_event::EnterEvent{0, 10});
 
     engine->events->addHandler(h1);
     engine->events->addHandler(h2);
 
     std::thread t([](Engine* engine) {
         engine->run();
+        delete engine; //GL context exists only in this thread
     }, engine);
 
     /*
@@ -45,6 +43,5 @@ int main() {
 
     // program close
     t.join();
-    delete engine;
     return 0;
 }

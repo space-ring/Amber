@@ -15,20 +15,14 @@
 
 class Stage {
     using string = std::string;
-    template<class T>
-    using vector = std::vector<T>;
 
 private:
     Engine* root;
     string name;
     int x, y, width, height;
     GLFWwindow* window = nullptr;
-
-    void render();
-
-    void poll();
-
-    void update();
+    std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
+    Scene* front = nullptr;
 
 public:
 
@@ -41,16 +35,21 @@ public:
     /* Initialises GLFW window and OpenGL context */
     void init();
 
-    /* Enters the main render loop */
-    void run();
+    void render();
 
-    void terminate();
+    void poll();
+
+    void update();
 
     void show();
 
     void hide();
 
     GLFWwindow* getWindow() const;
+
+    void addScene(const string& id, Scene* scene);
+
+    void setFrontScene(const string& scene);
 
 };
 
