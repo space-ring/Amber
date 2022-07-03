@@ -13,15 +13,15 @@ int main() {
 
     float r{0}, b{0}, g{0}, a{1};
 
-    window_event::EnterHandler h1(
-            [&](const window_event::EnterEvent& event) {
+    window_events::EnterHandler h1(
+            [&](const window_events::EnterEvent& event) {
                 r = (float) event.entered;
                 glClearColor(r, g, b, a);
             }
     );
 
-    window_event::FocusHandler h2(
-            [&](const window_event::FocusEvent& e) {
+    window_events::FocusHandler h2(
+            [&](const window_events::FocusEvent& e) {
                 g = (float) e.focused;
                 glClearColor(r, g, b, a);
             }

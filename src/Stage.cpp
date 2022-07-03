@@ -38,14 +38,14 @@ void Stage::init() {
     glfwSetWindowUserPointer(window, root);
 
     //events
-    glfwSetCursorEnterCallback(window, EventManager::onGLFWevent<window_event::EnterEvent, int>);
-    glfwSetWindowCloseCallback(window, EventManager::onGLFWevent<window_event::CloseEvent>);
-    glfwSetWindowFocusCallback(window, EventManager::onGLFWevent<window_event::FocusEvent, int>);
-    glfwSetKeyCallback(window, EventManager::onGLFWevent<window_event::KeyEvent, int, int, int, int>);
-    glfwSetCharCallback(window, EventManager::onGLFWevent<window_event::CharEvent, unsigned int>);
-    glfwSetMouseButtonCallback(window, EventManager::onGLFWevent<window_event::ClickEvent, int, int, int>);
-    glfwSetScrollCallback(window, EventManager::onGLFWevent<window_event::ScrollEvent, double, double>);
-    glfwSetCursorPosCallback(window, EventManager::onGLFWevent<window_event::MotionEvent, double, double>);
+    glfwSetCursorEnterCallback(window, EventManager::onGLFWevent<window_events::EnterEvent, int>);
+    glfwSetWindowCloseCallback(window, EventManager::onGLFWevent<window_events::CloseEvent>);
+    glfwSetWindowFocusCallback(window, EventManager::onGLFWevent<window_events::FocusEvent, int>);
+    glfwSetKeyCallback(window, EventManager::onGLFWevent<window_events::KeyEvent, int, int, int, int>);
+    glfwSetCharCallback(window, EventManager::onGLFWevent<window_events::CharEvent, unsigned int>);
+    glfwSetMouseButtonCallback(window, EventManager::onGLFWevent<window_events::ClickEvent, int, int, int>);
+    glfwSetScrollCallback(window, EventManager::onGLFWevent<window_events::ScrollEvent, double, double>);
+    glfwSetCursorPosCallback(window, EventManager::onGLFWevent<window_events::MotionEvent, double, double>);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

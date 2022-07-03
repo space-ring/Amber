@@ -15,10 +15,10 @@ void Engine::init() {
     stage->show();
 //    assets->buildAll();
     events->addHandler(
-            window_event::CloseHandler([&](const window_event::CloseEvent&) { running = false; })
+            window_events::CloseHandler([&](const window_events::CloseEvent&) { running = false; })
     );
     events->addHandler(
-            window_event::FocusHandler([&](const window_event::FocusEvent& e) { stage->focused = e.focused; })
+            window_events::FocusHandler([&](const window_events::FocusEvent& e) { stage->focused = e.focused; })
     );
 }
 

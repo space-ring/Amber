@@ -11,7 +11,7 @@
 #include "Engine.h"
 
 class EventManager {
-    using handlerMap = std::map<long, std::vector<window_event::GenericHandler>*>;
+    using handlerMap = std::map<long, std::vector<window_events::GenericHandler>*>;
     handlerMap* handlers = new handlerMap;
 
 public:
@@ -20,13 +20,13 @@ public:
 public:
     // add any handler
     template<class T>
-    void addHandler(const window_event::EventHandler<T>& handler) {
+    void addHandler(const window_events::EventHandler<T>& handler) {
         if (!handlers->contains(handler.type))
-            handlers->insert(std::pair(handler.type, new std::vector<window_event::GenericHandler>));
+            handlers->insert(std::pair(handler.type, new std::vector<window_events::GenericHandler>));
 
         auto* list = handlers->at(handler.type);
         //upcast to change template parameter (T is any here)
-        list->push_back(window_event::EventHandler<T>::upcast(handler));
+        list->push_back(window_events::EventHandler<T>::upcast(handler));
     }
 
     void clearHandlers(long id);
@@ -40,7 +40,7 @@ public:
      */
     template<class T>
     void onEvent(const T& event) {
-        long id = window_event::EventHandler<T>::type;
+        long id = window_events::EventHandler<T>::type;
         if (!handlers->contains(id)) return;
         for (auto& handler: *handlers->at(id)) {
             handler(event);

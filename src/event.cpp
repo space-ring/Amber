@@ -4,6 +4,4 @@
 
 #include "event.h"
 
-namespace window_event {
-    long handler_counter = 0;
-}
+long handler_counter = 0;
