@@ -6,18 +6,18 @@
 #define ENGINE_EVENT_H
 
 #include "graphics.h"
-#include "variadic.h"
 #include  <iostream>
+#include <functional>
 
-template<class Event, class T>
+template<class BaseEvent, class DerivedEvent>
 class EventHandler {
-    typedef std::function<void(const Event&)> base_handler;
-    typedef std::function<void(const T&)> derived_handler;
+    typedef std::function<void(const BaseEvent&)> base_handler;
+    typedef std::function<void(const DerivedEvent&)> derived_handler;
 
     const derived_handler function;
 
     static const derived_handler& check(const derived_handler& h) {
-        Event* p = static_cast<T*>(nullptr);
+        BaseEvent* p = static_cast<DerivedEvent*>(nullptr); //check DerivedEvent : BaseEvent
         return h;
     }
 
@@ -25,20 +25,22 @@ public:
     static const long type;
     bool active{true};
 
-    static base_handler upcast(const derived_handler& handler) { // existence of handler already checks T : Event
-        return [handler](const Event& event) -> void {
-            handler(static_cast<const T&>(event)); //downcast for call, static since inh checked already
+    //todo this upcast allows onEvent(A) where B is expected (A:C, B:C). find another implementation
+    static base_handler
+    upcast(const derived_handler& handler) { // existence of handler already checks DerivedEvent : BaseEvent
+        return [handler](const BaseEvent& event) -> void {
+            handler(static_cast<const DerivedEvent&>(event)); //downcast for call, static since inh checked already
         };
     }
 
     EventHandler(const derived_handler& handler) :
             function(
-                    check(handler) //check T : Event
+                    check(handler) //check DerivedEvent : BaseEvent
             ) {
     }
 
-    void operator()(const T& event) {
-        function(event); //todo upcast if commenting this function throws error (return void)
+    void operator()(const DerivedEvent& event) {
+        function(event);
     }
 };
 
@@ -55,7 +57,7 @@ namespace scene_events { //todo scene events
 
     };
 
-    template <class T>
+    template<class T>
     using EventHandler = EventHandler<Event, T>;
     using EnterHandler = EventHandler<EnterEvent>;
 
@@ -74,7 +76,7 @@ namespace window_events {
         MOTION
     };
 
-    struct Event {
+    struct Event { //todo remove list init because it allows incomplete init
         const GLFWwindow* window;
     };
 
@@ -119,7 +121,8 @@ namespace window_events {
     //todo joystick, gamepad
 
     template<class T>
-    using EventHandler = ::EventHandler<Event, T>;
+    using EventHandler = EventHandler<Event, T>;
+
     using GenericHandler = EventHandler<Event>;
     using EnterHandler = EventHandler<EnterEvent>;
     using FocusHandler = EventHandler<FocusEvent>;

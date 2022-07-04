@@ -25,7 +25,7 @@ public:
             handlers->insert(std::pair(handler.type, new std::vector<window_events::GenericHandler>));
 
         auto* list = handlers->at(handler.type);
-        //upcast to change template parameter (T is any here)
+        //upcast to change template parameter (DerivedEvent is any here)
         list->push_back(window_events::EventHandler<T>::upcast(handler));
     }
 
@@ -33,8 +33,8 @@ public:
 
     // call any handler
     /*
-     * handler is GenericHandler so event parameter enforces T:Event
-     * although handler(event) below enforces T:Event, keep template to find id.
+     * handler is GenericHandler so event parameter enforces DerivedEvent:BaseEvent
+     * although handler(event) below enforces DerivedEvent:BaseEvent, keep template to find id.
      * handler call is coerced (compile time)
      * todo unless events hold id and handlers reference them
      */
@@ -48,7 +48,7 @@ public:
     }
 
     /*
-     * call to onEvent enforces T:Event
+     * call to onEvent enforces DerivedEvent:BaseEvent
      */
     template<class T, class... Args>
     static void onGLFWevent(GLFWwindow* window, Args... args) {

@@ -8,11 +8,27 @@
 
 //todo use glfw library instead of sources (for this test.exe)
 
+
+struct C {
+    int p;
+};
+
+struct A : C {
+    int check;
+};
+struct B : C {
+    float none;
+};
+
+void call(const A& a) {
+    std::cout << a.check << std::endl;
+}
+
 int main() {
     auto* engine = new Engine("Engine", 710, 100, 500, 500);
 
     float r{0}, b{0}, g{0}, a{1};
-
+    
     window_events::EnterHandler h1(
             [&](const window_events::EnterEvent& event) {
                 r = (float) event.entered;
