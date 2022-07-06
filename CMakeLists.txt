@@ -7,7 +7,7 @@ SET(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_CXX_FLAGS "-static")
 
-file(GLOB sources "src/*.cpp" "deps/glad/src/glad.c")
+file(GLOB sources "src/*.cpp" "test/*.cpp" "deps/glad/src/glad.c")
 
 add_library(Engine STATIC ${sources} include/maths.h)
 add_executable(Test ${sources} test.cpp)

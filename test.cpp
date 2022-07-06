@@ -28,7 +28,7 @@ int main() {
     auto* engine = new Engine("Engine", 710, 100, 500, 500);
 
     float r{0}, b{0}, g{0}, a{1};
-    
+
     window_events::EnterHandler h1(
             [&](const window_events::EnterEvent& event) {
                 r = (float) event.entered;
@@ -46,6 +46,20 @@ int main() {
 
     engine->events->addHandler(h1);
     engine->events->addHandler(h2);
+
+    scene_events::EnterHandler s1(
+            [](const scene_events::EnterEvent&) {
+                int x = 0;
+            }
+    );
+
+    engine->events->addHandler(s1);
+
+    struct C {
+        GLFWwindow* p;
+    };
+
+//    engine->events->onGLFWevent<C>(0);
 
     std::thread t([](Engine* engine) {
         engine->run();

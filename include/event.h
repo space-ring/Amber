@@ -11,7 +11,6 @@
 
 template<class BaseEvent, class DerivedEvent>
 class EventHandler {
-    typedef std::function<void(const BaseEvent&)> base_handler;
     typedef std::function<void(const DerivedEvent&)> derived_handler;
 
     const derived_handler function;
@@ -22,16 +21,7 @@ class EventHandler {
     }
 
 public:
-    static const long type;
     bool active{true};
-
-    //todo this upcast allows onEvent(A) where B is expected (A:C, B:C). find another implementation
-    static base_handler
-    upcast(const derived_handler& handler) { // existence of handler already checks DerivedEvent : BaseEvent
-        return [handler](const BaseEvent& event) -> void {
-            handler(static_cast<const DerivedEvent&>(event)); //downcast for call, static since inh checked already
-        };
-    }
 
     EventHandler(const derived_handler& handler) :
             function(
@@ -43,10 +33,6 @@ public:
         function(event);
     }
 };
-
-extern long handler_counter;
-template<class Event, class T>
-const long EventHandler<Event, T>::type = handler_counter++;
 
 namespace scene_events { //todo scene events
     struct Event {
