@@ -1,2 +1,0 @@
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe qc libEngine.a CMakeFiles/Engine.dir/deps/glad/src/glad.c.obj CMakeFiles/Engine.dir/src/Engine.cpp.obj CMakeFiles/Engine.dir/src/Mesh.cpp.obj CMakeFiles/Engine.dir/src/Scene.cpp.obj CMakeFiles/Engine.dir/src/Shader.cpp.obj CMakeFiles/Engine.dir/src/Stage.cpp.obj CMakeFiles/Engine.dir/src/Texture.cpp.obj CMakeFiles/Engine.dir/src/io.cpp.obj
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ranlib.exe libEngine.a
