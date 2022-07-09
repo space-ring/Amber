@@ -11,44 +11,48 @@
 #include "Engine.h"
 
 class EventManager {
-
-    template<class Base, class Event>
-    using handlerVector = std::vector<EventHandler<Base, Event>>;
-
-    template<class Base, class Event>
-    static handlerVector<Base, Event> handler; //forces singleton EventManager
+    using handlerMap = std::map<long, std::vector<GenericHandler>*>;
+    handlerMap* handlers = new handlerMap;
 
 public:
     // add any handler
-    template<class Base, class Event>
-    void addHandler(const EventHandler<Base, Event>& handler) { //handler forces when Event : Base, no check required
-        EventManager::handler<Base, Event>.push_back(handler);
+    template<class T>
+    void addHandler(const window_events::EventHandler<T>& handler) {
+        if (!handlers->contains(handler.type))
+            handlers->insert(std::pair(handler.type, new std::vector<GenericHandler>));
+
+        auto* list = handlers->at(handler.type);
+        //upcast to change template parameter (T is any here)
+        list->push_back(window_events::EventHandler<T>::upcast(handler));
     }
 
-    template<class Base, class Event>
-    void clearHandlers() {
-        Base* p = static_cast<Event*>(nullptr);
-        EventManager::handler<Base, Event>.clear();
-    }
+    void clearHandlers(long id);
 
     // call any handler
-    template<class Base, class Event>
-    void onEvent(const Event& event) {
-        Base* p = static_cast<Event*>(nullptr);
-        for (EventHandler<Base, Event>& handler: EventManager::handler<Base, Event>) {
+    /*
+     * handler is GenericHandler so event parameter enforces T:Event
+     * although handler(event) below enforces T:Event, keep template to find id.
+     * handler call is coerced (compile time)
+     * todo unless events hold id and handlers reference them
+     */
+    template<class T>
+    void onEvent(const T& event) {
+        long id = window_events::EventHandler<T>::type;
+        if (!handlers->contains(id)) return;
+        for (auto& handler: *handlers->at(id)) {
             handler(event);
         }
     }
 
+    /*
+     * call to onEvent enforces T:Event
+     */
     template<class T, class... Args>
     static void onGLFWevent(GLFWwindow* window, Args... args) {
         auto* p = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-        p->events->template onEvent<window_events::Event, T>(T{window, args...}); //onEvent checks T : window::event
+        p->events->template onEvent(T{window, args...});
     }
 };
-
-template<class Base, class Event>
-std::vector<EventHandler<Base, Event>> EventManager::handler;
 
 
 #endif //ENGINE_EVENTMANAGER_H

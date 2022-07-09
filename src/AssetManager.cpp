@@ -24,8 +24,9 @@ void AssetManager::buildAll() {
 //        texture.second->build();
 //    }
 }
-
-void AssetManager::addManifest(const string& path) {
+//todo batch (name block instead of line)
+//todo manifest includes (also check for circular includes)
+void AssetManager::addManifest(const string& path) { //todo textures
     string manifest = readFile(path);
     if (manifest.empty()) return;
     string line;

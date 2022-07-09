@@ -12,7 +12,7 @@
 #include "light.h"
 #include "Frame.h"
 #include "Mesh.h"
-#include "Model.h"
+#include "ModelTransform.h"
 #include "variadic.h"
 #include "AssetManager.h"
 #include "rendering.h"
@@ -30,10 +30,10 @@ protected:
     std::map<id, Light*>* lights = new std::map<id, Light*>;
     std::map<Mesh*, std::vector<id>*>* instances = new std::map<Mesh*, std::vector<id>*>;
 
-    Model* last_picked = nullptr;
-    Model* dragged = nullptr;
-    Model* primed = nullptr;
-    Model* last_focused = nullptr;
+//    ModelTransform* last_picked = nullptr;
+//    ModelTransform* dragged = nullptr;
+//    ModelTransform* primed = nullptr;
+//    ModelTransform* last_focused = nullptr;
 
     const GenericLens wire = DEFAULT_WIRE;
     const GenericLens picker = DEFAULT_PICKER;

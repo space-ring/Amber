@@ -5,26 +5,30 @@
 #include "Stage.h"
 #include "managers.h"
 #include "rendering.h"
+#include "Model.h"
 
 //todo use glfw library instead of sources (for this test.exe)
 
 
-struct C {
-    int p;
-};
-
-struct A : C {
-    int check;
-};
-struct B : C {
-    float none;
-};
-
-void call(const A& a) {
-    std::cout << a.check << std::endl;
-}
-
 int main() {
+
+    std::vector<Vertex> vertex;
+    std::vector<unsigned int> index;
+
+    Mesh mesh(vertex, index);
+    ModelTransform transform(glm::vec3(10), glm::vec3(0), glm::vec3(1));
+
+    ModelManager manager;
+    Model model(&mesh, transform);
+    model.translate(glm::vec3(10));
+
+    manager.add(model);
+
+    glm::mat4* mat4 = &manager.instances.at(&mesh)->at(0);
+
+    model.setTranslation(glm::vec3(-4));
+    return 0;
+
     auto* engine = new Engine("Engine", 710, 100, 500, 500);
 
     float r{0}, b{0}, g{0}, a{1};
@@ -46,20 +50,6 @@ int main() {
 
     engine->events->addHandler(h1);
     engine->events->addHandler(h2);
-
-    scene_events::EnterHandler s1(
-            [](const scene_events::EnterEvent&) {
-                int x = 0;
-            }
-    );
-
-    engine->events->addHandler(s1);
-
-    struct C {
-        GLFWwindow* p;
-    };
-
-//    engine->events->onGLFWevent<C>(0);
 
     std::thread t([](Engine* engine) {
         engine->run();

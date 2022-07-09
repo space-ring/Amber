@@ -142,7 +142,7 @@ Mesh *loadMesh(const string &mesh) {
             }
         }
     }
-    return new Mesh(&vertices, &indices);
+    return new Mesh(vertices, indices);
 }
 
 Texture *getTextureFile(const string &path, SupportedTextures type) {

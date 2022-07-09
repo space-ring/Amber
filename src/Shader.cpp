@@ -91,6 +91,7 @@ Shader::Shader(compoundShader* sources) : sources(sources) {
 
 Shader::~Shader() {
     //delete gl objects
+    if (!program) return;
     glDeleteProgram(program); // also detaches shaders
     glDeleteShader(vertex);
     glDeleteShader(tessCtrl);

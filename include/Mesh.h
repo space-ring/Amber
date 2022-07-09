@@ -18,7 +18,7 @@ struct Vertex {
 
 class Mesh { //todo destroy
 private:
-    static Mesh* DEFAULT;
+    inline static Mesh* DEFAULT = nullptr;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -31,12 +31,14 @@ private:
      * 14 - 17 = camera transforms
      * 18 - 21 = perspective transforms
      */
-    GLuint vao{0}, vbo{0}, ebo{0};
+    GLuint vao{0},
+            vbo{0},
+            ebo{0};
 
 public:
     static Mesh* getDefault();
 
-    Mesh(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices);
+    Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
 
     virtual ~Mesh();
 

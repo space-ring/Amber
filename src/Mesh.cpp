@@ -45,11 +45,9 @@ std::string DEFAULT_MESH =
         "f 2/13/5 1/1/5 3/4/5 4/5/5\n"
         "f 6/11/6 5/10/6 1/1/6 2/13/6";
 
-Mesh* Mesh::DEFAULT = nullptr;
-
-Mesh::Mesh(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices)
-        : vertices(*vertices),
-          indices(*indices) {
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+        : vertices(vertices),
+          indices(indices) {
 }
 
 Mesh* Mesh::getDefault() {
@@ -92,6 +90,7 @@ Mesh* Mesh::build() {
 }
 
 Mesh::~Mesh() {
+    if (!vao) return;
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);

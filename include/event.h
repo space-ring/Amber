@@ -6,36 +6,57 @@
 #define ENGINE_EVENT_H
 
 #include "graphics.h"
+#include "variadic.h"
 #include  <iostream>
-#include <functional>
 
-template<class BaseEvent, class DerivedEvent>
+struct EngineEvent { //todo list init / constructors ?
+    EngineEvent();
+
+    virtual ~EngineEvent();
+};
+
+template<class T>
 class EventHandler {
-    typedef std::function<void(const DerivedEvent&)> derived_handler;
+    typedef std::function<void(const EngineEvent&)> base_handler;
+    typedef std::function<void(const T&)> derived_handler;
 
     const derived_handler function;
 
     static const derived_handler& check(const derived_handler& h) {
-        BaseEvent* p = static_cast<DerivedEvent*>(nullptr); //check DerivedEvent : BaseEvent
+        EngineEvent* p = static_cast<T*>(nullptr);
         return h;
     }
 
 public:
+    static const long type;
     bool active{true};
 
-    EventHandler(const derived_handler& handler) :
-            function(
-                    check(handler) //check DerivedEvent : BaseEvent
-            ) {
+    static base_handler upcast(const derived_handler& handler) { // existence of handler already checks T : Event
+        return [handler](const EngineEvent& event) -> void {
+            handler(dynamic_cast<const T&>(event)); //downcast for call, dynamic to ensure no sibling event cast
+        };
     }
 
-    void operator()(const DerivedEvent& event) {
+    base_handler upcast() {
+        return EventHandler<T>::upcast(function);
+    }
+
+    EventHandler(const derived_handler& handler) :
+            function(check(handler)) {} //check T : Event
+
+    void operator()(const T& event) {
         function(event);
     }
 };
 
+extern long handler_counter;
+template<class T>
+const long EventHandler<T>::type = handler_counter++;
+
+using GenericHandler = EventHandler<EngineEvent>;
+
 namespace scene_events { //todo scene events
-    struct Event {
+    struct Event : EngineEvent {
 
     };
 
@@ -44,7 +65,7 @@ namespace scene_events { //todo scene events
     };
 
     template<class T>
-    using EventHandler = EventHandler<Event, T>;
+    using EventHandler = EventHandler<T>;
     using EnterHandler = EventHandler<EnterEvent>;
 
 }
@@ -62,19 +83,26 @@ namespace window_events {
         MOTION
     };
 
-    struct Event { //todo remove list init because it allows incomplete init
+    struct Event : public EngineEvent {
         const GLFWwindow* window;
+
+        Event(const GLFWwindow* window);
     };
 
-    struct EnterEvent : Event {
+    struct EnterEvent : public Event {
         const int entered;
+
+        EnterEvent(const GLFWwindow* window, const int entered);
     };
 
     struct FocusEvent : Event {
         const int focused;
+
+        FocusEvent(const GLFWwindow* window, const int focused);
     };
 
     struct CloseEvent : Event {
+        CloseEvent(const GLFWwindow* window);
     };
 
     struct KeyEvent : Event {
@@ -82,34 +110,42 @@ namespace window_events {
         const int scancode;
         const int action;
         const int mods;
+
+        KeyEvent(const GLFWwindow* window, const int key, const int scancode, const int action, const int mods);
     };
 
     struct CharEvent : Event {
         const unsigned int codepoint;
+
+        CharEvent(const GLFWwindow* window, const unsigned int codepoint);
     };
 
     struct MotionEvent : Event {
         const double xpos;
         const double ypos;
+
+        MotionEvent(const GLFWwindow* window, const double xpos, const double ypos);
     };
 
     struct ClickEvent : Event {
         const int button;
         const int action;
         const int mods;
+
+        ClickEvent(const GLFWwindow* window, const int button, const int action, const int mods);
     };
 
     struct ScrollEvent : Event {
         const double xoffset;
         const double yoffset;
+
+        ScrollEvent(const GLFWwindow* window, const double xoffset, const double yoffset);
     };
 
     //todo joystick, gamepad
 
     template<class T>
-    using EventHandler = EventHandler<Event, T>;
-
-    using GenericHandler = EventHandler<Event>;
+    using EventHandler = ::EventHandler<T>;
     using EnterHandler = EventHandler<EnterEvent>;
     using FocusHandler = EventHandler<FocusEvent>;
     using CloseHandler = EventHandler<CloseEvent>;

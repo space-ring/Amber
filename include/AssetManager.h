@@ -13,14 +13,15 @@
 
 class AssetManager {
     using string = std::string;
+    template<class T> using stringMap = std::map<string, T>;
 
 private: //todo const maps?
-    std::map<string, compoundShader>* shaderPaths = new std::map<string, compoundShader>;
-    std::map<string, string>* meshPaths = new std::map<string, string>;
-    std::map<string, string>* texturePaths = new std::map<string, string>;
-    std::map<string, Shader*>* shaders = new std::map<string, Shader*>;
-    std::map<string, Mesh*>* meshes = new std::map<string, Mesh*>;
-    std::map<string, Texture*>* textures = new std::map<string, Texture*>;
+    stringMap<compoundShader>* shaderPaths = new stringMap<compoundShader>;
+    stringMap<string>* meshPaths = new stringMap<string>;
+    stringMap<string>* texturePaths = new stringMap<string>;
+    stringMap<Shader*>* shaders = new stringMap<Shader*>;
+    stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
+    stringMap<Texture*>* textures = new stringMap<Texture*>;
 
 public:
     AssetManager();
