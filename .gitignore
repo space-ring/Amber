@@ -1,6 +1,6 @@
 /deps/
 /cmake-build-release/
 /cmake-build-debug/
-/.idea/codeStyles/
+/.idea
 /desktop.ini
 /Test.exe
