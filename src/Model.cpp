@@ -3,6 +3,7 @@
 //
 
 #include "Model.h"
+#include "ModelManager.h"
 #include <iostream>
 
 unsigned long Model::counter{0};
@@ -12,15 +13,3 @@ Model::Model()
 
 Model::Model(Mesh* mesh, ModelTransform& transform)
         : mesh(mesh), own(ModelTransform()), transform(&transform), id(counter++) {}
-
-Mesh* Model::getMesh() const {
-    return mesh;
-}
-
-void Model::setMesh(Mesh* mesh) {
-    Model::mesh = mesh;
-}
-
-void Model::setTransform(ModelTransform* transform) {
-    Model::transform = transform;
-}

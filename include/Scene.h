@@ -28,7 +28,7 @@ protected:
     int width, height;
     std::map<id, Camera*>* cameras = new std::map<id, Camera*>;
     std::map<id, Light*>* lights = new std::map<id, Light*>;
-    std::map<Mesh*, std::vector<id>*>* instances = new std::map<Mesh*, std::vector<id>*>;
+    ModelManager* manager = new ModelManager();
 
 //    ModelTransform* last_picked = nullptr;
 //    ModelTransform* dragged = nullptr;

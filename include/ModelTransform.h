@@ -7,6 +7,7 @@
 
 #include "glm/glm.hpp"
 #include "ITransformable.h"
+#include <vector>
 
 class Model;
 
@@ -17,18 +18,23 @@ class ModelTransform : public ITransformable<ModelTransform> {
 
     friend class ITransformable<Model>;
 
+    friend class ModelManager;
+
+    ModelTransform* parent{nullptr};
+    std::vector<ModelTransform*> children;
+
+    glm::mat4 own; //for when not managed
     glm::mat4* matrix;
-    glm::mat4 own;
 
     glm::vec3 translation;
     glm::vec3 rotation; //todo use quaternions
     glm::vec3 scale;
 
+    glm::mat4 t, r, s;
+
     ModelTransform* _getTransform() {
         return this;
     }
-
-    void updateT();
 
     void _setTranslation(glm::vec3 v);
 
@@ -42,15 +48,22 @@ class ModelTransform : public ITransformable<ModelTransform> {
 
     void _scale(glm::vec3 v);
 
+    void setMatrix();
+
+    void propagate();
+
+    ModelTransform sumTree();
+
 public:
 
     ModelTransform();
 
     ModelTransform(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale);
 
-    glm::mat4* getMatrix() const;
+    void attachParent(ModelTransform& transform);
 
-    void setMatrix(glm::mat4* matrix);
+    void detachParent(bool inherit);
+
 };
 
 

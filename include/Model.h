@@ -12,15 +12,16 @@
 class ModelManager;
 
 class Model : public ITransformable<Model> {
-
     friend class ITransformable<Model>;
+
+    friend class ModelManager;
 
     static unsigned long counter;
     ModelManager* manager{nullptr};
     Mesh* mesh{nullptr};
 
-    ModelTransform* transform;
     ModelTransform own;
+    ModelTransform* transform;
 
     ModelTransform* _getTransform() { return transform; }
 
@@ -30,12 +31,6 @@ public:
     Model();
 
     Model(Mesh* mesh, ModelTransform& transform);
-
-    void setTransform(ModelTransform* transform);
-
-    Mesh* getMesh() const;
-
-    void setMesh(Mesh* mesh);
 
 };
 

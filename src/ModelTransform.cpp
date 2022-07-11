@@ -7,53 +7,99 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/euler_angles.hpp"
 
+ModelTransform ModelTransform::sumTree() {
+    if (!parent) return *this;
+    ModelTransform sum = parent->sumTree();
+    sum.rotation += rotation;
+    sum.translation += translation;
+    sum.scale *= scale;
+    return sum;
+}
+
 ModelTransform::ModelTransform()
-        : translation(glm::vec3(0)), rotation(glm::vec3(0)), scale(glm::vec3(1)), matrix(&own) { updateT(); }
+        : translation(glm::vec3(0)), rotation(glm::vec3(0)), scale(glm::vec3(1)),
+          t(glm::translate(translation)),
+          s(glm::scale(scale)),
+          r(glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z)),
+          own(glm::mat4(1)), matrix(&own) { setMatrix(); }
 
 ModelTransform::ModelTransform(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
-        : translation(translation), rotation(rotation), scale(scale), matrix(&own) { updateT(); }
+        : translation(translation), rotation(rotation), scale(scale),
+          t(glm::translate(translation)),
+          s(glm::scale(scale)),
+          r(glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z)),
+          own(glm::mat4(1)), matrix(&own) { setMatrix(); }
 
-void ModelTransform::updateT() {
-    glm::mat4 t = glm::translate(translation);
-    glm::mat4 s = glm::scale(scale);
-    glm::mat4 r = glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z);
+
+void ModelTransform::attachParent(ModelTransform& transform) {
+    if (parent) detachParent(false);
+    parent = &transform;
+    parent->children.push_back(this);
+    propagate();
+}
+
+void ModelTransform::detachParent(bool inherit) {
+    if (!parent) return;
+    if (inherit) { //if the child should copy the parent's transform at detachment
+        ModelTransform sum = sumTree();
+        translation = sum.translation;
+        t = glm::translate(translation);
+        rotation = sum.rotation;
+        r = glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z);
+        scale = sum.scale;
+        s = glm::scale(scale);
+    }
+    auto it = std::find(parent->children.begin(), parent->children.end(), this);
+    std::swap(*it, parent->children.back());
+    parent->children.pop_back();
+    parent = nullptr;
+    setMatrix();
+}
+
+void ModelTransform::propagate() {
+    if (parent) *matrix *= *parent->matrix;
+    for (auto child: children) {
+        child->setMatrix();
+    }
+}
+
+void ModelTransform::setMatrix() {
     *matrix = t * s * r;
+    propagate();
 }
 
 void ModelTransform::_setTranslation(glm::vec3 v) {
     translation = v;
-    updateT();
+    t = glm::translate(translation);
+    setMatrix();
 }
 
 void ModelTransform::_translate(glm::vec3 v) {
     translation += v;
-    updateT();
+    t = glm::translate(translation);
+    setMatrix();
 }
 
 void ModelTransform::_setRotation(glm::vec3 v) {
     rotation = v;
-    updateT();
+    r = glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z);
+    setMatrix();
 }
 
 void ModelTransform::_rotate(glm::vec3 v) {
     rotation += v;
-    updateT();
+    r = glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z);
+    setMatrix();
 }
 
 void ModelTransform::_setScale(glm::vec3 v) {
     scale = v;
-    updateT();
+    s = glm::scale(scale);
+    setMatrix();
 }
 
 void ModelTransform::_scale(glm::vec3 v) {
     scale *= v;
-    updateT();
-}
-
-glm::mat4* ModelTransform::getMatrix() const {
-    return matrix;
-}
-
-void ModelTransform::setMatrix(glm::mat4* matrix) {
-    ModelTransform::matrix = matrix;
+    s = glm::scale(v);
+    setMatrix();
 }

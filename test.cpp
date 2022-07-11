@@ -12,6 +12,16 @@
 
 int main() {
 
+    ModelTransform parent(glm::vec3(10), glm::vec3(0), glm::vec3(1));
+    ModelTransform child;
+    ModelTransform kid;
+    kid.attachParent(child);
+    kid.translate(glm::vec3(50));
+    child.attachParent(parent);
+    parent.translate(glm::vec3(2));
+    child.translate(glm::vec3(-3));
+    kid.detachParent(true);
+
     std::vector<Vertex> vertex;
     std::vector<unsigned int> index;
 
@@ -24,9 +34,10 @@ int main() {
 
     manager.add(model);
 
-    glm::mat4* mat4 = &manager.instances.at(&mesh)->at(0);
+//    glm::mat4* mat4 = &manager.instances.at(&mesh)->at(0);
 
     model.setTranslation(glm::vec3(-4));
+    manager.remove(model);
     return 0;
 
     auto* engine = new Engine("Engine", 710, 100, 500, 500);
