@@ -1,44 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(Engine)
-
-set(CMAKE_CXX_STANDARD 20)
-
-SET(CMAKE_BUILD_TYPE Debug)
-
-set(CMAKE_CXX_FLAGS "-static")
-
-file(GLOB sources "src/*.cpp" "test/*.cpp" "deps/glad/src/glad.c")
-
-add_library(Engine STATIC ${sources} include/maths.h)
-add_executable(Test ${sources} test.cpp)
-
-#find_package(glfw3 3.3 REQUIRED)
-#target_link_libraries(Engine glfw)
+project(EngineTest)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL " " FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL " " FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
 
-add_subdirectory(deps/glfw-3.3.6)
-
-include_directories(deps/glfw-3.3.6/include)
-include_directories(deps/glad/include)
-#include_directories(deps/assimp/include)
-include_directories(deps/glm/include)
-
-include_directories(include)
-
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-
-#add_subdirectory(deps/assimp)
-
-#include_directories(deps/glfw-3.3.6/src)
-#include_directories(deps/glad/src)
-
-#target_link_libraries(Engine glfw opengl32 assimp::assimp)
-#target_link_libraries(Test glfw opengl32 Threads::Threads assimp::assimp)
-
-target_link_libraries(Engine glfw opengl32)
-target_link_libraries(Test glfw opengl32 Threads::Threads)
+add_subdirectory(library)
+add_subdirectory(test)

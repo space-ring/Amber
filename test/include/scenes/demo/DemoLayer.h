@@ -1,0 +1,31 @@
+//
+// Created by croissant on 19/07/2022.
+//
+
+#ifndef ENGINETEST_DEMOLAYER_H
+#define ENGINETEST_DEMOLAYER_H
+
+#include "Layer.h"
+#include "Model.h"
+
+
+class DemoLayer : public Amber::Layer {
+
+    float r = 0, g = 0, b = 0, a = 1;
+    Amber::window_events::FocusHandler onFocus;
+    Amber::window_events::EnterHandler onEnter;
+
+    Amber::Model* cube = nullptr;
+
+public:
+    DemoLayer();
+
+    void render() override;
+
+    void pick(double x, double y) override;
+
+    void update() override;
+
+};
+
+#endif //ENGINETEST_DEMOLAYER_H
