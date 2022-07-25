@@ -10,12 +10,13 @@
 
 
 class DemoLayer : public Amber::Layer {
+    friend class DemoScene;
 
     float r = 0, g = 0, b = 0, a = 1;
     Amber::window_events::FocusHandler onFocus;
     Amber::window_events::EnterHandler onEnter;
 
-    Amber::Model* cube = nullptr;
+    Amber::Model cube;
 
 public:
     DemoLayer();

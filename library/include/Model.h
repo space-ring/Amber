@@ -18,7 +18,7 @@ namespace Amber {
         friend class ModelManager;
 
         static unsigned long counter;
-        ModelManager* manager{nullptr}; //todo add to multiple managers?
+        ModelManager* manager{nullptr}; //todo add to multiple managers? impossible, only 1 ref to mat is stored.
         Mesh* mesh{nullptr};
 
         ModelTransform own;

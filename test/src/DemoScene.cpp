@@ -4,16 +4,17 @@
 
 #include <iostream>
 #include "scenes/demo/DemoScene.h"
+#include "Mesh.h"
 
 DemoScene::DemoScene() {
     layers.addLayer(&demoLayer);
 };
 
 DemoScene::~DemoScene() {
-};
+
+}
 
 void DemoScene::build() {
-
 }
 
 void DemoScene::show() {
@@ -33,5 +34,5 @@ void DemoScene::update() {
 }
 
 void DemoScene::pick(double x, double y) {
-
+    Scene::pick(x, y);
 }

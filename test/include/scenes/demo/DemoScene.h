@@ -11,6 +11,7 @@
 #include "Engine.h"
 
 class DemoScene : public Amber::Scene {
+    friend DemoLayer;
 
     DemoLayer demoLayer;
 

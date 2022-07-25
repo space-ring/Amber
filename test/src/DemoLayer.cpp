@@ -13,12 +13,10 @@ DemoLayer::DemoLayer() :
         onFocus([&](Amber::window_events::FocusEvent& event) {
             g = (float) event.focused;
             glClearColor(r, g, b, a);
-        }) {
+        }),
+        cube(Amber::Model()){
     addHandler(onEnter);
     addHandler(onFocus);
-
-    cube = new Amber::Model();
-
 }
 
 void DemoLayer::render() {

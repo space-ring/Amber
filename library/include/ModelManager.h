@@ -11,20 +11,19 @@
 #include "ITransformable.h"
 #include "Model.h"
 //todo buffer mapping
-//todo automatically sub buffer at transforming using index
 namespace Amber {
     class ModelManager {
 
     public:
 
-        //todo vector invalidates references!!! use a different structure
         std::map<Mesh*, std::vector<glm::mat4>*> instances; //todo use lists to optimise removal? no, must be contiguous
         std::map<Mesh*, bool> resize;
         std::map<Model*, unsigned long long> index;
+        std::map<Mesh*, unsigned long> sizes;
 
         virtual ~ModelManager();
 
-        void add(Model& model);
+        void add(Model& model, unsigned long size);
 
         void remove(Model& model);
 
