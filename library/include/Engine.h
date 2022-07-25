@@ -27,6 +27,8 @@
 //todo move semantics (engine should own almost everything)
 //todo destructor calls destroy (so can terminate graphics manually)
 //todo some vectors need to be changed to lists when random access not needed
+//todo omg use singletons fgs
+
 namespace Amber {
     class Stage;
 

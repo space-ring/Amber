@@ -15,4 +15,11 @@ namespace Amber {
     Model::Model(Mesh* mesh, ModelTransform& transform)
             : mesh(mesh), own(ModelTransform()), transform(&transform), id(counter++) {}
 
+    void Model::setMesh(Mesh* newMesh, unsigned long limit) {
+        ModelManager* temp = manager;
+        if (manager) manager->remove(*this);
+        this->mesh = newMesh;
+        if (temp) temp->add(*this, limit);
+    }
+
 }

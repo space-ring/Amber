@@ -100,6 +100,7 @@ namespace Amber {
 
     void Stage::addScene(const string& id, Scene* scene) {
         scenes->insert(std::pair(id, scene));
+        scene->setStage(this);
     }
 
     void Stage::setFrontScene(const string& scene) {
@@ -112,6 +113,10 @@ namespace Amber {
 
     Scene* Stage::getFront() const {
         return front;
+    }
+
+    Engine* Stage::getRoot() const {
+        return root;
     }
 
 }

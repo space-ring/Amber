@@ -12,9 +12,10 @@
 namespace Amber {
     class Layer {
         std::map<unsigned long, GenericHandler> handlers;
-        ModelManager models;
 
     public:
+
+        ModelManager models;
 
         bool active = true;
 

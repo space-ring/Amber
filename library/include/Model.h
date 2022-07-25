@@ -33,6 +33,10 @@ namespace Amber {
 
         Model(Mesh* mesh, ModelTransform& transform);
 
+        void setMesh(Mesh* newMesh, unsigned long limit);
+
+        Mesh* getMesh() const;
+
     };
 
 }

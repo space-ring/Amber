@@ -106,12 +106,15 @@ namespace Amber {
         delete sources;
     }
 
-    void Shader::start() {
+    Shader* Shader::start() {
+        //todo if !program throw error
         glUseProgram(program);
+        return this;
     }
 
-    void Shader::stop() {
+    Shader* Shader::stop() {
         glUseProgram(0);
+        return this;
     }
 
     GLuint Shader::addShader(SupportedShaders type, const GLchar* const* code) {

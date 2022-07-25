@@ -49,6 +49,11 @@ namespace Amber {
 
     void Scene::build() {
         if (built) return;
+        built = true;
+    }
+
+    void Scene::setStage(Stage* stage) {
+        Scene::stage = stage;
     }
 
 }

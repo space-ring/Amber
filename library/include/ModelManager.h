@@ -17,19 +17,25 @@ namespace Amber {
     public:
 
         std::map<Mesh*, std::vector<glm::mat4>*> instances; //todo use lists to optimise removal? no, must be contiguous
-        std::map<Mesh*, bool> resize;
         std::map<Model*, unsigned long long> index;
         std::map<Mesh*, unsigned long> sizes;
+        std::map<Mesh*, bool> resize;
 
         virtual ~ModelManager();
 
-        void add(Model& model, unsigned long size);
+        void add(Model& model, unsigned long limit);
 
         void remove(Model& model);
 
         void buffer(Mesh* mesh);
 
+        unsigned long getLimit(Mesh* mesh);
+
     };
+
+    Mesh* Model::getMesh() const {
+        return mesh;
+    }
 
 }
 

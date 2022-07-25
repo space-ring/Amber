@@ -5,24 +5,24 @@
 #include "ModelManager.h"
 
 namespace Amber {
-    void ModelManager::add(Model& model, unsigned long size) {
+    void ModelManager::add(Model& model, unsigned long limit) {
         if (model.manager == this) return;
 
         Mesh* mesh = model.mesh;
-
-        //prevent resizing to keep references
-        //todo using vectors for now, erase type of instance list and use normal array maybe
-        if (instances.at(mesh)->size() == sizes.at(mesh)) return; //todo throw exception
 
         std::vector<glm::mat4>* list;
 
         if (!instances.contains(mesh)) { //first time mesh
             list = new std::vector<glm::mat4>();
             instances.insert(std::pair(mesh, list));
-            sizes.insert(std::pair(mesh, size));
+            sizes.insert(std::pair(mesh, limit));
             resize.insert(std::pair(mesh, true));
-            list->reserve(size);
+            list->reserve(limit);
         } else list = instances.at(mesh);
+
+        //prevent resizing to keep references
+        //todo using vectors for now, erase type of instance list and use normal array maybe
+        if (instances.at(mesh)->size() == sizes.at(mesh)) return; //todo throw exception
 
         list->push_back(*model.transform->matrix);
 
@@ -53,6 +53,7 @@ namespace Amber {
         index.erase(&model);
 
         resize.at(mesh) = true;
+        model.manager = nullptr;
     }
 
     void ModelManager::buffer(Mesh* mesh) { //todo mapping buffers !!! map to the mesh vector
@@ -77,6 +78,11 @@ namespace Amber {
         for (auto pair: instances) {
             delete pair.second;
         }
+    }
+
+    unsigned long ModelManager::getLimit(Mesh* mesh) {
+        if (sizes.contains(mesh)) return sizes.at(mesh);
+        return 0;
     }
 
 }

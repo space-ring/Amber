@@ -8,5 +8,4 @@ namespace Amber {
     void EventManager::clearHandlers(unsigned long id) {
         //todo
     }
-
 }

@@ -52,9 +52,9 @@ namespace Amber {
 
         Shader* build();
 
-        void start();
+        Shader* start();
 
-        void stop();
+        Shader* stop();
     };
 
 }

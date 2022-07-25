@@ -21,9 +21,13 @@
 
 
 namespace Amber {
-//todo static polymorphism? how to store any scene in a vector?
+
+    class Stage;
+
     class Scene {
     protected:
+
+        Stage* stage = nullptr;
 
         using id = unsigned long;
         using string = std::string;
@@ -64,6 +68,8 @@ namespace Amber {
         virtual void pick(double x, double y) = 0;
 
         virtual void render() = 0;
+
+        void setStage(Stage* stage);
 
         //todo should be virtual?
         template<class T>

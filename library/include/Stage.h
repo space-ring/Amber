@@ -69,6 +69,7 @@ namespace Amber {
 
         Scene* getFront() const;
 
+        Engine* getRoot() const;
     };
 
 }

@@ -3,7 +3,8 @@
 //
 
 #include "scenes/demo/DemoLayer.h"
-
+#include "scenes/demo/DemoScene.h"
+#include "Stage.h"
 
 DemoLayer::DemoLayer() :
         onEnter([&](Amber::window_events::EnterEvent& event) {
@@ -20,6 +21,14 @@ DemoLayer::DemoLayer() :
 }
 
 void DemoLayer::render() {
+    //render all cubes
+    Amber::Shader* wire = DemoScene::getInstance().stage->getRoot()->assets->getShader("wire")->build();
+    wire->start();
+
+    models.buffer(cube.getMesh());
+
+    glBindVertexArray(cube.getMesh()->getVao());
+
 }
 
 void DemoLayer::update() {

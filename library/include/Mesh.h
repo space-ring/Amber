@@ -50,6 +50,8 @@ namespace Amber {
         Mesh* build();
 
         GLuint getInstanceVbo() const;
+
+        GLuint getVao() const;
     };
 }
 

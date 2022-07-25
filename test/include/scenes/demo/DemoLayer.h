@@ -7,6 +7,7 @@
 
 #include "Layer.h"
 #include "Model.h"
+#include "Camera.h"
 
 
 class DemoLayer : public Amber::Layer {
@@ -17,6 +18,8 @@ class DemoLayer : public Amber::Layer {
     Amber::window_events::EnterHandler onEnter;
 
     Amber::Model cube;
+
+    Amber::Camera camera;
 
 public:
     DemoLayer();
