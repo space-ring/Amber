@@ -1,5 +1,8 @@
 mesh@box@assets/box.obj
-format of shader manifests:
- shader@program name@vertex@fragment@geometry@tess control@tess eval@compute
-shader@wire@assets/wire.vert@assets/wire.frag
+mesh@plane@assets/plane.obj
+#format of shader manifests:
+# shader@program name@vertex@fragment@geometry@tess control@tess eval@compute
+#shader@wire@assets/wire.vert@assets/wire.frag
 shader@basic@assets/basic.vert@assets/basic.frag
+mesh@triangle@assets/triangle.obj
+shader@easy@assets/test.vert@assets/test.frag

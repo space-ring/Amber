@@ -27,7 +27,7 @@ namespace Amber {
             for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
                 if (event.handled) break;
                 if (!(*it)->active) continue;
-                (*it)->onEvent(event);
+                (*it)->handlers.onEvent(event);
             }
         }
 

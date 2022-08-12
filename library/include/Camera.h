@@ -8,31 +8,49 @@
 #include "maths.h"
 
 namespace Amber {
-    class Camera { //todo actually encapsulate privates.
-    private:
-        glm::vec3 pos, up, right;
-        glm::mat4 view, projection;
-        float fov, ratio, near, far;
+    class Camera {
+
     public:
-        Camera(const glm::vec3& pos, const glm::vec3& up, const glm::vec3& right);
+        glm::vec3 position, rotation;
+        glm::mat4 view, perspective, orthogonal;
+        float fov, ratio, near_p, far_p, near_o, far_o;
+
+        void updatePerspective();
+
+        void updateOrthogonal();
+
+        void updateView();
+
+    public:
+
+        /**
+         * @param pos
+         * @param rotation pitch - yaw - roll
+         * @param fov
+         * @param ratio
+         * @param nearP
+         * @param farP
+         * @param nearO
+         * @param farO
+         */
+        Camera(const glm::vec3& pos, const glm::vec3& rotation, float fov, float ratio, float nearP,
+               float farP, float nearO, float farO);
 
         void setPerspective(float fov, float ratio, float near, float far);
 
         void setOrthogonal(float near, float far);
 
-        void move(glm::vec3& dxyz);
+        void move(const glm::vec3& dxyz);
 
-        void look(glm::vec3 dxyz);
+        void rotate(const glm::vec3& dxyz);
 
-        const glm::vec3& getPos() const;
-
-        const glm::vec3& getUp() const;
-
-        const glm::vec3& getRight() const;
-
-        const glm::mat4& getProjection() const;
+        void lookAt(glm::vec3 dxyz);
 
         const glm::mat4& getView() const;
+
+        const glm::mat4& getPerspective() const;
+
+        const glm::mat4& getOrthogonal() const;
     };
 
 }

@@ -15,27 +15,33 @@ namespace Amber {
 
     Engine::Engine(const string& name, int x, int y, int width, int height) :
             assets(new AssetManager()),
-            events(new EventManager()),
-            stage(new Stage(this, name, x, y, width, height)) {
+            handlers(new EventManager()),
+            stage(new Stage(name, x, y, width, height)) {
+        std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;
     }
 
     Engine::~Engine() {
+        std::cout << "destroying engine from thread " << std::this_thread::get_id() << std::endl;
         delete assets;
-        delete events;
+        delete handlers;
         delete stage;
     };
 
     void Engine::init() {
         stage->init();
-//    assets->buildAll();
-        events->addHandler(
-                window_events::CloseHandler([&](window_events::CloseEvent&) {
-                    running = false;
-                })
+
+        handlers->addHandler(
+                window_events::CloseHandler([&](window_events::CloseEvent&) { running = false; })
         );
-        events->addHandler(
+        handlers->addHandler(
                 window_events::FocusHandler([&](window_events::FocusEvent& e) { stage->focused = e.focused; })
         );
+        handlers->addHandler(
+                window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
+                    glViewport(0, 0, e.width, e.height);
+                })
+        );
+
         stage->show();
 
         running = true;

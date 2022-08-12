@@ -9,12 +9,14 @@
 #include "ITransformable.h"
 #include <vector>
 
+//todo detach from dead parent
+
 namespace Amber {
     class Model;
 
     class ModelManager;
 
-    class ModelTransform : public ITransformable<ModelTransform> {
+    class ModelTransform : public ITransformable<ModelTransform> { //this is wrong usage of crtp
         friend class ITransformable<ModelTransform>;
 
         friend class ITransformable<Model>;
@@ -25,11 +27,11 @@ namespace Amber {
         std::vector<ModelTransform*> children;
 
         glm::mat4 own; //for when not managed
-        glm::mat4* matrix;
+        glm::mat4* matrix; //todo use ref
 
         glm::vec3 translation;
         glm::vec3 rotation; //todo use quaternions
-        glm::vec3 scale;
+        glm::vec3 m_scale;
 
         glm::mat4 t, r, s;
 
@@ -64,6 +66,8 @@ namespace Amber {
         void attachParent(ModelTransform& transform, bool inherit);
 
         void detachParent(bool inherit);
+
+        glm::mat4& getMatrix();
 
     };
 

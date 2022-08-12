@@ -73,38 +73,38 @@ namespace Amber {
         glGenBuffers(1, &vertexVBO);
         glGenBuffers(1, &instanceVBO);
         glGenBuffers(1, &EBO);
-
+        glCheckError();
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
+        glCheckError();
         // vertex positions
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) nullptr);
-        // vertex normals
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, normal));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position));
         // vertex texture coords
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texUV));
+        // vertex normals
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texUV));
-        //todo other attributes (see .h)
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, normal));
 
+        glCheckError();
         //instances
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         for (int i = 10; i < 14; ++i) {
             glEnableVertexAttribArray(i);
-            glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4),
-                                  (void*) ((i - 10) * sizeof(glm::vec4)));
+            glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*) ((i - 10) * sizeof(glm::vec4)));
             glVertexAttribDivisor(i, 1);
         }
-
+        glCheckError();
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+        glCheckError();
         return this;
     }
 
@@ -122,6 +122,14 @@ namespace Amber {
 
     GLuint Mesh::getVao() const {
         return VAO;
+    }
+
+    GLuint Mesh::getElementCount() const {
+        return indices.size();
+    }
+
+    GLuint Mesh::getEbo() const {
+        return EBO;
     }
 
 }

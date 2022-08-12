@@ -15,26 +15,6 @@ namespace Amber {
 
     Scene::~Scene() = default;
 
-    id Scene::addCamera(Camera* camera) {
-        static id index = 0;
-        cameras.insert(std::pair(index, camera));
-        return index++;
-    }
-
-    id Scene::addLight(Light* light) {
-        static id index = 0;
-        lights.insert(std::pair(index, light));
-        return index++;
-    }
-
-    void Scene::removeCamera(id index) {
-        cameras.erase(index);
-    }
-
-    void Scene::removeLight(id index) {
-        lights.erase(index);
-    }
-
     void Scene::render() {
         layers.render();
     }
@@ -52,8 +32,8 @@ namespace Amber {
         built = true;
     }
 
-    void Scene::setStage(Stage* stage) {
-        Scene::stage = stage;
+    void Scene::update() {
+        layers.update();
     }
 
 }

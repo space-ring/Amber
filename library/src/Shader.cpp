@@ -12,6 +12,7 @@
 namespace Amber {
 
     string DEFAULT_VERTEX =
+            "//default.vert\n"
             "#version 430 core\n"
             "layout (location = 0) in vec3 v_position;\n"
             "layout (location = 1) in vec2 v_colour;\n"
@@ -39,6 +40,7 @@ namespace Amber {
 
 
     string DEFAULT_FRAGMENT =
+            "//default.frag\n"
             "#version 430 core\n"
             "\n"
             "in vec3 frag_position;\n"
@@ -117,11 +119,13 @@ namespace Amber {
         return this;
     }
 
+    //todo delete previous shader if assigned
+    //todo this doesn't allow multiple of the same type (as gl spec allows)
     GLuint Shader::addShader(SupportedShaders type, const GLchar* const* code) {
         GLuint shader = glCreateShader(type);
         glShaderSource(shader, 1, code, nullptr);
         glCompileShader(shader);
-        GLint flag;
+        GLint flag = 0;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &flag);
         if (!flag) {
             GLint logSize = 0;
@@ -169,43 +173,44 @@ namespace Amber {
     Shader* Shader::build() {
         if (program) return this;
 
+        glCheckError();
+        GLuint p = glCreateProgram();glCheckError();
         if (!sources->vertex.empty()) {
-            const char* p = sources->vertex.c_str();
-            addShader(VERTEX, &p);
+            const char* str = sources->vertex.c_str();
+            addShader(VERTEX, &str);
+            glAttachShader(p, vertex);glCheckError();
         }
         if (!sources->tessControl.empty()) {
-            const char* p = sources->tessControl.c_str();
-            addShader(TESS_CONTROL, &p);
+            const char* str = sources->tessControl.c_str();
+            addShader(TESS_CONTROL, &str);
+            glAttachShader(p, tessCtrl);glCheckError();
         }
         if (!sources->tessEval.empty()) {
-            const char* p = sources->tessEval.c_str();
-            addShader(TESS_EVALUATION, &p);
+            const char* str = sources->tessEval.c_str();
+            addShader(TESS_EVALUATION, &str);
+            glAttachShader(p, tessEval);glCheckError();
         }
         if (!sources->geometry.empty()) {
-            const char* p = sources->geometry.c_str();
-            addShader(GEOMETRY, &p);
+            const char* str = sources->geometry.c_str();
+            addShader(GEOMETRY, &str);
+            glAttachShader(p, geometry);glCheckError();
         }
         if (!sources->fragment.empty()) {
-            const char* p = sources->fragment.c_str();
-            addShader(FRAGMENT, &p);
+            const char* str = sources->fragment.c_str();
+            addShader(FRAGMENT, &str);
+            glAttachShader(p, fragment);glCheckError();
         }
         if (!sources->compute.empty()) {
-            const char* p = sources->compute.c_str();
-            addShader(COMPUTE, &p);
+            const char* str = sources->compute.c_str();
+            addShader(COMPUTE, &str);
+            glAttachShader(p, compute);glCheckError();
         }
 
-        GLuint p = glCreateProgram();
-        glAttachShader(p, vertex);
-        glAttachShader(p, tessCtrl);
-        glAttachShader(p, tessEval);
-        glAttachShader(p, geometry);
-        glAttachShader(p, fragment);
-        glAttachShader(p, compute);
-
+        glCheckError();
         //todo pre-linkup build e.g. transform feedback
         glLinkProgram(p);
-
-        GLint flag;
+        glCheckError();
+        GLint flag = 0;
         glGetProgramiv(p, GL_LINK_STATUS, &flag);
         if (!flag) {
             GLint logSize = 0;
@@ -233,7 +238,7 @@ namespace Amber {
             compute = 0;
             return this;
         }
-
+        glCheckError();
         program = p;
         return this;
     }

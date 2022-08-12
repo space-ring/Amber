@@ -43,4 +43,7 @@ namespace Amber {
 
     }
 
+    window_events::FramebufferSizeEvent::FramebufferSizeEvent(const GLFWwindow* window, const int width,const int height)
+                                                              : Event(window), width(width),
+                                                                                  height(height) {}
 }

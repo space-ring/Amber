@@ -7,15 +7,16 @@
 
 #include "event.h"
 #include "ModelManager.h"
+#include "EventManager.h"
 #include <map>
 
 namespace Amber {
     class Layer {
-        std::map<unsigned long, GenericHandler> handlers;
 
     public:
 
         ModelManager models;
+        EventManager handlers;
 
         bool active = true;
 
@@ -33,23 +34,6 @@ namespace Amber {
         virtual void pick(double x, double y) = 0;
 
         virtual void update() = 0;
-
-        template<class T>
-        void addHandler(const EventHandler<T>& handler) {
-            if (handlers.contains(handler.type)) {
-                handlers.erase(handler.type);
-            }
-            handlers.insert(std::pair(handler.type, EventHandler<T>::upcast(handler)));
-        }
-
-        template<class T>
-        void onEvent(T& event) {
-            long id = EventHandler<T>::type;
-            if (!handlers.contains(id)) return;
-            handlers.at(id)(event);
-        }
-
-        void removeHandler(long id);
 
     };
 

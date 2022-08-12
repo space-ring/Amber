@@ -16,26 +16,24 @@ namespace Amber {
 
     public:
 
-        std::map<Mesh*, std::vector<glm::mat4>*> instances; //todo use lists to optimise removal? no, must be contiguous
-        std::map<Model*, unsigned long long> index;
-        std::map<Mesh*, unsigned long> sizes;
-        std::map<Mesh*, bool> resize;
+        std::map<Mesh*, std::vector<glm::mat4>*> instances;
+        std::map<Model*, unsigned long long> index; //stores index of instance in mapped vec
+        std::map<Mesh*, unsigned long> sizes; //stores max instance count
+        std::map<Mesh*, bool> resize; //todo just use set
+        std::map<Mesh*,
+                std::map<unsigned long long, ModelTransform&>*> transforms;
 
         virtual ~ModelManager();
 
-        void add(Model& model, unsigned long limit);
+        void add(Model& model, unsigned long limit); //todo don't like this signature
 
-        void remove(Model& model);
+//        void remove(Model& model);
 
         void buffer(Mesh* mesh);
 
         unsigned long getLimit(Mesh* mesh);
 
     };
-
-    Mesh* Model::getMesh() const {
-        return mesh;
-    }
 
 }
 

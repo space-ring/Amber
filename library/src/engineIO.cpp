@@ -21,7 +21,6 @@ namespace Amber {
         while (std::getline(openfile, line)) {
             file += line + "\n";
         }
-        openfile.close();
         return file;
     }
 
@@ -102,40 +101,45 @@ Mesh* loadMeshFromScene(const aiScene* scene) {
         unsigned int index = 0;
 
         while (std::getline(ss, line, '\n')) {
-            auto items = split(line, ' ');
-
-            if (items[0] == "v") {
+            if (line.empty()) continue;
+            auto spaced_line = split(line, ' ');
+            if (spaced_line[0] == "v") {
                 glm::vec3 vec3;
-                vec3.x = std::stof(items[1]);
-                vec3.y = std::stof(items[2]);
-                vec3.z = std::stof(items[3]);
+                vec3.x = std::stof(spaced_line[1]);
+                vec3.y = std::stof(spaced_line[2]);
+                vec3.z = std::stof(spaced_line[3]);
                 positions.push_back(vec3);
 
-            } else if (items[0] == "vt") {
+            } else if (spaced_line[0] == "vt") {
                 glm::vec2 vec2;
-                vec2.x = std::stof(items[1]);
-                vec2.y = std::stof(items[2]);
+                vec2.x = std::stof(spaced_line[1]);
+                vec2.y = std::stof(spaced_line[2]);
                 uv.push_back(vec2);
 
-            } else if (items[0] == "vn") {
+            } else if (spaced_line[0] == "vn") {
                 glm::vec3 vec3;
-                vec3.x = std::stof(items[1]);
-                vec3.y = std::stof(items[2]);
-                vec3.z = std::stof(items[3]);
+                vec3.x = std::stof(spaced_line[1]);
+                vec3.y = std::stof(spaced_line[2]);
+                vec3.z = std::stof(spaced_line[3]);
                 normals.push_back(vec3);
 
-            } else if (items[0] == "f") {
+            } else if (spaced_line[0] == "f") {
                 for (int i = 1; i < 4; ++i) {
-                    if (seen.contains(items[i])) {
-                        indices.push_back(seen[items[i]]);
+                    if (seen.contains(spaced_line[i])) {
+                        indices.push_back(seen[spaced_line[i]]);
                     } else {
                         Vertex vertex;
-                        auto iface = isplit(items[i], '/');
+                        auto iface = isplit(spaced_line[i], '/');
                         vertex.position = positions[iface[0] - 1];
-                        vertex.texUV = uv[iface[1] - 1];
-                        vertex.normal = normals[iface[2] - 1];
+                        if (iface.size() == 2) {
+                            vertex.normal = normals[iface[1] - 1];
+                            vertex.texUV = glm::vec2(0, 0);
+                        } else {
+                            vertex.texUV = uv[iface[1] - 1];
+                            vertex.normal = normals[iface[2] - 1];
+                        }
                         vertices.push_back(vertex);
-                        seen.insert(std::pair<string, unsigned int>(items[i], index));
+                        seen.insert(std::pair<string, unsigned int>(spaced_line[i], index));
                         indices.push_back(index++);
                     }
                 }

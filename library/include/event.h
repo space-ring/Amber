@@ -54,7 +54,7 @@ namespace Amber {
 
     using GenericHandler = EventHandler<Event>;
 
-    namespace scene_events { //todo scene game_events
+    namespace scene_events {
         struct Event : Amber::Event {
 
         };
@@ -139,6 +139,13 @@ namespace Amber {
             ScrollEvent(const GLFWwindow* window, const double xoffset, const double yoffset);
         };
 
+        struct FramebufferSizeEvent : Event {
+            const int width;
+            const int height;
+
+            FramebufferSizeEvent(const GLFWwindow* window, const int width, const int height);
+        };
+
         //todo joystick, gamepad
 
         using EnterHandler = EventHandler<EnterEvent>;
@@ -149,6 +156,7 @@ namespace Amber {
         using MotionHandler = EventHandler<MotionEvent>;
         using ClickHandler = EventHandler<ClickEvent>;
         using ScrollHandler = EventHandler<ScrollEvent>;
+        using FramebufferSizeHandler = EventHandler<FramebufferSizeEvent>;
     }
 }
 #endif //ENGINE_EVENT_H

@@ -4,11 +4,12 @@
 
 #include <iostream>
 #include "scenes/demo/DemoScene.h"
-#include "Mesh.h"
 #include "Stage.h"
 
-DemoScene::DemoScene() {
+DemoScene::DemoScene()
+        : camera(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 85, 1, 0.1, 100, 0.1, 100) {
     layers.addLayer(&demoLayer);
+    layers.addLayer(&groundLayer);
 };
 
 DemoScene::~DemoScene() {
@@ -18,8 +19,7 @@ DemoScene::~DemoScene() {
 void DemoScene::build() {
     if (built) return;
     built = true;
-    demoLayer.cube.setMesh(stage->getRoot()->assets->getMesh("cube"), 10);
-    demoLayer.models.add(demoLayer.cube, 10);
+    Amber::Engine::getInstance().assets->buildAll();
 }
 
 void DemoScene::show() {
@@ -35,7 +35,12 @@ void DemoScene::render() {
 }
 
 void DemoScene::update() {
+    Scene::update();
 
+//    std::cout<<camera.position.x << " " << camera.position.y << " " << camera.position.z << " " << std::endl;
+//    std::cout<<camera.rotation.x << " " << camera.rotation.y << " " << camera.rotation.z << " " << std::endl;
+//    camera.move(glm::vec3(0.0f, 0.0f, -0.1f));
+//    camera.rotate(glm::vec3(0, 0, 9.0/60));
 }
 
 void DemoScene::pick(double x, double y) {

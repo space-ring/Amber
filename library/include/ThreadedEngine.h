@@ -13,10 +13,12 @@
 
 namespace Amber {
 
+    //todo make this singleton too
+    //todo merge with engine?
     template<class Game>
     class ThreadedEngine {
 
-        StateBuffer <Game> buffer;
+        StateBuffer<Game> buffer;
         std::jthread gameThread;
         std::deque<Event> game_events;
         std::mutex event_mutex;
@@ -24,7 +26,7 @@ namespace Amber {
         void handleEvents() {
             std::lock_guard lock(event_mutex);
             for (auto& event: game_events) {
-                buffer.getLogicState().events.onEvent(event);
+                buffer.getLogicState().handlers.onEvent(event);
             }
         }
 
@@ -38,16 +40,20 @@ namespace Amber {
         }
 
         void renderLoop() {
-            engine->init();
+            Engine& engine = Engine::getInstance();
+            engine.init();
+
+            std::cout << "running engine on thread " << std::this_thread::get_id() << std::endl;
 
             std::time_t start = std::time(nullptr);
             int frames = 0;
 
-            while (engine->getRunning()) {
+            Amber::Stage* stage = engine.stage;
+
+            while (engine.getRunning()) {
                 buffer.bufferCopy();
-                Amber::Stage* stage = engine->getStage();
                 stage->update();
-                stage->pick();
+//                stage->pick();
                 stage->poll();
                 stage->render();
 //                using namespace std::chrono_literals;
@@ -63,26 +69,23 @@ namespace Amber {
             }
 
             std::cout << "render stop" << std::endl;
-            delete engine;
-            engine = nullptr;
         }
 
     public:
         Game& game = buffer.getLogicState();
-        Engine* engine;
 
         void run() {
-            gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
+//            gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
             renderLoop();
             game.running = false;
-            gameThread.join();
+            if (gameThread.joinable()) gameThread.join();
         };
 
-        ThreadedEngine(const string& name, int x, int y, int width, int height)
-                : engine(new Engine(name, x, y, width, height)) {};
+        ThreadedEngine(const string& name, int x, int y, int width, int height) {
+            Engine::getInstance(name, x, y, width, height);
+        };
 
         virtual ~ThreadedEngine() {
-            if (engine) engine->kill();
             game.running = false;
             if (gameThread.joinable()) gameThread.join();
         };

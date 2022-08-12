@@ -11,6 +11,22 @@ Later development seeks to allow sharing of components between Engine instances.
 
 ## Threading
 
+IMPORTANT: Engine should be created, run and destroyed on the main thread. Preferably, follow the following pattern:
+
+```
+int main(){
+    ThreadedEngine application("Game Title", x, y, width, height);
+    
+    // ... add game objects to the engine
+    
+    application.run();
+    return 0;
+}
+```
+
+In addition, calling ```Engine::getInstance``` should not be called at statically since ```Engine``` is initialised at
+runtime.
+
 The threaded engine runs on threads:
 
 - [main] receiving input callbacks (input loop)
@@ -54,11 +70,11 @@ scenarios:
 
 1) logic thread bottleneck
 
-   The input thread should not put timed game_events into the event queue because this forces game ticks to be timed; e.g.
-   now when 1 game tick occurs, the engine calculates the intended number of ticks the user was pressing the key for and
-   the character is suddenly given too much velocity because the input thread claims that they've been moving the whole
-   time. This can upset other systems like physics calculations. Events should not be timed but synchronised with the
-   logic loop.
+   The input thread should not put timed game_events into the event queue because this forces game ticks to be timed;
+   e.g. now when 1 game tick occurs, the engine calculates the intended number of ticks the user was pressing the key
+   for and the character is suddenly given too much velocity because the input thread claims that they've been moving
+   the whole time. This can upset other systems like physics calculations. Events should not be timed but synchronised
+   with the logic loop.
 
 
 2) render thread bottleneck
@@ -66,12 +82,13 @@ scenarios:
 ### Event sync
 
 Input thread produces game_events on the queue and the game thread consumes them. For any conditions checked during the
-update function, e.g. button held, maintain a structure which adds and removes keys as their respective game_events occur.
-Then, during the evaluation, peek at the structure.
+update function, e.g. button held, maintain a structure which adds and removes keys as their respective game_events
+occur. Then, during the evaluation, peek at the structure.
 
 
 ___
 The render thread is the main thread and polls game_events and processes them in the according order:
+
 1) Event is passed to the front demoLayer of the front scene.
 2) If the event is not marked as handled, it is propagated through the rest of the demoLayer layers.
 3) If the event is still not marked as handled, it is propagated to the game event queue.
@@ -81,13 +98,14 @@ ___
 Order:
 
 Render thread:
-click events require correct picked
+click handlers require correct picked
 
 picked requires current mouse position
 
 mouse movement should recalculate picked
 
 proposition:
+
 1) get position. if not in box, focused = none, else pick.
 2) now if a click occurs, picked is correct
 3) if move occurs, it must match glfw get cursor position so no need to repick.

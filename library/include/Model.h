@@ -21,15 +21,19 @@ namespace Amber {
         ModelManager* manager{nullptr}; //todo add to multiple managers? impossible, only 1 ref to mat is stored.
         Mesh* mesh{nullptr};
 
-        ModelTransform own;
-        ModelTransform* transform;
+        ModelTransform own; //for when not managed
+        ModelTransform* transform; //todo use refs
 
         ModelTransform* _getTransform() { return transform; }
 
     public:
         const unsigned long id;
 
+        //todo sort out links to transforms when models are added (deep copy)
+
         Model();
+
+        Model(Mesh* mesh);
 
         Model(Mesh* mesh, ModelTransform& transform);
 

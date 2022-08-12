@@ -19,7 +19,6 @@ namespace Amber {
         using string = std::string;
 
     private:
-        Engine* root;
         string name;
         int x, y, width, height;
         GLFWwindow* window = nullptr;
@@ -28,21 +27,21 @@ namespace Amber {
 
         template<class T, class... Args>
         static void onGLFWevent(GLFWwindow* window, Args... args) {
-            auto* p = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+            auto& p = Engine::getInstance();
             T event{window, args...};
-            if (p->getStage()->getFront()) {
-                p->getStage()->getFront()->template onEvent(event);
+            if (p.stage->getFront()) {
+                p.stage->getFront()->template onEvent(event);
                 if (!event.handled)
-                    p->events->template onEvent(event);
+                    p.handlers->template onEvent(event);
             } else
-                p->events->template onEvent(event);
+                p.handlers->template onEvent(event);
         }
 
     public:
 
         bool focused;
 
-        Stage(Engine* root, const string& name, int x, int y, int width, int height);
+        Stage(const string& name, int x, int y, int width, int height);
 
         virtual ~Stage();
 
@@ -69,7 +68,6 @@ namespace Amber {
 
         Scene* getFront() const;
 
-        Engine* getRoot() const;
     };
 
 }

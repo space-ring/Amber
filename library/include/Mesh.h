@@ -14,8 +14,8 @@ namespace Amber {
 
     struct Vertex {
         glm::vec3 position;
-        glm::vec3 normal;
         glm::vec2 texUV;
+        glm::vec3 normal;
     };
 
     class Mesh { //todo destroy
@@ -31,7 +31,7 @@ namespace Amber {
          * 2 = vertex normals
          * 10 - 13 = instance transforms
          * 14 - 17 = camera transforms
-         * 18 - 21 = perspective transforms
+         * 18 - 21 = projection transforms
          */
         GLuint VAO{0},
                 vertexVBO{0},
@@ -41,7 +41,7 @@ namespace Amber {
     public:
         static Mesh* getDefault();
 
-        static void deleteDefault();
+        static void deleteDefault(); //todo use local static
 
         Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
 
@@ -52,6 +52,10 @@ namespace Amber {
         GLuint getInstanceVbo() const;
 
         GLuint getVao() const;
+
+        GLuint getElementCount() const;
+
+        GLuint getEbo() const;
     };
 }
 

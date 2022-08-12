@@ -21,7 +21,8 @@ namespace Amber {
         std::vector<int> elems;
         string item;
         while (std::getline(ss, item, delimiter)) {
-            elems.push_back(std::stoi(item));
+            if (!item.empty())
+                elems.push_back(std::stoi(item));
         }
         return elems;
     }

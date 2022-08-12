@@ -17,9 +17,9 @@ class DemoLayer : public Amber::Layer {
     Amber::window_events::FocusHandler onFocus;
     Amber::window_events::EnterHandler onEnter;
 
-    Amber::Model cube;
+    Amber::Model cube, triangle;
 
-    Amber::Camera camera;
+    void test();
 
 public:
     DemoLayer();

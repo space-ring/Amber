@@ -7,13 +7,19 @@
 
 
 #include "Scene.h"
-#include "DemoLayer.h"
 #include "Engine.h"
+#include "DemoLayer.h"
+#include "GroundLayer.h"
+
 
 class DemoScene : public Amber::Scene {
     friend DemoLayer;
+    friend GroundLayer;
 
     DemoLayer demoLayer;
+    GroundLayer groundLayer;
+
+    Amber::Camera camera;
 
     DemoScene();
 

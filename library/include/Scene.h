@@ -27,14 +27,10 @@ namespace Amber {
     class Scene {
     protected:
 
-        Stage* stage = nullptr;
-
         using id = unsigned long;
         using string = std::string;
 
         bool built = false;
-        std::map<id, Camera*> cameras;
-        std::map<id, Light*> lights;
         LayerStack layers;
 
 //    ModelTransform* last_picked = nullptr;
@@ -49,14 +45,6 @@ namespace Amber {
 
         virtual ~Scene();
 
-        id addCamera(Camera* camera);
-
-        id addLight(Light* light);
-
-        void removeCamera(id index);
-
-        void removeLight(id index);
-
         virtual void build() = 0;
 
         virtual void show() = 0;
@@ -68,8 +56,6 @@ namespace Amber {
         virtual void pick(double x, double y) = 0;
 
         virtual void render() = 0;
-
-        void setStage(Stage* stage);
 
         //todo should be virtual?
         template<class T>

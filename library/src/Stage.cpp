@@ -9,8 +9,8 @@
 #include <ctime>
 
 namespace Amber {
-    Stage::Stage(Engine* root, const string& name, int x, int y, int width, int height)
-            : root(root), name(name), x(x), y(y), width(width), height(height) {
+    Stage::Stage(const string& name, int x, int y, int width, int height)
+            : name(name), x(x), y(y), width(width), height(height) {
     }
 
     Stage::~Stage() {
@@ -20,6 +20,7 @@ namespace Amber {
     }
 
     void Stage::init() {
+        std::cout << "GL on thread " << std::this_thread::get_id() << std::endl;
         // set up GL context
         if (!glfwInit()) {
             exit(1);
@@ -39,10 +40,12 @@ namespace Amber {
         }
 
         glfwSetWindowPos(window, x, y);
-//        glfwSwapInterval(1);
+        glfwSwapInterval(1);
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
-        glfwSetWindowUserPointer(window, root);
+        int pixWidth, pixHeight;
+        glfwGetFramebufferSize(window, &pixWidth, &pixHeight);
+        glViewport(0, 0, pixWidth, pixHeight);
 
         //game_events
         glfwSetCursorEnterCallback(window, onGLFWevent<window_events::EnterEvent, int>);
@@ -53,9 +56,10 @@ namespace Amber {
         glfwSetMouseButtonCallback(window, onGLFWevent<window_events::ClickEvent, int, int, int>);
         glfwSetScrollCallback(window, onGLFWevent<window_events::ScrollEvent, double, double>);
         glfwSetCursorPosCallback(window, onGLFWevent<window_events::MotionEvent, double, double>);
+        glfwSetFramebufferSizeCallback(window, onGLFWevent<window_events::FramebufferSizeEvent, int, int>);
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+//        glEnable(GL_CULL_FACE);
     }
 
     void Stage::render() {
@@ -100,7 +104,6 @@ namespace Amber {
 
     void Stage::addScene(const string& id, Scene* scene) {
         scenes->insert(std::pair(id, scene));
-        scene->setStage(this);
     }
 
     void Stage::setFrontScene(const string& scene) {
@@ -113,10 +116,6 @@ namespace Amber {
 
     Scene* Stage::getFront() const {
         return front;
-    }
-
-    Engine* Stage::getRoot() const {
-        return root;
     }
 
 }

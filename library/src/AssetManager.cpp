@@ -12,14 +12,21 @@
 namespace Amber {
     AssetManager::AssetManager() {}
 
+    /*
+     * The problem here was that if an asset was retrieved before calling this method,
+     * freshly constructed and built meshes could not be added since there would've already been a mapping.
+     * So split the calls into 2, one for setting the mapping (if it doesn't already exist) and then build.
+     */
     void AssetManager::buildAll() {
         Shader::getDefault()->build();
         for (const auto& shader: *shaderPaths) {
-            addShader(shader.first, *loadShaderFile(shader.second)->build());
+            addShader(shader.first, *loadShaderFile(shader.second));
+            getShader(shader.first)->build();
         }
         Mesh::getDefault()->build();
         for (const auto& mesh: *meshPaths) {
-            addMesh(mesh.first, *loadMeshFile(mesh.second)->build());
+            addMesh(mesh.first, *loadMeshFile(mesh.second)); //add if not constructed
+            getMesh(mesh.first)->build(); //and build (whether previously retrieved or not)
         }
 //    for (auto texture: *textures) {
 //        texture.renderState->build();
@@ -34,13 +41,13 @@ namespace Amber {
         string line;
         std::stringstream ss(manifest);
         while (std::getline(ss, line, '\n')) {
+            if (line.starts_with("#")) continue;
             auto items = split(line, '@');
             string type = items[0];
             string name = items[1];
 
             if (type == "mesh") {
-                auto pair = std::pair<string, string>(name, items[2]);
-                meshPaths->insert(pair);
+                addMesh(name, items[2]);
 
             } else if (type == "shader") {
                 string v, f, g, tc, te, c;
@@ -51,7 +58,7 @@ namespace Amber {
                 }
 
                 compoundShader paths{v, f, g, tc, te, c};
-                shaderPaths->insert(std::pair<string, compoundShader>(name, paths));
+                addShader(name, paths);
             }
         }
     }

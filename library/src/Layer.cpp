@@ -6,8 +6,4 @@
 
 namespace Amber {
 
-    void Layer::removeHandler(long id) {
-        handlers.erase(id);
-    }
-
 }

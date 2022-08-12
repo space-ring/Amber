@@ -23,11 +23,9 @@
 //todo use references instead of pointers
 //todo circular dependencies with IO
 //todo make everything public?
-//todo singleton engine?
 //todo move semantics (engine should own almost everything)
 //todo destructor calls destroy (so can terminate graphics manually)
 //todo some vectors need to be changed to lists when random access not needed
-//todo omg use singletons fgs
 
 namespace Amber {
     class Stage;
@@ -37,25 +35,30 @@ namespace Amber {
 
     private:
         volatile bool running = false;
-        Stage* stage;
 
-    public:
-
-        AssetManager* assets;
-        EventManager* events;
         Engine(const string& name, int x, int y, int width, int height);
 
         virtual ~Engine();
+
+    public:
+        AssetManager* assets;
+        EventManager* handlers;
+        Stage* stage;
+
+        static Engine& getInstance(const string& name, int x, int y, int width, int height) {
+            static Engine engine(name, x, y, width, height);
+            return engine;
+        }
+
+        static Engine& getInstance() {
+            return getInstance("", 100, 100, 100, 100);
+        }
 
         /* Initialises all listed resources, scenes and stages. Enters main renderState loop */
         void init();
 
         /* Requests for the window to shut down */
         void kill();
-
-        Stage* getStage() const {
-            return stage;
-        };
 
         bool getRunning() const;
 
