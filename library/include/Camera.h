@@ -13,7 +13,7 @@ namespace Amber {
     public:
         glm::vec3 position, rotation;
         glm::mat4 view, perspective, orthogonal;
-        float fov, ratio, near_p, far_p, near_o, far_o;
+        float fov, width, height, near_p, far_p, near_o, far_o;
 
         void updatePerspective();
 
@@ -33,12 +33,14 @@ namespace Amber {
          * @param nearO
          * @param farO
          */
-        Camera(const glm::vec3& pos, const glm::vec3& rotation, float fov, float ratio, float nearP,
-               float farP, float nearO, float farO);
+        Camera(const glm::vec3& pos, const glm::vec3& rotation, float fov, float width,
+               float height, float nearP, float farP, float nearO, float farO);
 
-        void setPerspective(float fov, float ratio, float near, float far);
+        void setPerspective(float fov, float width, float height, float near, float far);
 
-        void setOrthogonal(float near, float far);
+        void setOrthogonal(float width, float height, float near, float far);
+
+        void setAspectRatio(float width, float height);
 
         void move(const glm::vec3& dxyz);
 

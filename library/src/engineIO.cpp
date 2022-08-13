@@ -31,8 +31,8 @@ namespace Amber {
     }
 
     Shader* loadShaderFile(const compoundShader& paths) {
-        return new Shader(
-                new compoundShader{
+        return loadShader(
+                {
                         readFile(paths.vertex),
                         readFile(paths.fragment),
                         readFile(paths.geometry),
@@ -44,10 +44,7 @@ namespace Amber {
     }
 
     Shader* loadShader(const compoundShader& sources) {
-        return new Shader(new compoundShader{
-                sources.vertex, sources.fragment, sources.geometry,
-                sources.tessControl, sources.tessEval, sources.compute
-        });
+        return new Shader(sources);
     }
 
 /*
@@ -86,11 +83,8 @@ Mesh* loadMeshFromScene(const aiScene* scene) {
     return new Mesh(&vertices, &indices);
 }
 */
-    Mesh* loadMeshFile(const string& path) {
-        return loadMesh(readFile(path));
-    }
 
-    Mesh* loadMesh(const string& mesh) {
+    RawMesh parseMesh(const string& mesh){
         std::stringstream ss(mesh);
         string line;
         std::vector<glm::vec3> positions, normals;
@@ -145,11 +139,20 @@ Mesh* loadMeshFromScene(const aiScene* scene) {
                 }
             }
         }
-        return new Mesh(vertices, indices);
+        return {vertices, indices};
     }
 
-    Texture* getTextureFile(const string& path, SupportedTextures type) {
-        return 0;
+
+    Mesh* loadMeshFile(const string& path) {
+        return loadMesh(readFile(path));
+    }
+
+    Mesh* loadMesh(const string& mesh) {
+        return new Mesh(parseMesh(mesh));
+    }
+
+    Texture* getTextureFile(const string& path) {
+        return nullptr;
     }
 
 //Mesh* loadMeshFile(string& path) {

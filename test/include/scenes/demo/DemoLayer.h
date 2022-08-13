@@ -13,20 +13,14 @@
 class DemoLayer : public Amber::Layer {
     friend class DemoScene;
 
-    float r = 0, g = 0, b = 0, a = 1;
-    Amber::window_events::FocusHandler onFocus;
-    Amber::window_events::EnterHandler onEnter;
-
-    Amber::Model cube, triangle;
-
-    void test();
+    Amber::Model cube;
 
 public:
     DemoLayer();
 
     void render() override;
 
-    void pick(double x, double y) override;
+    Amber::Model* pick(double x, double y) override;
 
     void update() override;
 

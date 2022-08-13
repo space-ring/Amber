@@ -59,7 +59,7 @@ namespace Amber {
         glfwSetFramebufferSizeCallback(window, onGLFWevent<window_events::FramebufferSizeEvent, int, int>);
 
         glEnable(GL_DEPTH_TEST);
-//        glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
     }
 
     void Stage::render() {
@@ -81,12 +81,12 @@ namespace Amber {
     }
 
     void Stage::pick() {
-        int wx, wy, ww, wh;
-        double dx, dy;
-        glfwGetWindowPos(window, &wx, &wy);
+        int ww, wh;
         glfwGetWindowSize(window, &ww, &wh);
+        double dx, dy;
         glfwGetCursorPos(window, &dx, &dy);
-        if (wx <= (int) dx && (int) dx < (wx + ww) && wy <= (int) dy && (int) dy < (wy + wh))
+        int mx = dx, my = dy;
+        if (0 <= mx && mx < ww && 0 <= my && my < wh)
             if (front) front->pick(dx, dy);
     }
 

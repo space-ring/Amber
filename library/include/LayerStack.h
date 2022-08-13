@@ -31,7 +31,7 @@ namespace Amber {
             }
         }
 
-        void pick(double x, double y);
+        Model* pick(double x, double y);
 
         void update();
 

@@ -20,7 +20,7 @@ namespace Amber {
     }
 
     void Scene::pick(double x, double y) {
-        layers.pick(x, y);
+        Model* picked = layers.pick(x, y);
     }
 
     LayerStack& Scene::getLayers() {

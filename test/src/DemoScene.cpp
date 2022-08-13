@@ -7,9 +7,14 @@
 #include "Stage.h"
 
 DemoScene::DemoScene()
-        : camera(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 85, 1, 0.1, 100, 0.1, 100) {
+        : camera(glm::vec3(0), glm::vec3(0), 85, 500,500, 0.01, 100, 0.1, 100) {
     layers.addLayer(&demoLayer);
     layers.addLayer(&groundLayer);
+
+    handlers.addHandler(Amber::window_events::FramebufferSizeHandler (
+            [&](Amber::window_events::FramebufferSizeEvent& e) {
+                camera.setAspectRatio((float) e.width, (float) e.height);
+            }));
 };
 
 DemoScene::~DemoScene() {

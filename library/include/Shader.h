@@ -24,9 +24,8 @@ namespace Amber {
 
     class Shader {
     private:
-        static Shader* DEFAULT;
 
-        compoundShader* sources;
+        compoundShader sources; //todo think about lifetime of this and sharing between shader programs
 
         GLuint program = 0,
                 vertex = 0,
@@ -41,12 +40,10 @@ namespace Amber {
     public:
         static Shader* getDefault();
 
-        static void deleteDefault();
-
         Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
                GLuint compute);
 
-        Shader(compoundShader* sources);
+        Shader(const compoundShader& sources);
 
         virtual ~Shader();
 

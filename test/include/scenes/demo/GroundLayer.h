@@ -10,7 +10,8 @@
 class GroundLayer : public Amber::Layer{
     friend class DemoScene;
 
-    Amber::Model m1, m2, m3, m4;
+    Amber::Model ground;
+    Amber::Model m1,m2,m3,m4;
 
 public:
 
@@ -18,7 +19,7 @@ public:
 
     void render() override;
 
-    void pick(double x, double y) override;
+    Amber::Model* pick(double x, double y) override;
 
     void update() override;
 };

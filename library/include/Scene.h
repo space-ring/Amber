@@ -22,8 +22,6 @@
 
 namespace Amber {
 
-    class Stage;
-
     class Scene {
     protected:
 
@@ -32,12 +30,12 @@ namespace Amber {
 
         bool built = false;
         LayerStack layers;
+        EventManager handlers;
 
-//    ModelTransform* last_picked = nullptr;
-//    ModelTransform* dragged = nullptr;
-//    ModelTransform* primed = nullptr;
-//    ModelTransform* last_focused = nullptr;
-
+    ModelTransform* last_picked = nullptr;
+    ModelTransform* dragged = nullptr;
+    ModelTransform* primed = nullptr;
+    ModelTransform* last_focused = nullptr;
 
     public:
 
@@ -57,10 +55,10 @@ namespace Amber {
 
         virtual void render() = 0;
 
-        //todo should be virtual?
         template<class T>
         void onEvent(T& event) {
             layers.template onEvent(event);
+            handlers.template onEvent(event);
         }
 
         LayerStack& getLayers();

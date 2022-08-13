@@ -16,11 +16,14 @@ namespace Amber {
         }
     }
 
-    void LayerStack::pick(double x, double y) {
+    Model* LayerStack::pick(double x, double y) {
+        Model* picked = nullptr;
         for (auto layer : stack) {
             if (!layer->active) continue;
-            layer->pick(x,y);
+            picked = layer->pick(x,y);
+            if (picked) break;
         }
+        return picked;
     }
 
     void LayerStack::update() {

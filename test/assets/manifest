@@ -1,8 +1,10 @@
-mesh@box@assets/box.obj
-mesh@plane@assets/plane.obj
+mesh box assets/meshes/box.obj
+mesh plane assets/meshes/plane.obj
+mesh triangle assets/meshes/triangle.obj
+
+shader basic assets/shaders/basic.vert assets/shaders/basic.frag
+shader pick assets/shaders/pick.vert assets/shaders/pick.frag
+
 #format of shader manifests:
-# shader@program name@vertex@fragment@geometry@tess control@tess eval@compute
-#shader@wire@assets/wire.vert@assets/wire.frag
-shader@basic@assets/basic.vert@assets/basic.frag
-mesh@triangle@assets/triangle.obj
-shader@easy@assets/test.vert@assets/test.frag
+# shader program name vertex fragment geometry tess control tess eval compute
+#shader wire assets/shaders/wire.vert assets/shaders/wire.frag

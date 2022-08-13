@@ -16,8 +16,6 @@ int main() {
     Sandbox& game = app.game;
 
     engine.assets->addManifest("assets/manifest");
-
-    auto plane = engine.assets->getMesh("plane");
     engine.stage->addScene("demo", &DemoScene::getInstance());
     engine.stage->setFrontScene("demo");
 

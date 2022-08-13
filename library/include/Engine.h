@@ -26,7 +26,8 @@
 //todo move semantics (engine should own almost everything)
 //todo destructor calls destroy (so can terminate graphics manually)
 //todo some vectors need to be changed to lists when random access not needed
-
+//todo move away from string references
+//todo resource classes should adhere to the big 5.
 namespace Amber {
     class Stage;
 

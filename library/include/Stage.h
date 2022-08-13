@@ -31,9 +31,8 @@ namespace Amber {
             T event{window, args...};
             if (p.stage->getFront()) {
                 p.stage->getFront()->template onEvent(event);
-                if (!event.handled)
-                    p.handlers->template onEvent(event);
-            } else
+            }
+            if (!event.handled)
                 p.handlers->template onEvent(event);
         }
 

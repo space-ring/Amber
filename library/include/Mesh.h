@@ -18,17 +18,22 @@ namespace Amber {
         glm::vec3 normal;
     };
 
-    class Mesh { //todo destroy
-    private:
-        inline static Mesh* DEFAULT = nullptr;
+    struct RawMesh {
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
+    };
+
+    class Mesh {
+    private:
+
+        RawMesh data;
 
         /**
          * VAO Standard attributes:
          * 0 = vertex positions
          * 1 = vertex textures
          * 2 = vertex normals
+         * 3 = model pick colour
          * 10 - 13 = instance transforms
          * 14 - 17 = camera transforms
          * 18 - 21 = projection transforms
@@ -41,9 +46,7 @@ namespace Amber {
     public:
         static Mesh* getDefault();
 
-        static void deleteDefault(); //todo use local static
-
-        Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+        Mesh(const RawMesh& data);
 
         virtual ~Mesh();
 

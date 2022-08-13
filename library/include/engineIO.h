@@ -41,6 +41,8 @@ namespace Amber {
  */
     Mesh* loadMesh(const string& mesh);
 
-    Texture* getTextureFile(const string& path, enum SupportedTextures type); // todo texture types
+    RawMesh parseMesh(const string& mesh);
+
+    Texture* getTextureFile(const string& path); // todo texture types
 }
 #endif //ENGINE_IO_H

@@ -90,4 +90,10 @@ namespace Amber {
         return 0;
     }
 
+    unsigned long ModelManager::getCount(Mesh* mesh) {
+        unsigned long count = 0;
+        if (instances.contains(mesh))
+            count = instances.at(mesh)->size();
+        return count;
+    }
 }

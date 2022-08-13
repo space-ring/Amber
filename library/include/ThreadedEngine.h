@@ -53,7 +53,7 @@ namespace Amber {
             while (engine.getRunning()) {
                 buffer.bufferCopy();
                 stage->update();
-//                stage->pick();
+                stage->pick();
                 stage->poll();
                 stage->render();
 //                using namespace std::chrono_literals;
@@ -75,7 +75,7 @@ namespace Amber {
         Game& game = buffer.getLogicState();
 
         void run() {
-//            gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
+//            gameThread = std::jthread{&ThreadedEngine::gameLoop, this}; todo RELEASE uncomment this
             renderLoop();
             game.running = false;
             if (gameThread.joinable()) gameThread.join();

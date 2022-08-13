@@ -42,21 +42,24 @@ GroundLayer::GroundLayer() {
     m3.getTransform()->attachParent(*m1.getTransform(), true);
     m4.getTransform()->attachParent(*m1.getTransform(), true);
 
-    m1.translate(glm::vec3(-1, -1, -2));
+    m1.translate(glm::vec3(-1, -1, -20));
     m2.translate(glm::vec3(2, 0, 0));
     m3.translate(glm::vec3(0, 2, 0));
     m4.translate(glm::vec3(2, 2, 0));
+    m1.scale(glm::vec3(2.5));
 
     models.add(m1, 100);
     models.add(m2, 100);
     models.add(m3, 100);
     models.add(m4, 100);
 
-    handlers.addHandler(Amber::window_events::FramebufferSizeHandler (
-            [&](Amber::window_events::FramebufferSizeEvent& e) {
-                Amber::Camera& camera = DemoScene::getInstance().camera;
-                camera.setPerspective(camera.fov, (float) e.width / (float) e.height, camera.near_p, camera.far_p);
-            }));
+    ground.setMesh(mesh, 100);
+    ground.setRotation(glm::vec3(90, 0, 0));
+    ground.setScale(glm::vec3(100));
+    ground.setTranslation(glm::vec3(0, -5, 0));
+
+    models.add(ground, 100);
+
 }
 
 void GroundLayer::render() {
@@ -68,25 +71,41 @@ void GroundLayer::render() {
 
     glBindVertexArray(plane->getVao());
 
-    models.buffer(plane);
-    unsigned int size = models.instances.at(plane)->size();
+    models.buffer(plane);//this buffer should be moved to pick
 
     glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
     glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
 
-//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr, size);
+    glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr, models.getCount(plane));
+
+    glBindVertexArray(0);
+    shader->stop();
+}
+
+Amber::Model* GroundLayer::pick(double x, double y) {
+    //todo example of standardised picking (model manager):
+    Amber::Engine& engine = Amber::Engine::getInstance();
+    DemoScene& scene = DemoScene::getInstance();
+    Amber::Mesh* plane = engine.assets->getMesh("plane");
+
+    Amber::Shader* shader = engine.assets->getShader("pick");
+
+    glBindVertexArray(plane->getVao());
+    models.buffer(plane); //buffer here only once per frame (in whichever function comes first after bufferCopy
+
+    glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
+    glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
+
+    unsigned int count = 4; // this is the number of pickable models from this mesh
+    glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr, count);
 
     glBindVertexArray(0);
     shader->stop();
 
-}
-
-void GroundLayer::pick(double x, double y) {
-
+    return nullptr;
 }
 
 void GroundLayer::update() {
 //    m1.translate(glm::vec3(0,0.1/60, 0));
-    m1.rotate(glm::vec3(0, 0, 90.0 / 60));
+//    m1.rotate(glm::vec3(0, 0, 90.0 / 60));
 }

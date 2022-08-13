@@ -50,20 +50,13 @@ namespace Amber {
             "f 1/3/5 3/2/5 4/5/5\n"
             "f 5/12/6 1/3/6 2/9/6";
 
-    Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
-            : vertices(vertices),
-              indices(indices) {
+    Mesh::Mesh(const RawMesh& data)
+            : data(data) {
     }
 
     Mesh* Mesh::getDefault() {
-        if (!DEFAULT) {
-            DEFAULT = loadMesh(DEFAULT_MESH);
-        }
-        return DEFAULT;
-    }
-
-    void Mesh::deleteDefault() {
-        if (DEFAULT) delete DEFAULT;
+        static Mesh DEFAULT(parseMesh(DEFAULT_MESH));
+        return &DEFAULT;
     }
 
     Mesh* Mesh::build() {
@@ -76,10 +69,10 @@ namespace Amber {
         glCheckError();
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data.vertices.size() * sizeof(Vertex), &data.vertices[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(unsigned int), &data.indices[0], GL_STATIC_DRAW);
         glCheckError();
         // vertex positions
         glEnableVertexAttribArray(0);
@@ -125,7 +118,7 @@ namespace Amber {
     }
 
     GLuint Mesh::getElementCount() const {
-        return indices.size();
+        return data.indices.size();
     }
 
     GLuint Mesh::getEbo() const {

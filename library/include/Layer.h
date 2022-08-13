@@ -26,12 +26,7 @@ namespace Amber {
 
         virtual void render() = 0;
 
-        /*
-         * todo default implementation,
-         * perhaps store all pickable models in a list (map by mesh) what about fbos?
-         * Remember to check against frame bounds in subs!
-         */
-        virtual void pick(double x, double y) = 0;
+        virtual Model* pick(double x, double y) = 0;
 
         virtual void update() = 0;
 

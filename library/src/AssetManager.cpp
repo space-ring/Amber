@@ -34,15 +34,17 @@ namespace Amber {
     }
 
 //todo batch (name block instead of line)
-//todo manifest includes (also check for circular includes)
+//todo manifest includes (also check for circular includes) not high priority
+//todo component paths e.g. all meshes in assets/meshes
+//todo the whole manifest language!!! default to json maybe...
     void AssetManager::addManifest(const string& path) { //todo textures
         string manifest = readFile(path);
         if (manifest.empty()) return;
         string line;
         std::stringstream ss(manifest);
         while (std::getline(ss, line, '\n')) {
-            if (line.starts_with("#")) continue;
-            auto items = split(line, '@');
+            if (line.starts_with("#") || line.empty()) continue;
+            auto items = split(line, ' ');
             string type = items[0];
             string name = items[1];
 
@@ -121,13 +123,11 @@ namespace Amber {
             delete shader.second;
         }
         delete shaders;
-        Shader::deleteDefault();
 
         for (const auto& mesh: *meshes) {
             delete mesh.second;
         }
         delete meshes;
-        Mesh::deleteDefault();
     }
 
 }

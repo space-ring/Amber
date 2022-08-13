@@ -72,28 +72,18 @@ namespace Amber {
             "}";
 
 
-    Shader* Shader::DEFAULT = nullptr;
-
-    Shader* Shader::getDefault() { //todo upcast for GL context
-        if (!DEFAULT) {
-            compoundShader defaultSources{DEFAULT_VERTEX, DEFAULT_FRAGMENT};
-            DEFAULT = loadShader(defaultSources);
-        }
-        return DEFAULT;
-    }
-
-    void Shader::deleteDefault() {
-        if (DEFAULT) delete DEFAULT;
+    Shader* Shader::getDefault() { //todo upcast for GL context (what??)
+        static Shader DEFAULT({DEFAULT_VERTEX, DEFAULT_FRAGMENT});
+        return &DEFAULT;
     }
 
     Shader::Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
                    GLuint compute)
-            : sources(new compoundShader{}), program(program), vertex(vertex), tessCtrl(tessCtrl),
+            : program(program), vertex(vertex), tessCtrl(tessCtrl),
               tessEval(tessEval), geometry(geometry), fragment(fragment), compute(compute) {
     }
 
-    Shader::Shader(compoundShader* sources) : sources(sources) {
-    }
+    Shader::Shader(const compoundShader& sources) : sources(sources) {}
 
     Shader::~Shader() {
         //delete gl objects
@@ -105,7 +95,6 @@ namespace Amber {
         glDeleteShader(geometry);
         glDeleteShader(fragment);
         glDeleteShader(compute);
-        delete sources;
     }
 
     Shader* Shader::start() {
@@ -174,36 +163,43 @@ namespace Amber {
         if (program) return this;
 
         glCheckError();
-        GLuint p = glCreateProgram();glCheckError();
-        if (!sources->vertex.empty()) {
-            const char* str = sources->vertex.c_str();
+        GLuint p = glCreateProgram();
+        glCheckError();
+        if (!sources.vertex.empty()) {
+            const char* str = sources.vertex.c_str();
             addShader(VERTEX, &str);
-            glAttachShader(p, vertex);glCheckError();
+            glAttachShader(p, vertex);
+            glCheckError();
         }
-        if (!sources->tessControl.empty()) {
-            const char* str = sources->tessControl.c_str();
+        if (!sources.tessControl.empty()) {
+            const char* str = sources.tessControl.c_str();
             addShader(TESS_CONTROL, &str);
-            glAttachShader(p, tessCtrl);glCheckError();
+            glAttachShader(p, tessCtrl);
+            glCheckError();
         }
-        if (!sources->tessEval.empty()) {
-            const char* str = sources->tessEval.c_str();
+        if (!sources.tessEval.empty()) {
+            const char* str = sources.tessEval.c_str();
             addShader(TESS_EVALUATION, &str);
-            glAttachShader(p, tessEval);glCheckError();
+            glAttachShader(p, tessEval);
+            glCheckError();
         }
-        if (!sources->geometry.empty()) {
-            const char* str = sources->geometry.c_str();
+        if (!sources.geometry.empty()) {
+            const char* str = sources.geometry.c_str();
             addShader(GEOMETRY, &str);
-            glAttachShader(p, geometry);glCheckError();
+            glAttachShader(p, geometry);
+            glCheckError();
         }
-        if (!sources->fragment.empty()) {
-            const char* str = sources->fragment.c_str();
+        if (!sources.fragment.empty()) {
+            const char* str = sources.fragment.c_str();
             addShader(FRAGMENT, &str);
-            glAttachShader(p, fragment);glCheckError();
+            glAttachShader(p, fragment);
+            glCheckError();
         }
-        if (!sources->compute.empty()) {
-            const char* str = sources->compute.c_str();
+        if (!sources.compute.empty()) {
+            const char* str = sources.compute.c_str();
             addShader(COMPUTE, &str);
-            glAttachShader(p, compute);glCheckError();
+            glAttachShader(p, compute);
+            glCheckError();
         }
 
         glCheckError();
