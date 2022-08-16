@@ -5,7 +5,7 @@
 #include "Frame.h"
 
 namespace Amber {
-    Frame::Frame(unsigned int x, unsigned int y, unsigned int width, unsigned int height) : x(x), y(y), width(width),
-                                                                                            height(height) {}
+	Frame::Frame(unsigned int x, unsigned int y, unsigned int width, unsigned int height) : x(x), y(y), width(width),
+	                                                                                        height(height) {}
 
 }

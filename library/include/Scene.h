@@ -22,46 +22,46 @@
 
 namespace Amber {
 
-    class Scene {
-    protected:
+	class Scene {
+	protected:
 
-        using id = unsigned long;
-        using string = std::string;
+		using id = unsigned long;
+		using string = std::string;
 
-        bool built = false;
-        LayerStack layers;
-        EventManager handlers;
+		bool built = false;
+		LayerStack layers;
+		EventManager handlers;
 
-    ModelTransform* last_picked = nullptr;
-    ModelTransform* dragged = nullptr;
-    ModelTransform* primed = nullptr;
-    ModelTransform* last_focused = nullptr;
+		ModelTransform* last_picked = nullptr;
+		ModelTransform* dragged = nullptr;
+		ModelTransform* primed = nullptr;
+		ModelTransform* last_focused = nullptr;
 
-    public:
+	public:
 
-        Scene();
+		Scene();
 
-        virtual ~Scene();
+		virtual ~Scene();
 
-        virtual void build() = 0;
+		virtual void build() = 0;
 
-        virtual void show() = 0;
+		virtual void show() = 0;
 
-        virtual void hide() = 0;
+		virtual void hide() = 0;
 
-        virtual void update() = 0;
+		virtual void update() = 0;
 
-        virtual void pick(int x, int y) = 0;
+		virtual void pick(int x, int y) = 0;
 
-        virtual void render() = 0;
+		virtual void render() = 0;
 
-        template<class T>
-        void onEvent(T& event) {
-            layers.template onEvent(event);
-            handlers.template onEvent(event);
-        }
+		template<class T>
+		void onEvent(T& event) {
+			layers.template onEvent(event);
+			handlers.template onEvent(event);
+		}
 
-        LayerStack& getLayers();
-    };
+		LayerStack& getLayers();
+	};
 }
 #endif //ENGINE_SCENE_H

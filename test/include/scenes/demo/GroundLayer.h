@@ -7,21 +7,21 @@
 
 #include "Layer.h"
 
-class GroundLayer : public Amber::Layer{
-    friend class DemoScene;
+class GroundLayer : public Amber::Layer {
+	friend class DemoScene;
 
-    Amber::Model ground;
-    Amber::Model m1,m2,m3,m4;
+	Amber::Model ground;
+	Amber::Model m1, m2, m3, m4;
 
 public:
 
-    GroundLayer();
+	GroundLayer();
 
-    void render() override;
+	void render() override;
 
-    Amber::Model* pick(int x, int y) override;
+	Amber::Model* pick(int x, int y) override;
 
-    void update() override;
+	void update() override;
 };
 
 

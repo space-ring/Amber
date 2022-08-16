@@ -21,7 +21,7 @@ namespace Amber {
 	class Model : public ITransformable<Model> {
 		friend class ITransformable<Model>;
 
-        friend class ModelManager;
+		friend class ModelManager;
 
 		static unsigned long counter;
 		ModelManager* manager{nullptr}; //todo add to multiple managers? impossible, only 1 ref to mat is stored.

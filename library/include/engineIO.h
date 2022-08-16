@@ -16,33 +16,33 @@
 //todo error detection & handling
 //todo use string references etc
 namespace Amber {
-    using string = std::string;
+	using string = std::string;
 
-    string readFile(const string& path);
+	string readFile(const string& path);
 
-    void writeFile(const string& path, const string& file);
+	void writeFile(const string& path, const string& file);
 
 //todo put compute before tesselation
-    Shader* loadShaderFile(const compoundShader& paths);
+	Shader* loadShaderFile(const compoundShader& paths);
 
-    Shader* loadShader(const compoundShader& sources);
+	Shader* loadShader(const compoundShader& sources);
 
 /**
  * Constructs a mesh loaded from the given path
  * @param path path to mesh
  * @return Mesh object
  */
-    Mesh* loadMeshFile(const string& path);
+	Mesh* loadMeshFile(const string& path);
 
 /**
  * Constructs a mesh from the given source
  * @param mesh serialised mesh
  * @return Mesh object
  */
-    Mesh* loadMesh(const string& mesh);
+	Mesh* loadMesh(const string& mesh);
 
-    RawMesh parseMesh(const string& mesh);
+	RawMesh parseMesh(const string& mesh);
 
-    Texture* getTextureFile(const string& path); // todo texture types
+	Texture* getTextureFile(const string& path); // todo texture types
 }
 #endif //ENGINE_IO_H

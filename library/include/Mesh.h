@@ -12,53 +12,53 @@
 
 namespace Amber {
 
-    struct Vertex {
-        glm::vec3 position;
-        glm::vec2 texUV;
-        glm::vec3 normal;
-    };
+	struct Vertex {
+		glm::vec3 position;
+		glm::vec2 texUV;
+		glm::vec3 normal;
+	};
 
-    struct RawMesh {
-        std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
-    };
+	struct RawMesh {
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+	};
 
-    class Mesh {
-    private:
+	class Mesh {
+	private:
 
-        RawMesh data;
+		RawMesh data;
 
-        /**
-         * VAO Standard attributes:
-         * 0 = vertex positions
-         * 1 = vertex textures
-         * 2 = vertex normals
-         * 10 - 13 = instance transforms
-         * 14 - 17 = camera transforms
-         * 18 - 21 = projection transforms
-         */
-        GLuint VAO{0},
-                vertexVBO{0},
-                instanceVBO{0},
-                EBO{0};
+		/**
+		 * VAO Standard attributes:
+		 * 0 = vertex positions
+		 * 1 = vertex textures
+		 * 2 = vertex normals
+		 * 10 - 13 = instance transforms
+		 * 14 - 17 = camera transforms
+		 * 18 - 21 = projection transforms
+		 */
+		GLuint VAO{0},
+				vertexVBO{0},
+				instanceVBO{0},
+				EBO{0};
 
-    public:
-        static Mesh* getDefault();
+	public:
+		static Mesh* getDefault();
 
-        Mesh(const RawMesh& data);
+		Mesh(const RawMesh& data);
 
-        virtual ~Mesh();
+		virtual ~Mesh();
 
-        Mesh* build();
+		Mesh* build();
 
-        GLuint getInstanceVbo() const;
+		GLuint getInstanceVbo() const;
 
-        GLuint getVao() const;
+		GLuint getVao() const;
 
-        GLuint getElementCount() const;
+		GLuint getElementCount() const;
 
-        GLuint getEbo() const;
-    };
+		GLuint getEbo() const;
+	};
 }
 
 

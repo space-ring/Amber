@@ -13,46 +13,46 @@
 
 namespace Amber {
 
-    Engine::Engine(const string& name, int x, int y, int width, int height) :
-            assets(new AssetManager()),
-            handlers(new EventManager()),
-            stage(new Stage(name, x, y, width, height)) {
-        std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;
-    }
+	Engine::Engine(const string& name, int x, int y, int width, int height) :
+			assets(new AssetManager()),
+			handlers(new EventManager()),
+			stage(new Stage(name, x, y, width, height)) {
+		std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;
+	}
 
-    Engine::~Engine() {
-        std::cout << "destroying engine from thread " << std::this_thread::get_id() << std::endl;
-        delete assets;
-        delete handlers;
-        delete stage;
-    };
+	Engine::~Engine() {
+		std::cout << "destroying engine from thread " << std::this_thread::get_id() << std::endl;
+		delete assets;
+		delete handlers;
+		delete stage;
+	};
 
-    void Engine::init() {
-        stage->init();
+	void Engine::init() {
+		stage->init();
 
-        handlers->addHandler(
-                window_events::CloseHandler([&](window_events::CloseEvent&) { running = false; })
-        );
-        handlers->addHandler(
-                window_events::FocusHandler([&](window_events::FocusEvent& e) { stage->focused = e.focused; })
-        );
-        handlers->addHandler(
-                window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
-                    glViewport(0, 0, e.width, e.height);
-                })
-        );
+		handlers->addHandler(
+				window_events::CloseHandler([&](window_events::CloseEvent&) { running = false; })
+		);
+		handlers->addHandler(
+				window_events::FocusHandler([&](window_events::FocusEvent& e) { stage->focused = e.focused; })
+		);
+		handlers->addHandler(
+				window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
+					glViewport(0, 0, e.width, e.height);
+				})
+		);
 
-        stage->show();
+		stage->show();
 
-        running = true;
-    }
+		running = true;
+	}
 
-    void Engine::kill() {
-        running = false;
-    }
+	void Engine::kill() {
+		running = false;
+	}
 
-    bool Engine::getRunning() const {
-        return running;
-    }
+	bool Engine::getRunning() const {
+		return running;
+	}
 
 }

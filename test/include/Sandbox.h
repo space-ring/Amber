@@ -10,13 +10,14 @@
 
 struct Sandbox {
 
-    bool running = true;
-    Amber::EventManager events;
-    Sandbox();
+	bool running = true;
+	Amber::EventManager events;
 
-    void update(){
+	Sandbox();
 
-    }
+	void update() {
+
+	}
 };
 
 

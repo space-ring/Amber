@@ -15,59 +15,59 @@
 #include "EventManager.h"
 
 namespace Amber {
-    class Stage {
-        using string = std::string;
+	class Stage {
+		using string = std::string;
 
-    private:
-        string name;
-        int x, y, width, height;
-        GLFWwindow* window = nullptr;
-        std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
-        Scene* front = nullptr;
+	private:
+		string name;
+		int x, y, width, height;
+		GLFWwindow* window = nullptr;
+		std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
+		Scene* front = nullptr;
 
-        template<class T, class... Args>
-        static void onGLFWevent(GLFWwindow* window, Args... args) {
-            auto& p = Engine::getInstance();
-            T event{window, args...};
-            if (p.stage->getFront()) {
-                p.stage->getFront()->template onEvent(event);
-            }
-            if (!event.handled)
-                p.handlers->template onEvent(event);
-        }
+		template<class T, class... Args>
+		static void onGLFWevent(GLFWwindow* window, Args... args) {
+			auto& p = Engine::getInstance();
+			T event{window, args...};
+			if (p.stage->getFront()) {
+				p.stage->getFront()->template onEvent(event);
+			}
+			if (!event.handled)
+				p.handlers->template onEvent(event);
+		}
 
-    public:
+	public:
 
-        bool focused;
+		bool focused;
 
-        Stage(const string& name, int x, int y, int width, int height);
+		Stage(const string& name, int x, int y, int width, int height);
 
-        virtual ~Stage();
+		virtual ~Stage();
 
-        /* Initialises GLFW window and OpenGL context */
-        void init();
+		/* Initialises GLFW window and OpenGL context */
+		void init();
 
-        void render();
+		void render();
 
-        void poll();
+		void poll();
 
-        void update();
+		void update();
 
-        void pick();
+		void pick();
 
-        void show();
+		void show();
 
-        void hide();
+		void hide();
 
-        GLFWwindow* getWindow() const;
+		GLFWwindow* getWindow() const;
 
-        void addScene(const string& id, Scene* scene);
+		void addScene(const string& id, Scene* scene);
 
-        void setFrontScene(const string& scene);
+		void setFrontScene(const string& scene);
 
-        Scene* getFront() const;
+		Scene* getFront() const;
 
-    };
+	};
 
 }
 

@@ -11,26 +11,26 @@
 #include <map>
 
 namespace Amber {
-    class Layer {
+	class Layer {
 
-    public:
+	public:
 
-        ModelManager models;
-        EventManager handlers;
+		ModelManager models;
+		EventManager handlers;
 
-        bool active = true;
+		bool active = true;
 
-        Layer() = default;
+		Layer() = default;
 
-        virtual ~Layer() = default;
+		virtual ~Layer() = default;
 
-        virtual void render() = 0;
+		virtual void render() = 0;
 
-        virtual Model* pick(int x, int y) = 0;
+		virtual Model* pick(int x, int y) = 0;
 
-        virtual void update() = 0;
+		virtual void update() = 0;
 
-    };
+	};
 
 }
 

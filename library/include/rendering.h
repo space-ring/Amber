@@ -9,23 +9,23 @@
 #include "Frame.h"
 
 namespace Amber {
-    class Scene;
+	class Scene;
 
-    class Engine;
+	class Engine;
 
-    template<class... Args>
-    class RenderCall {
-        using f = std::function<Frame(Args...)>;
+	template<class... Args>
+	class RenderCall {
+		using f = std::function<Frame(Args...)>;
 
-        const f function;
+		const f function;
 
-    public:
-        RenderCall(const f& function) : function(function) {}
+	public:
+		RenderCall(const f& function) : function(function) {}
 
-        Frame operator()(Args... args) {
-            return function(args...);
-        }
-    };
+		Frame operator()(Args... args) {
+			return function(args...);
+		}
+	};
 
 }
 #endif //ENGINE_RENDERING_H

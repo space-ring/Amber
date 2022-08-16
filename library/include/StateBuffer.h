@@ -8,29 +8,29 @@
 #include <mutex>
 
 namespace Amber {
-    template<class T>
-    class StateBuffer {
-        T logicState, copy, renderState;
-        std::mutex copy_mutex;
+	template<class T>
+	class StateBuffer {
+		T logicState, copy, renderState;
+		std::mutex copy_mutex;
 
-    public:
+	public:
 
-        StateBuffer() : logicState(T()), copy(T()), renderState(T()) {}
+		StateBuffer() : logicState(T()), copy(T()), renderState(T()) {}
 
-        void bufferUpdate() {
-            std::lock_guard lock(copy_mutex);
-            copy = logicState;
-        }
+		void bufferUpdate() {
+			std::lock_guard lock(copy_mutex);
+			copy = logicState;
+		}
 
-        void bufferCopy() {
-            std::lock_guard lock(copy_mutex);
-            renderState = copy;
-        }
+		void bufferCopy() {
+			std::lock_guard lock(copy_mutex);
+			renderState = copy;
+		}
 
-        T& getLogicState() {
-            return logicState;
-        }
-    };
+		T& getLogicState() {
+			return logicState;
+		}
+	};
 
 }
 #endif //ENGINE_STATEBUFFER_H

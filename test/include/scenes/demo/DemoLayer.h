@@ -11,18 +11,18 @@
 
 
 class DemoLayer : public Amber::Layer {
-    friend class DemoScene;
+	friend class DemoScene;
 
-    Amber::Model cube;
+	Amber::Model cube;
 
 public:
-    DemoLayer();
+	DemoLayer();
 
-    void render() override;
+	void render() override;
 
-    Amber::Model* pick(int x, int y) override;
+	Amber::Model* pick(int x, int y) override;
 
-    void update() override;
+	void update() override;
 
 };
 

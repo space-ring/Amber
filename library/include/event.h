@@ -10,153 +10,153 @@
 #include  <iostream>
 
 namespace Amber {
-    struct Event { //todo list init / constructors ?
-        bool handled;
+	struct Event { //todo list init / constructors ?
+		bool handled;
 
-        Event();
+		Event();
 
-        virtual ~Event();
-    };
+		virtual ~Event();
+	};
 
-    template<class T>
-    class EventHandler {
-        typedef std::function<void(Event&)> base_handler;
-        typedef std::function<void(T&)> derived_handler;
+	template<class T>
+	class EventHandler {
+		typedef std::function<void(Event&)> base_handler;
+		typedef std::function<void(T&)> derived_handler;
 
-        const derived_handler function;
+		const derived_handler function;
 
-        static const derived_handler& check(const derived_handler& h) { //todo concepts?
-            Event* p = static_cast<T*>(nullptr);
-            return h;
-        }
+		static const derived_handler& check(const derived_handler& h) { //todo concepts?
+			Event* p = static_cast<T*>(nullptr);
+			return h;
+		}
 
-    public:
-        static const unsigned long type;
-        bool active{true};
+	public:
+		static const unsigned long type;
+		bool active{true};
 
-        static base_handler upcast(const derived_handler& handler) { // existence of handler already checks T : Event
-            return [handler](Event& event) -> void {
-                handler(dynamic_cast<T&>(event)); //downcast for call, dynamic to ensure no sibling event cast
-            };
-        }
+		static base_handler upcast(const derived_handler& handler) { // existence of handler already checks T : Event
+			return [handler](Event& event) -> void {
+				handler(dynamic_cast<T&>(event)); //downcast for call, dynamic to ensure no sibling event cast
+			};
+		}
 
-        EventHandler(const derived_handler& handler) :
-                function(check(handler)) {} //check T : Event
+		EventHandler(const derived_handler& handler) :
+				function(check(handler)) {} //check T : Event
 
-        void operator()(T& event) {
-            function(event);
-        }
-    };
+		void operator()(T& event) {
+			function(event);
+		}
+	};
 
-    extern unsigned long handler_counter;
-    template<class T>
-    const unsigned long EventHandler<T>::type = handler_counter++;
+	extern unsigned long handler_counter;
+	template<class T>
+	const unsigned long EventHandler<T>::type = handler_counter++;
 
-    using GenericHandler = EventHandler<Event>;
+	using GenericHandler = EventHandler<Event>;
 
-    namespace scene_events {
-        struct Event : Amber::Event {
+	namespace scene_events {
+		struct Event : Amber::Event {
 
-        };
+		};
 
-        struct EnterEvent : Event {
+		struct EnterEvent : Event {
 
-        };
+		};
 
-        using EnterHandler = EventHandler<EnterEvent>;
+		using EnterHandler = EventHandler<EnterEvent>;
 
-    }
+	}
 
-    namespace window_events {
+	namespace window_events {
 
-        enum class event_type {
-            CLOSE,
-            ENTER,
-            FOCUS,
-            KEY,
-            CHAR,
-            CLICK,
-            SCROLL,
-            MOTION
-        };
+		enum class event_type {
+			CLOSE,
+			ENTER,
+			FOCUS,
+			KEY,
+			CHAR,
+			CLICK,
+			SCROLL,
+			MOTION
+		};
 
-    struct Event : public Amber::Event {
-            const GLFWwindow* window;
+		struct Event : public Amber::Event {
+			const GLFWwindow* window;
 
-            Event(const GLFWwindow* window);
-        };
+			Event(const GLFWwindow* window);
+		};
 
-        struct EnterEvent : public Event {
-            const int entered;
+		struct EnterEvent : public Event {
+			const int entered;
 
-            EnterEvent(const GLFWwindow* window, const int entered);
-        };
+			EnterEvent(const GLFWwindow* window, const int entered);
+		};
 
-        struct FocusEvent : Event {
-            const int focused;
+		struct FocusEvent : Event {
+			const int focused;
 
-            FocusEvent(const GLFWwindow* window, const int focused);
-        };
+			FocusEvent(const GLFWwindow* window, const int focused);
+		};
 
-        struct CloseEvent : Event {
-            CloseEvent(const GLFWwindow* window);
-        };
+		struct CloseEvent : Event {
+			CloseEvent(const GLFWwindow* window);
+		};
 
-        struct KeyEvent : Event {
-            const int key;
-            const int scancode;
-            const int action;
-            const int mods;
+		struct KeyEvent : Event {
+			const int key;
+			const int scancode;
+			const int action;
+			const int mods;
 
-            KeyEvent(const GLFWwindow* window, const int key, const int scancode, const int action, const int mods);
-        };
+			KeyEvent(const GLFWwindow* window, const int key, const int scancode, const int action, const int mods);
+		};
 
-        struct CharEvent : Event {
-            const unsigned int codepoint;
+		struct CharEvent : Event {
+			const unsigned int codepoint;
 
-            CharEvent(const GLFWwindow* window, const unsigned int codepoint);
-        };
+			CharEvent(const GLFWwindow* window, const unsigned int codepoint);
+		};
 
-        struct MotionEvent : Event {
-            const double xpos;
-            const double ypos;
+		struct MotionEvent : Event {
+			const double xpos;
+			const double ypos;
 
-            MotionEvent(const GLFWwindow* window, const double xpos, const double ypos);
-        };
+			MotionEvent(const GLFWwindow* window, const double xpos, const double ypos);
+		};
 
-        struct ClickEvent : Event {
-            const int button;
-            const int action;
-            const int mods;
+		struct ClickEvent : Event {
+			const int button;
+			const int action;
+			const int mods;
 
-            ClickEvent(const GLFWwindow* window, const int button, const int action, const int mods);
-        };
+			ClickEvent(const GLFWwindow* window, const int button, const int action, const int mods);
+		};
 
-        struct ScrollEvent : Event {
-            const double xoffset;
-            const double yoffset;
+		struct ScrollEvent : Event {
+			const double xoffset;
+			const double yoffset;
 
-            ScrollEvent(const GLFWwindow* window, const double xoffset, const double yoffset);
-        };
+			ScrollEvent(const GLFWwindow* window, const double xoffset, const double yoffset);
+		};
 
-        struct FramebufferSizeEvent : Event {
-            const int width;
-            const int height;
+		struct FramebufferSizeEvent : Event {
+			const int width;
+			const int height;
 
-            FramebufferSizeEvent(const GLFWwindow* window, const int width, const int height);
-        };
+			FramebufferSizeEvent(const GLFWwindow* window, const int width, const int height);
+		};
 
-        //todo joystick, gamepad
+		//todo joystick, gamepad
 
-        using EnterHandler = EventHandler<EnterEvent>;
-        using FocusHandler = EventHandler<FocusEvent>;
-        using CloseHandler = EventHandler<CloseEvent>;
-        using KeyHandler = EventHandler<KeyEvent>;
-        using CharHandler = EventHandler<CharEvent>;
-        using MotionHandler = EventHandler<MotionEvent>;
-        using ClickHandler = EventHandler<ClickEvent>;
-        using ScrollHandler = EventHandler<ScrollEvent>;
-        using FramebufferSizeHandler = EventHandler<FramebufferSizeEvent>;
-    }
+		using EnterHandler = EventHandler<EnterEvent>;
+		using FocusHandler = EventHandler<FocusEvent>;
+		using CloseHandler = EventHandler<CloseEvent>;
+		using KeyHandler = EventHandler<KeyEvent>;
+		using CharHandler = EventHandler<CharEvent>;
+		using MotionHandler = EventHandler<MotionEvent>;
+		using ClickHandler = EventHandler<ClickEvent>;
+		using ScrollHandler = EventHandler<ScrollEvent>;
+		using FramebufferSizeHandler = EventHandler<FramebufferSizeEvent>;
+	}
 }
 #endif //ENGINE_EVENT_H

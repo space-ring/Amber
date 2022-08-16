@@ -8,21 +8,21 @@
 #include <functional>
 
 namespace Amber {
-    template<class Derived, class Return, class... Args>
-    class Variadic {
-        friend Derived;
-        using f = std::function<Return(Args...)>;
+	template<class Derived, class Return, class... Args>
+	class Variadic {
+		friend Derived;
+		using f = std::function<Return(Args...)>;
 
-        Variadic(const f& function) : function(function) {}
+		Variadic(const f& function) : function(function) {}
 
-    protected:
-        const f function;
+	protected:
+		const f function;
 
-    public:
-        Return operator()(Args... args) {
-            return static_cast<Derived*>(this)->call(args...);
-        }
-    };
+	public:
+		Return operator()(Args... args) {
+			return static_cast<Derived*>(this)->call(args...);
+		}
+	};
 
 }
 

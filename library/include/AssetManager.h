@@ -13,45 +13,45 @@
 
 namespace Amber {
 
-    class AssetManager {
-        using string = std::string;
-        template<class T> using stringMap = std::map<string, T>;
+	class AssetManager {
+		using string = std::string;
+		template<class T> using stringMap = std::map<string, T>;
 
-    private: //todo const maps?
-        stringMap<compoundShader>* shaderPaths = new stringMap<compoundShader>;
-        stringMap<string>* meshPaths = new stringMap<string>;
-        stringMap<string>* texturePaths = new stringMap<string>;
-        stringMap<Shader*>* shaders = new stringMap<Shader*>;
-        stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
-        stringMap<Texture*>* textures = new stringMap<Texture*>;
+	private: //todo const maps?
+		stringMap<compoundShader>* shaderPaths = new stringMap<compoundShader>;
+		stringMap<string>* meshPaths = new stringMap<string>;
+		stringMap<string>* texturePaths = new stringMap<string>;
+		stringMap<Shader*>* shaders = new stringMap<Shader*>;
+		stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
+		stringMap<Texture*>* textures = new stringMap<Texture*>;
 
-    public:
-        AssetManager();
+	public:
+		AssetManager();
 
-        virtual ~AssetManager();
+		virtual ~AssetManager();
 
-        void buildAll();
+		void buildAll();
 
-        void addManifest(const string& manifest);
+		void addManifest(const string& manifest);
 
-        void addShader(const string& name, const compoundShader& paths);
+		void addShader(const string& name, const compoundShader& paths);
 
-        void addShader(const string& name, Shader& shader);
+		void addShader(const string& name, Shader& shader);
 
-        void addMesh(const string& name, const string& path);
+		void addMesh(const string& name, const string& path);
 
-        void addMesh(const string& name, Mesh& mesh);
+		void addMesh(const string& name, Mesh& mesh);
 
-        void addTexture(const string& name, const string& path);
+		void addTexture(const string& name, const string& path);
 
-        void addTexture(const string& name, Texture& texture);
+		void addTexture(const string& name, Texture& texture);
 
-        Shader* getShader(const string& name);
+		Shader* getShader(const string& name);
 
-        Mesh* getMesh(const string& name);
+		Mesh* getMesh(const string& name);
 
-        Texture* getTexture(const string& name);
-    };
+		Texture* getTexture(const string& name);
+	};
 }
 
 

@@ -8,52 +8,52 @@
 #include "maths.h"
 
 namespace Amber {
-    class Camera {
+	class Camera {
 
-    public:
-        glm::vec3 position, rotation;
-        glm::mat4 view, perspective, orthogonal;
-        float fov, width, height, near_p, far_p, near_o, far_o;
+	public:
+		glm::vec3 position, rotation;
+		glm::mat4 view, perspective, orthogonal;
+		float fov, width, height, near_p, far_p, near_o, far_o;
 
-        void updatePerspective();
+		void updatePerspective();
 
-        void updateOrthogonal();
+		void updateOrthogonal();
 
-        void updateView();
+		void updateView();
 
-    public:
+	public:
 
-        /**
-         * @param pos
-         * @param rotation pitch - yaw - roll
-         * @param fov
-         * @param ratio
-         * @param nearP
-         * @param farP
-         * @param nearO
-         * @param farO
-         */
-        Camera(const glm::vec3& pos, const glm::vec3& rotation, float fov, float width,
-               float height, float nearP, float farP, float nearO, float farO);
+		/**
+		 * @param pos
+		 * @param rotation pitch - yaw - roll
+		 * @param fov
+		 * @param ratio
+		 * @param nearP
+		 * @param farP
+		 * @param nearO
+		 * @param farO
+		 */
+		Camera(const glm::vec3& pos, const glm::vec3& rotation, float fov, float width,
+		       float height, float nearP, float farP, float nearO, float farO);
 
-        void setPerspective(float fov, float width, float height, float near, float far);
+		void setPerspective(float fov, float width, float height, float near, float far);
 
-        void setOrthogonal(float width, float height, float near, float far);
+		void setOrthogonal(float width, float height, float near, float far);
 
-        void setAspectRatio(float width, float height);
+		void setAspectRatio(float width, float height);
 
-        void move(const glm::vec3& dxyz);
+		void move(const glm::vec3& dxyz);
 
-        void rotate(const glm::vec3& dxyz);
+		void rotate(const glm::vec3& dxyz);
 
-        void lookAt(glm::vec3 dxyz);
+		void lookAt(glm::vec3 dxyz);
 
-        const glm::mat4& getView() const;
+		const glm::mat4& getView() const;
 
-        const glm::mat4& getPerspective() const;
+		const glm::mat4& getPerspective() const;
 
-        const glm::mat4& getOrthogonal() const;
-    };
+		const glm::mat4& getOrthogonal() const;
+	};
 
 }
 

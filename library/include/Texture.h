@@ -9,26 +9,26 @@
 #include "Shader.h"
 
 namespace Amber {
-    enum SupportedTextures { //todo add more texture types
-        TEXTURE_2D = GL_TEXTURE_2D
-    };
+	enum SupportedTextures { //todo add more texture types
+		TEXTURE_2D = GL_TEXTURE_2D
+	};
 
-    class Texture {
-        static Texture* DEFAULT;
+	class Texture {
+		static Texture* DEFAULT;
 
-        unsigned char* texels;
+		unsigned char* texels;
 
-        GLuint texture = 0;
+		GLuint texture = 0;
 
-    public:
-        static Texture* getDefault();
+	public:
+		static Texture* getDefault();
 
-        static void deleteDefault();
+		static void deleteDefault();
 
-        Texture(unsigned char* data);
+		Texture(unsigned char* data);
 
-        Texture* build();
-    };
+		Texture* build();
+	};
 
 }
 

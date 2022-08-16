@@ -7,33 +7,33 @@
 #include "Stage.h"
 
 namespace Amber {
-    using id = unsigned long;
-    using string = std::string;
+	using id = unsigned long;
+	using string = std::string;
 
 
-    Scene::Scene() {}
+	Scene::Scene() {}
 
-    Scene::~Scene() = default;
+	Scene::~Scene() = default;
 
-    void Scene::render() {
-        layers.render();
-    }
+	void Scene::render() {
+		layers.render();
+	}
 
-    void Scene::pick(int x, int y) {
-        Model* picked = layers.pick(x, y);
-    }
+	void Scene::pick(int x, int y) {
+		Model* picked = layers.pick(x, y);
+	}
 
-    LayerStack& Scene::getLayers() {
-        return layers;
-    }
+	LayerStack& Scene::getLayers() {
+		return layers;
+	}
 
-    void Scene::build() {
-        if (built) return;
-        built = true;
-    }
+	void Scene::build() {
+		if (built) return;
+		built = true;
+	}
 
-    void Scene::update() {
-        layers.update();
-    }
+	void Scene::update() {
+		layers.update();
+	}
 
 }

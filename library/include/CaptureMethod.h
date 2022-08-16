@@ -5,9 +5,9 @@
 #ifndef ENGINE_CAPTUREMETHOD_H
 #define ENGINE_CAPTUREMETHOD_H
 namespace Amber {
-    class CaptureMethod {
+	class CaptureMethod {
 
-    };
+	};
 
 }
 

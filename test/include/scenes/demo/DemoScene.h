@@ -13,40 +13,40 @@
 
 
 class DemoScene : public Amber::Scene {
-    friend DemoLayer;
-    friend GroundLayer;
+	friend DemoLayer;
+	friend GroundLayer;
 
-    DemoLayer demoLayer;
-    GroundLayer groundLayer;
+	DemoLayer demoLayer;
+	GroundLayer groundLayer;
 
-    Amber::Camera camera;
+	Amber::Camera camera;
 
-    DemoScene();
+	DemoScene();
 
-    ~DemoScene() override;
+	~DemoScene() override;
 
 public:
 
-    static DemoScene& getInstance() {
-        static DemoScene instance;
-        return instance;
-    }
+	static DemoScene& getInstance() {
+		static DemoScene instance;
+		return instance;
+	}
 
-    DemoScene(const DemoScene&) = delete;
+	DemoScene(const DemoScene&) = delete;
 
-    void operator=(const DemoScene&) = delete;
+	void operator=(const DemoScene&) = delete;
 
-    void build() override;
+	void build() override;
 
-    void show() override;
+	void show() override;
 
-    void hide() override;
+	void hide() override;
 
-    void render() override;
+	void render() override;
 
-    void pick(int x, int y) override;
+	void pick(int x, int y) override;
 
-    void update() override;
+	void update() override;
 };
 
 

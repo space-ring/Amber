@@ -5,7 +5,7 @@
 #include "EventManager.h"
 
 namespace Amber {
-    void EventManager::clearHandlers(unsigned long id) {
-        //todo
-    }
+	void EventManager::clearHandlers(unsigned long id) {
+		//todo
+	}
 }

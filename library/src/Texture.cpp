@@ -5,7 +5,7 @@
 #include "Texture.h"
 
 Amber::Texture* Amber::Texture::getDefault() {
-    return nullptr;
+	return nullptr;
 }
 
 void Amber::Texture::deleteDefault() {
@@ -17,5 +17,5 @@ Amber::Texture::Texture(unsigned char* data) {
 }
 
 Amber::Texture* Amber::Texture::build() {
-    return nullptr;
+	return nullptr;
 }

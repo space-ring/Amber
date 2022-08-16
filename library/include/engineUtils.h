@@ -9,11 +9,11 @@
 #include <vector>
 
 namespace Amber {
-    using string = std::string;
+	using string = std::string;
 
-    std::vector<string> split(const string& s, char delimiter);
+	std::vector<string> split(const string& s, char delimiter);
 
-    std::vector<int> isplit(const string& s, char delimiter);
+	std::vector<int> isplit(const string& s, char delimiter);
 
 }
 

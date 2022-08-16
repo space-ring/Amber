@@ -29,41 +29,41 @@
 //todo move away from string references
 //todo resource classes should adhere to the big 5.
 namespace Amber {
-    class Stage;
+	class Stage;
 
-    class Engine {
-        using string = std::string;
+	class Engine {
+		using string = std::string;
 
-    private:
-        volatile bool running = false;
+	private:
+		volatile bool running = false;
 
-        Engine(const string& name, int x, int y, int width, int height);
+		Engine(const string& name, int x, int y, int width, int height);
 
-        virtual ~Engine();
+		virtual ~Engine();
 
-    public:
-        AssetManager* assets;
-        EventManager* handlers;
-        Stage* stage;
+	public:
+		AssetManager* assets;
+		EventManager* handlers;
+		Stage* stage;
 
-        static Engine& getInstance(const string& name, int x, int y, int width, int height) {
-            static Engine engine(name, x, y, width, height);
-            return engine;
-        }
+		static Engine& getInstance(const string& name, int x, int y, int width, int height) {
+			static Engine engine(name, x, y, width, height);
+			return engine;
+		}
 
-        static Engine& getInstance() {
-            return getInstance("", 100, 100, 100, 100);
-        }
+		static Engine& getInstance() {
+			return getInstance("", 100, 100, 100, 100);
+		}
 
-        /* Initialises all listed resources, scenes and stages. Enters main renderState loop */
-        void init();
+		/* Initialises all listed resources, scenes and stages. Enters main renderState loop */
+		void init();
 
-        /* Requests for the window to shut down */
-        void kill();
+		/* Requests for the window to shut down */
+		void kill();
 
-        bool getRunning() const;
+		bool getRunning() const;
 
-    };
+	};
 
 }
 
