@@ -6,49 +6,51 @@
 #define ENGINE_MODELMANAGER_H
 
 #include <map>
+#include <set>
+#include <list>
 #include "Mesh.h"
 #include "ModelTransform.h"
 #include "ITransformable.h"
 #include "Model.h"
+
 //todo buffer mapping
 namespace Amber {
-    class ModelManager {
 
-    public:
+	class ModelManager {
+		friend class Model;
 
-        //todo use std::array and not vector: strictly disallow reallocation
-        //this is fine because this is just per layer and at this granularity it shouldn't be hard to estimate
-        // how many instances will be alive at once
-        std::map<Mesh*, std::vector<glm::mat4>*> instances;
-        std::map<Model*, unsigned long long> index; //stores index of instance in mapped vec
-        std::map<Mesh*, unsigned long> sizes; //stores max instance count
-        std::map<Mesh*, bool> resize; //todo just use set
-        std::map<Mesh*,
-                std::map<unsigned long long, ModelTransform&>*> transforms;
-        std::map<Mesh*, unsigned long long> pickables; //todo
+		using index = unsigned long long int;
 
-    public:
-        virtual ~ModelManager();
+	private:
+		std::list<Model> models;
+		std::map<Mesh*, std::vector<glm::mat4>*> instances;
+		std::map<Mesh*, std::map<index, ModelTransform*>*> references; //maps back to ref of matrix
+		std::map<Mesh*, index> pickCount;
+		std::map<Mesh*, index> renderCount;
+		std::set<Mesh*> resize;
 
-        //todo return ref, OWN this model.
-        /*
-         * Model& cube = models.add(Model());
-         */
-        void add(Model& model, unsigned long limit); //todo don't like this signature
+		void updateRef(Mesh* mesh, const index from, const index to);
 
-//        void remove(Model& model);
+	public:
+		virtual ~ModelManager();
 
-        void swap(unsigned long long i1, unsigned long long i2);
+		Model& newModel();
 
-        void swap(Model& mode, unsigned long long i);
+		void reserve(Mesh* mesh, index limit);
 
-        void buffer(Mesh* mesh);
+		void add(Model& model, index limit);
 
-        unsigned long getLimit(Mesh* mesh);
+		void remove(Model& model);
 
-        unsigned long getCount(Mesh* mesh);
+		void swap(Mesh* mesh, index i1, index i2);
 
-    };
+		void buffer(Mesh* mesh);
+
+		unsigned long long getRenderCount(Mesh* mesh);
+
+		unsigned long long getPickCount(Mesh* mesh);
+
+	};
 
 }
 

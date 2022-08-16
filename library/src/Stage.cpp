@@ -9,113 +9,128 @@
 #include <ctime>
 
 namespace Amber {
-    Stage::Stage(const string& name, int x, int y, int width, int height)
-            : name(name), x(x), y(y), width(width), height(height) {
-    }
+	Stage::Stage(const string& name, int x, int y, int width, int height)
+			: name(name), x(x), y(y), width(width), height(height) {
+	}
 
-    Stage::~Stage() {
-        //todo removed delete scene here. ownership.
-        delete scenes;
-        glfwTerminate();
-    }
+	Stage::~Stage() {
+		//todo removed delete scene here. ownership.
+		delete scenes;
+		glfwTerminate();
+	}
 
-    void Stage::init() {
-        std::cout << "GL on thread " << std::this_thread::get_id() << std::endl;
-        // set up GL context
-        if (!glfwInit()) {
-            exit(1);
-        }
+	void Stage::init() {
+		std::cout << "GL on thread " << std::this_thread::get_id() << std::endl;
+		// set up GL context
+		if (!glfwInit()) {
+			exit(1);
+		}
 
-        glfwWindowHint(GLFW_VISIBLE, 0);
+		glfwWindowHint(GLFW_VISIBLE, 0);
 
-        window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
-        if (!window) {
-            glfwTerminate();
-            exit(2);
-        }
+		window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+		if (!window) {
+			glfwTerminate();
+			exit(2);
+		}
 
-        glfwMakeContextCurrent(window);
-        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-            exit(3);
-        }
+		glfwMakeContextCurrent(window);
+		if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+			exit(3);
+		}
 
-        glfwSetWindowPos(window, x, y);
-        glfwSwapInterval(1);
-        printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
+		glfwSetWindowPos(window, x, y);
+		glfwSwapInterval(1);
+		printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
-        int pixWidth, pixHeight;
-        glfwGetFramebufferSize(window, &pixWidth, &pixHeight);
-        glViewport(0, 0, pixWidth, pixHeight);
+		int pixWidth, pixHeight;
+		glfwGetFramebufferSize(window, &pixWidth, &pixHeight);
+		glViewport(0, 0, pixWidth, pixHeight);
 
-        //game_events
-        glfwSetCursorEnterCallback(window, onGLFWevent<window_events::EnterEvent, int>);
-        glfwSetWindowCloseCallback(window, onGLFWevent<window_events::CloseEvent>);
-        glfwSetWindowFocusCallback(window, onGLFWevent<window_events::FocusEvent, int>);
-        glfwSetKeyCallback(window, onGLFWevent<window_events::KeyEvent, int, int, int, int>);
-        glfwSetCharCallback(window, onGLFWevent<window_events::CharEvent, unsigned int>);
-        glfwSetMouseButtonCallback(window, onGLFWevent<window_events::ClickEvent, int, int, int>);
-        glfwSetScrollCallback(window, onGLFWevent<window_events::ScrollEvent, double, double>);
-        glfwSetCursorPosCallback(window, onGLFWevent<window_events::MotionEvent, double, double>);
-        glfwSetFramebufferSizeCallback(window, onGLFWevent<window_events::FramebufferSizeEvent, int, int>);
+		//game_events
+		glfwSetCursorEnterCallback(window, onGLFWevent<window_events::EnterEvent, int>);
+		glfwSetWindowCloseCallback(window, onGLFWevent<window_events::CloseEvent>);
+		glfwSetWindowFocusCallback(window, onGLFWevent<window_events::FocusEvent, int>);
+		glfwSetKeyCallback(window, onGLFWevent<window_events::KeyEvent, int, int, int, int>);
+		glfwSetCharCallback(window, onGLFWevent<window_events::CharEvent, unsigned int>);
+		glfwSetMouseButtonCallback(window, onGLFWevent<window_events::ClickEvent, int, int, int>);
+		glfwSetScrollCallback(window, onGLFWevent<window_events::ScrollEvent, double, double>);
+		glfwSetCursorPosCallback(window, onGLFWevent<window_events::MotionEvent, double, double>);
+		glfwSetFramebufferSizeCallback(window, onGLFWevent<window_events::FramebufferSizeEvent, int, int>);
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-    }
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+	}
 
-    void Stage::render() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (front) {
-            front->build(); //todo poor
-            front->render();
-        }
-        glfwSwapBuffers(window);
-    }
+	void Stage::render() {
+		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (front) {
+			front->build(); //todo poor
+			front->render();
+		}
+		glfwSwapBuffers(window);
+	}
 
-    void Stage::update() {
-        if (front) front->update();
-    }
+	void Stage::update() {
+		if (front) front->update();
+	}
 
-    void Stage::poll() {
-        if (focused) glfwPollEvents();
-        else glfwWaitEvents();
-    }
+	void Stage::poll() {
+		if (focused) glfwPollEvents();
+		else glfwWaitEvents();
+	}
 
-    void Stage::pick() {
-        int ww, wh;
-        glfwGetWindowSize(window, &ww, &wh);
-        double dx, dy;
-        glfwGetCursorPos(window, &dx, &dy);
-        int mx = dx, my = dy;
-        if (0 <= mx && mx < ww && 0 <= my && my < wh)
-            if (front) front->pick(dx, dy);
-    }
+	void Stage::pick() {
+		int ww, wh;
+		glfwGetWindowSize(window, &ww, &wh);
+		double dx, dy;
+		glfwGetCursorPos(window, &dx, &dy);
+		int mx = dx, my = dy;
+		if (0 <= mx && mx < ww && 0 <= my && my < wh)
+			if (front) {
+				//save old clear values
+				float colour[4];
+				double depth;
+				int stencil;
+				glGetFloatv(GL_COLOR_CLEAR_VALUE, &colour[0]);
+				glGetDoublev(GL_DEPTH_CLEAR_VALUE, &depth);
+				glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencil);
+				front->build();
+				front->pick(mx, height - my);
+				//restore old clear values
+				glClearColor(colour[0], colour[1], colour[2], colour[3]);
+				glClearDepth(depth);
+				glClearStencil(stencil);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			}
+	}
 
-    void Stage::show() {
-        glfwShowWindow(window);
-    }
+	void Stage::show() {
+		glfwShowWindow(window);
+	}
 
-    void Stage::hide() {
-        glfwHideWindow(window);
-    }
+	void Stage::hide() {
+		glfwHideWindow(window);
+	}
 
-    GLFWwindow* Stage::getWindow() const {
-        return window;
-    }
+	GLFWwindow* Stage::getWindow() const {
+		return window;
+	}
 
-    void Stage::addScene(const string& id, Scene* scene) {
-        scenes->insert(std::pair(id, scene));
-    }
+	void Stage::addScene(const string& id, Scene* scene) {
+		scenes->insert(std::pair(id, scene));
+	}
 
-    void Stage::setFrontScene(const string& scene) {
-        if (scenes->contains(scene)) {
-            if (front) front->hide();
-            front = scenes->at(scene);
-            front->show();
-        }
-    }
+	void Stage::setFrontScene(const string& scene) {
+		if (scenes->contains(scene)) {
+			if (front) front->hide();
+			front = scenes->at(scene);
+			front->show();
+		}
+	}
 
-    Scene* Stage::getFront() const {
-        return front;
-    }
+	Scene* Stage::getFront() const {
+		return front;
+	}
 
 }

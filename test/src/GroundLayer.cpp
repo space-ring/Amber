@@ -5,6 +5,7 @@
 #include "scenes/demo/GroundLayer.h"
 #include "scenes/demo/DemoScene.h"
 #include "Engine.h"
+#include "Stage.h"
 
 GroundLayer::GroundLayer() {
 //    ground.setMesh(Amber::Engine::getInstance().assets->getMesh("plane"), 10);
@@ -32,80 +33,103 @@ GroundLayer::GroundLayer() {
 //        }
 //    }
 
-    Amber::Mesh* mesh = Amber::Engine::getInstance().assets->getMesh("plane");
-    m1.setMesh(mesh, 100);
-    m2.setMesh(mesh, 100);
-    m3.setMesh(mesh, 100);
-    m4.setMesh(mesh, 100);
+	Amber::Mesh* mesh = Amber::Engine::getInstance().assets->getMesh("plane");
+	m1.setMesh(mesh, 100);
+	m2.setMesh(mesh, 100);
+	m3.setMesh(mesh, 100);
+	m4.setMesh(mesh, 100);
 
-    m2.getTransform()->attachParent(*m1.getTransform(), true);
-    m3.getTransform()->attachParent(*m1.getTransform(), true);
-    m4.getTransform()->attachParent(*m1.getTransform(), true);
+	m1.setState(Amber::RenderState::VISIBLE);
+	m3.setState(Amber::RenderState::INVISIBLE);
+	m2.setState(Amber::RenderState::VISIBLE);
 
-    m1.translate(glm::vec3(-1, -1, -20));
-    m2.translate(glm::vec3(2, 0, 0));
-    m3.translate(glm::vec3(0, 2, 0));
-    m4.translate(glm::vec3(2, 2, 0));
-    m1.scale(glm::vec3(2.5));
+	m2.getTransform()->attachParent(*m1.getTransform(), true);
+	m3.getTransform()->attachParent(*m1.getTransform(), true);
+	m4.getTransform()->attachParent(*m1.getTransform(), true);
 
-    models.add(m1, 100);
-    models.add(m2, 100);
-    models.add(m3, 100);
-    models.add(m4, 100);
+	m1.translate(glm::vec3(0, 0, -20));
+	m2.translate(glm::vec3(2, 0, 0));
+	m3.translate(glm::vec3(0, 2, 0));
+	m4.translate(glm::vec3(2, 2, 0));
 
-    ground.setMesh(mesh, 100);
-    ground.setRotation(glm::vec3(90, 0, 0));
-    ground.setScale(glm::vec3(100));
-    ground.setTranslation(glm::vec3(0, -5, 0));
+	models.add(m1, 100);
+	models.add(m2, 100);
+	models.add(m3, 100);
+	models.add(m4, 100);
 
-    models.add(ground, 100);
-
+	ground.setMesh(mesh, 100);
+	ground.setRotation(glm::vec3(90, 0, 0));
+	ground.setScale(glm::vec3(100));
+	ground.setTranslation(glm::vec3(0, -5, 0));
 }
 
 void GroundLayer::render() {
-    Amber::Engine& engine = Amber::Engine::getInstance();
-    DemoScene& scene = DemoScene::getInstance();
-    Amber::Mesh* plane = engine.assets->getMesh("plane");
+	Amber::Engine& engine = Amber::Engine::getInstance();
+	DemoScene& scene = DemoScene::getInstance();
+	Amber::Mesh* plane = engine.assets->getMesh("plane");
 
-    Amber::Shader* shader = engine.assets->getShader("basic")->start();
+	Amber::Shader* shader = engine.assets->getShader("basic")->start();
 
-    glBindVertexArray(plane->getVao());
+	glBindVertexArray(plane->getVao());
 
-    models.buffer(plane);//this buffer should be moved to pick
+	models.buffer(plane);//this buffer should be moved to pick
 
-    glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
-    glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
+	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
+	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
 
-    glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr, models.getCount(plane));
+	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
+	                        models.getRenderCount(plane));
 
-    glBindVertexArray(0);
-    shader->stop();
+	glBindVertexArray(0);
+	shader->stop();
 }
 
-Amber::Model* GroundLayer::pick(double x, double y) {
-    //todo example of standardised picking (model manager):
-    Amber::Engine& engine = Amber::Engine::getInstance();
-    DemoScene& scene = DemoScene::getInstance();
-    Amber::Mesh* plane = engine.assets->getMesh("plane");
+Amber::Model* GroundLayer::pick(int x, int y) {
+	Layer::pick(x, y);
 
-    Amber::Shader* shader = engine.assets->getShader("pick");
+	//todo first choose models to render using ray tracing and BBs.
+	//todo render to a framebuffer? don't really need to, not swapping buffers here
+	//todo example of standardised picking (model manager):
+	Amber::Engine& engine = Amber::Engine::getInstance();
+	DemoScene& scene = DemoScene::getInstance();
+	Amber::Mesh* plane = engine.assets->getMesh("plane");
 
-    glBindVertexArray(plane->getVao());
-    models.buffer(plane); //buffer here only once per frame (in whichever function comes first after bufferCopy
+	Amber::Shader* shader = engine.assets->getShader("pick");
+	shader->start();
 
-    glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
-    glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
+	glBindVertexArray(plane->getVao());
 
-    unsigned int count = 4; // this is the number of pickable models from this mesh
-    glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr, count);
+	models.buffer(plane); //buffer here only once per frame (in whichever function comes first after bufferCopy
 
-    glBindVertexArray(0);
-    shader->stop();
+	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
+	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
 
-    return nullptr;
+	int offset = 1;
+	glUniform1i(19, offset);
+
+	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
+	                        models.getPickCount(plane));
+
+	glBindVertexArray(0);
+	shader->stop();
+
+	//todo omit these?
+	//todo read pixel colour & check with manager
+//	glFlush();
+//	glFinish();
+//
+//	int colour_picked[3];
+//	glReadPixels(x, y, 1, 1, GL_RGB, GL_INT, &colour_picked);
+//	std::cout << "picked " << x << " " << y << " " << colour_picked[0] << " " << colour_picked[1] << " "
+//	          << colour_picked[2] << " " << std::endl;
+//
+	glfwSwapBuffers(engine.stage->getWindow());
+
+	offset += models.getPickCount(plane);
+	//render next mesh
+
+	return nullptr;
 }
 
 void GroundLayer::update() {
-//    m1.translate(glm::vec3(0,0.1/60, 0));
-//    m1.rotate(glm::vec3(0, 0, 90.0 / 60));
 }

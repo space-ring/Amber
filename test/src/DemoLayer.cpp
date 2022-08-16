@@ -13,7 +13,7 @@ DemoLayer::DemoLayer() :
     models.add(cube, 50);
 }
 
-void DemoLayer::render() {
+void DemoLayer::render() {return;
     //render all cubes
     DemoScene& scene = DemoScene::getInstance();
 
@@ -24,7 +24,7 @@ void DemoLayer::render() {
 
     glCheckError();
     glBindVertexArray(cubemesh->getVao());
-    models.buffer(cubemesh);
+	models.buffer(cubemesh);
 
     glCheckError();
     glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
@@ -34,7 +34,7 @@ void DemoLayer::render() {
 
     glCheckError();
     glDrawElementsInstanced(GL_TRIANGLES, cubemesh->getElementCount(), GL_UNSIGNED_INT, nullptr,
-                            models.getCount(cubemesh));
+                            models.getRenderCount(cubemesh));
     glCheckError();
     shader->stop();
     glBindVertexArray(0);
@@ -44,6 +44,6 @@ void DemoLayer::update() {
     cube.rotate(glm::vec3(45.0/60));
 }
 
-Amber::Model* DemoLayer::pick(double x, double y) {
+Amber::Model* DemoLayer::pick(int x, int y) {
     return nullptr;
 }

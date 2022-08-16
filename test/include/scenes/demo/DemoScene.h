@@ -44,7 +44,7 @@ public:
 
     void render() override;
 
-    void pick(double x, double y) override;
+    void pick(int x, int y) override;
 
     void update() override;
 };

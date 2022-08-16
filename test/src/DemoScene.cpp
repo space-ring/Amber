@@ -48,6 +48,6 @@ void DemoScene::update() {
 //    camera.rotate(glm::vec3(0, 0, 9.0/60));
 }
 
-void DemoScene::pick(double x, double y) {
+void DemoScene::pick(int x, int y) {
     Scene::pick(x, y);
 }

@@ -26,7 +26,7 @@ namespace Amber {
 
         virtual void render() = 0;
 
-        virtual Model* pick(double x, double y) = 0;
+        virtual Model* pick(int x, int y) = 0;
 
         virtual void update() = 0;
 

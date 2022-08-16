@@ -12,40 +12,84 @@
 //Assimp::Importer importer;
 
 //todo throw / catch errors
+
+#include <algorithm>
+#include <cctype>
+#include <locale>
+
+// trim from start (in place)
+static inline void ltrim(std::string& s) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string& s) {
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string& s) {
+	ltrim(s);
+	rtrim(s);
+}
+
+// trim from start (copying)
+static inline std::string ltrim_copy(std::string s) {
+	ltrim(s);
+	return s;
+}
+
+// trim from end (copying)
+static inline std::string rtrim_copy(std::string s) {
+	rtrim(s);
+	return s;
+}
+
+// trim from both ends (copying)
+static inline std::string trim_copy(std::string s) {
+	trim(s);
+	return s;
+}
+
 namespace Amber {
-    string readFile(const string& path) {
-        if (path.empty()) return "";
-        string file;
-        string line;
-        std::ifstream openfile(path);
-        while (std::getline(openfile, line)) {
-            file += line + "\n";
-        }
-        return file;
-    }
+	string readFile(const string& path) {
+		if (path.empty()) return "";
+		string file;
+		string line;
+		std::ifstream openfile(path);
+		while (std::getline(openfile, line)) {
+			trim(line);
+			file += line + "\n";
+		}
+		return file;
+	}
 
-    void writeFile(const string& path, const string& file) {
-        std::ofstream openfile(path);
-        openfile << file;
-        openfile.close();
-    }
+	void writeFile(const string& path, const string& file) {
+		std::ofstream openfile(path);
+		openfile << file;
+		openfile.close();
+	}
 
-    Shader* loadShaderFile(const compoundShader& paths) {
-        return loadShader(
-                {
-                        readFile(paths.vertex),
-                        readFile(paths.fragment),
-                        readFile(paths.geometry),
-                        readFile(paths.tessControl),
-                        readFile(paths.tessEval),
-                        readFile(paths.compute)
-                }
-        );
-    }
+	Shader* loadShaderFile(const compoundShader& paths) {
+		return loadShader(
+				{
+						readFile(paths.vertex),
+						readFile(paths.fragment),
+						readFile(paths.geometry),
+						readFile(paths.tessControl),
+						readFile(paths.tessEval),
+						readFile(paths.compute)
+				}
+		);
+	}
 
-    Shader* loadShader(const compoundShader& sources) {
-        return new Shader(sources);
-    }
+	Shader* loadShader(const compoundShader& sources) {
+		return new Shader(sources);
+	}
 
 /*
 Mesh* loadMeshFromScene(const aiScene* scene) {
@@ -84,76 +128,76 @@ Mesh* loadMeshFromScene(const aiScene* scene) {
 }
 */
 
-    RawMesh parseMesh(const string& mesh){
-        std::stringstream ss(mesh);
-        string line;
-        std::vector<glm::vec3> positions, normals;
-        std::vector<glm::vec2> uv;
-        std::map<string, unsigned int> seen; // indices to vertices vector
-        std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
-        unsigned int index = 0;
+	RawMesh parseMesh(const string& mesh) {
+		std::stringstream ss(mesh);
+		string line;
+		std::vector<glm::vec3> positions, normals;
+		std::vector<glm::vec2> uv;
+		std::map<string, unsigned int> seen; // indices to vertices vector
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		unsigned int index = 0;
 
-        while (std::getline(ss, line, '\n')) {
-            if (line.empty()) continue;
-            auto spaced_line = split(line, ' ');
-            if (spaced_line[0] == "v") {
-                glm::vec3 vec3;
-                vec3.x = std::stof(spaced_line[1]);
-                vec3.y = std::stof(spaced_line[2]);
-                vec3.z = std::stof(spaced_line[3]);
-                positions.push_back(vec3);
+		while (std::getline(ss, line, '\n')) {
+			if (line.empty()) continue;
+			auto spaced_line = split(line, ' ');
+			if (spaced_line[0] == "v") {
+				glm::vec3 vec3;
+				vec3.x = std::stof(spaced_line[1]);
+				vec3.y = std::stof(spaced_line[2]);
+				vec3.z = std::stof(spaced_line[3]);
+				positions.push_back(vec3);
 
-            } else if (spaced_line[0] == "vt") {
-                glm::vec2 vec2;
-                vec2.x = std::stof(spaced_line[1]);
-                vec2.y = std::stof(spaced_line[2]);
-                uv.push_back(vec2);
+			} else if (spaced_line[0] == "vt") {
+				glm::vec2 vec2;
+				vec2.x = std::stof(spaced_line[1]);
+				vec2.y = std::stof(spaced_line[2]);
+				uv.push_back(vec2);
 
-            } else if (spaced_line[0] == "vn") {
-                glm::vec3 vec3;
-                vec3.x = std::stof(spaced_line[1]);
-                vec3.y = std::stof(spaced_line[2]);
-                vec3.z = std::stof(spaced_line[3]);
-                normals.push_back(vec3);
+			} else if (spaced_line[0] == "vn") {
+				glm::vec3 vec3;
+				vec3.x = std::stof(spaced_line[1]);
+				vec3.y = std::stof(spaced_line[2]);
+				vec3.z = std::stof(spaced_line[3]);
+				normals.push_back(vec3);
 
-            } else if (spaced_line[0] == "f") {
-                for (int i = 1; i < 4; ++i) {
-                    if (seen.contains(spaced_line[i])) {
-                        indices.push_back(seen[spaced_line[i]]);
-                    } else {
-                        Vertex vertex;
-                        auto iface = isplit(spaced_line[i], '/');
-                        vertex.position = positions[iface[0] - 1];
-                        if (iface.size() == 2) {
-                            vertex.normal = normals[iface[1] - 1];
-                            vertex.texUV = glm::vec2(0, 0);
-                        } else {
-                            vertex.texUV = uv[iface[1] - 1];
-                            vertex.normal = normals[iface[2] - 1];
-                        }
-                        vertices.push_back(vertex);
-                        seen.insert(std::pair<string, unsigned int>(spaced_line[i], index));
-                        indices.push_back(index++);
-                    }
-                }
-            }
-        }
-        return {vertices, indices};
-    }
+			} else if (spaced_line[0] == "f") {
+				for (int i = 1; i < 4; ++i) {
+					if (seen.contains(spaced_line[i])) {
+						indices.push_back(seen[spaced_line[i]]);
+					} else {
+						Vertex vertex;
+						auto iface = isplit(spaced_line[i], '/');
+						vertex.position = positions[iface[0] - 1];
+						if (iface.size() == 2) {
+							vertex.normal = normals[iface[1] - 1];
+							vertex.texUV = glm::vec2(0, 0);
+						} else {
+							vertex.texUV = uv[iface[1] - 1];
+							vertex.normal = normals[iface[2] - 1];
+						}
+						vertices.push_back(vertex);
+						seen.insert(std::pair<string, unsigned int>(spaced_line[i], index));
+						indices.push_back(index++);
+					}
+				}
+			}
+		}
+		return {vertices, indices};
+	}
 
 
-    Mesh* loadMeshFile(const string& path) {
-        return loadMesh(readFile(path));
-    }
+	Mesh* loadMeshFile(const string& path) {
+		return loadMesh(readFile(path));
+	}
 
-    Mesh* loadMesh(const string& mesh) {
-        return new Mesh(parseMesh(mesh));
-    }
+	Mesh* loadMesh(const string& mesh) {
+		return new Mesh(parseMesh(mesh));
+	}
 
-    Texture* getTextureFile(const string& path) {
-        return nullptr;
-    }
+	Texture* getTextureFile(const string& path) {
+		return nullptr;
+	}
 
 //Mesh* loadMeshFile(string& path) {
 //    const aiScene* scene = importer.ReadFile(path, 0);

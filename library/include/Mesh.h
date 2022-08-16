@@ -33,7 +33,6 @@ namespace Amber {
          * 0 = vertex positions
          * 1 = vertex textures
          * 2 = vertex normals
-         * 3 = model pick colour
          * 10 - 13 = instance transforms
          * 14 - 17 = camera transforms
          * 18 - 21 = projection transforms

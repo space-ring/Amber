@@ -56,8 +56,6 @@ namespace Amber {
                 stage->pick();
                 stage->poll();
                 stage->render();
-//                using namespace std::chrono_literals;
-//                std::this_thread::sleep_for(5s);
 
                 ++frames;
                 std::time_t now = std::time(nullptr);

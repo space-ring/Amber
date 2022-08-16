@@ -19,7 +19,7 @@ namespace Amber {
         layers.render();
     }
 
-    void Scene::pick(double x, double y) {
+    void Scene::pick(int x, int y) {
         Model* picked = layers.pick(x, y);
     }
 

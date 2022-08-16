@@ -19,7 +19,7 @@ public:
 
     void render() override;
 
-    Amber::Model* pick(double x, double y) override;
+    Amber::Model* pick(int x, int y) override;
 
     void update() override;
 };

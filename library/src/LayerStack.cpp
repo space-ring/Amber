@@ -16,7 +16,7 @@ namespace Amber {
         }
     }
 
-    Model* LayerStack::pick(double x, double y) {
+    Model* LayerStack::pick(int x, int y) {
         Model* picked = nullptr;
         for (auto layer : stack) {
             if (!layer->active) continue;

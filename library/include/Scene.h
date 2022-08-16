@@ -51,7 +51,7 @@ namespace Amber {
 
         virtual void update() = 0;
 
-        virtual void pick(double x, double y) = 0;
+        virtual void pick(int x, int y) = 0;
 
         virtual void render() = 0;
 
