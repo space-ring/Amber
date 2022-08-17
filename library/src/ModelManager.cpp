@@ -3,7 +3,6 @@
 //
 
 #include "ModelManager.h"
-#include "maths.h"
 #include "Model.h"
 
 namespace Amber {
@@ -38,9 +37,8 @@ namespace Amber {
 		references.insert(std::pair(mesh, new std::map<index, ModelTransform*>));
 	}
 
-	void ModelManager::add(Model& model, index limit = 0) {
+	void ModelManager::add(Model& model, index limit) {
 		if (model.manager == this) return;
-		model.manager = this;
 
 		Mesh* mesh = model.mesh;
 		if (!instances.contains(mesh))
@@ -77,9 +75,9 @@ namespace Amber {
 						}
 					}
 
-					list->at(endSolid) = *model.transform->matrix;
+					list->at(endSolid) = *model.transform.matrix;
 
-				} else list->push_back(*model.transform->matrix);
+				} else list->push_back(*model.transform.matrix);
 
 				position = endSolid;
 				++endSolid;
@@ -92,45 +90,45 @@ namespace Amber {
 				if (endVisible < list->size()) {
 					list->push_back(list->at(endVisible));
 					updateRef(mesh, endVisible, list->size() - 1);
-					list->at(endVisible) = *model.transform->matrix;
+					list->at(endVisible) = *model.transform.matrix;
 
-				} else list->push_back(*model.transform->matrix);
+				} else list->push_back(*model.transform.matrix);
 
 				position = endVisible;
 				++endVisible;
 				break;
 
 			case RenderState::INVISIBLE:
-				list->push_back(*model.transform->matrix);
+				list->push_back(*model.transform.matrix);
 				position = list->size() - 1;
 				break;
 		}
 
 		//change Transform's pointer (since vec stores copies)
-		model.transform->matrix = &list->at(position);
+		model.transform.matrix = &list->at(position);
 
 		//set reference to transform
-		references.at(mesh)->insert_or_assign(position, model.transform);
+		references.at(mesh)->insert_or_assign(position, &model.transform);
+		model.manager = this;
 	}
 
 	void ModelManager::remove(Model& model) {
 		if (model.manager != this) return;
-		model.manager = nullptr;
 
 		Mesh* mesh = model.mesh;
 
 		auto* list = instances.at(mesh);
 		index& endSolid = pickCount.at(mesh);
 		index& endVisible = renderCount.at(mesh);
-		index position = model.transform->matrix - &list->front();
+		index position = model.transform.matrix - &list->front();
 
 		//copy managed matrix into transform and reset pointer
 		//no need to deduce transformation vectors since managed matrix can't be operated on directly, only through vector updates
 		//(so the transform already has the correct transformation vectors)
 		//do this before overwriting in the switch below
-		ModelTransform* transform = model.transform;
-		transform->own = *transform->matrix;
-		transform->matrix = &transform->own;
+		ModelTransform& transform = model.transform;
+		transform.own = *transform.matrix;
+		transform.matrix = &transform.own;
 
 		switch (model.state) {
 
@@ -192,8 +190,9 @@ namespace Amber {
 				break;
 		}
 
-		list->pop_back(); //there's always a hole at the end
 		references.at(mesh)->erase(list->size() - 1);
+		list->pop_back(); //there's always a hole at the end
+		model.manager = nullptr;
 	}
 
 	void ModelManager::buffer(Mesh* mesh) { //todo mapping buffers !!! map to the instance vector
@@ -212,22 +211,12 @@ namespace Amber {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void ModelManager::swap(Mesh* mesh, index i1, index i2) {
-		if (!instances.contains(mesh)) return;
-		auto* list = instances.at(mesh);
-
-		auto size = list->size();
-		if (i2 < size) {
-			if (i1 < size) {
-				glm::mat4 temp = list->at(i2);
-				list->at(i2) = list->at(i1);
-				list->at(i1) = temp;
-			} else return; //cannot swap with null element
-		}
-	}
-
 	ModelManager::~ModelManager() {
-		for (auto pair: instances) {
+		models.clear();
+		for (auto& pair: instances) {
+			delete pair.second;
+		}
+		for (auto& pair: references){
 			delete pair.second;
 		}
 	}

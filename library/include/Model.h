@@ -24,16 +24,14 @@ namespace Amber {
 		friend class ModelManager;
 
 		static unsigned long counter;
-		ModelManager* manager{nullptr}; //todo add to multiple managers? impossible, only 1 ref to mat is stored.
-		Mesh* mesh{nullptr};
+		ModelManager* manager = nullptr;
+		Mesh* mesh = nullptr;
 
-		ModelTransform own; //for when not managed
-		ModelTransform* transform; //todo use refs //todo what if transform is destroyed?
-		//todo use shared pointer for transform
+		ModelTransform transform;
 
-		ModelTransform* _getTransform() { return transform; }
+		ModelTransform* _getTransform() { return &transform; }
 
-		RenderState state = RenderState::VISIBLE_SOLID;
+		RenderState state = RenderState::VISIBLE;
 
 	public:
 		const unsigned long id;
@@ -41,8 +39,6 @@ namespace Amber {
 		Model();
 
 		Model(Mesh* mesh);
-
-		Model(Mesh* mesh, ModelTransform& transform);
 
 		virtual ~Model();
 
@@ -55,7 +51,7 @@ namespace Amber {
 
 		Model& operator=(Model&&) = delete;
 
-		void setMesh(Mesh* newMesh, unsigned long limit);
+		void setMesh(Mesh* newMesh, unsigned long limit = 100);
 
 		Mesh* getMesh() const;
 

@@ -14,6 +14,7 @@
 #include "Model.h"
 
 //todo buffer mapping
+//todo nodes in trees should be stored together but what if they have different render states?
 namespace Amber {
 
 	class ModelManager {
@@ -38,11 +39,9 @@ namespace Amber {
 
 		void reserve(Mesh* mesh, index limit);
 
-		void add(Model& model, index limit);
+		void add(Model& model, index limit = 100);
 
 		void remove(Model& model);
-
-		void swap(Mesh* mesh, index i1, index i2);
 
 		void buffer(Mesh* mesh);
 

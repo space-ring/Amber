@@ -19,11 +19,15 @@ class DemoScene : public Amber::Scene {
 	DemoLayer demoLayer;
 	GroundLayer groundLayer;
 
+	float cameraSpeed = 1.0 / 60;
+
 	Amber::Camera camera;
 
 	DemoScene();
 
 	~DemoScene() override;
+
+	void cameraControl(Amber::window_events::KeyEvent& event);
 
 public:
 

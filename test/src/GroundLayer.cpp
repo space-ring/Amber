@@ -34,10 +34,10 @@ GroundLayer::GroundLayer() {
 //    }
 
 	Amber::Mesh* mesh = Amber::Engine::getInstance().assets->getMesh("plane");
-	m1.setMesh(mesh, 100);
-	m2.setMesh(mesh, 100);
-	m3.setMesh(mesh, 100);
-	m4.setMesh(mesh, 100);
+	m1.setMesh(mesh);
+	m2.setMesh(mesh);
+	m3.setMesh(mesh);
+	m4.setMesh(mesh);
 
 	m1.setState(Amber::RenderState::VISIBLE);
 	m3.setState(Amber::RenderState::INVISIBLE);
@@ -47,15 +47,25 @@ GroundLayer::GroundLayer() {
 	m3.getTransform()->attachParent(*m1.getTransform(), true);
 	m4.getTransform()->attachParent(*m1.getTransform(), true);
 
-	m1.translate(glm::vec3(0, 0, -20));
-	m2.translate(glm::vec3(2, 0, 0));
-	m3.translate(glm::vec3(0, 2, 0));
-	m4.translate(glm::vec3(2, 2, 0));
+	m1.translate(glm::vec3(0, 0, -5));
+	m2.translate(glm::vec3(2, 0, -1));
+	m3.translate(glm::vec3(0, 2, -1));
+	m4.translate(glm::vec3(2, 2, -1));
 
-	models.add(m1, 100);
-	models.add(m2, 100);
-	models.add(m3, 100);
-	models.add(m4, 100);
+//	for (int i = -50; i < 50; ++i) {
+//		for (int j = -50; j < 50; ++j) {
+//			Amber::Model& m = models.newModel();
+//			m.setMesh(mesh);
+//			m.getTransform()->attachParent(*m1.getTransform(), true);
+//			m.translate(glm::vec3(j*2, i*2, 0));
+//			models.add(m, 10000);
+//		}
+//	}
+
+	models.add(m1);
+//	models.add(m2);
+//	models.add(m3);
+//	models.add(m4);
 
 	ground.setMesh(mesh, 100);
 	ground.setRotation(glm::vec3(90, 0, 0));
@@ -123,7 +133,7 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 //	std::cout << "picked " << x << " " << y << " " << colour_picked[0] << " " << colour_picked[1] << " "
 //	          << colour_picked[2] << " " << std::endl;
 //
-	glfwSwapBuffers(engine.stage->getWindow());
+//	glfwSwapBuffers(engine.stage->getWindow());
 
 	offset += models.getPickCount(plane);
 	//render next mesh
@@ -132,4 +142,5 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 }
 
 void GroundLayer::update() {
+//	m1.rotate(glm::vec3(0, 1, 0));
 }

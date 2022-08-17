@@ -6,8 +6,32 @@
 #include "scenes/demo/DemoScene.h"
 #include "Stage.h"
 
+
+void DemoScene::cameraControl(Amber::window_events::KeyEvent& event) {
+	//up 265
+	//left 263
+	//down 264
+	//right 262
+	glm::vec3 direction(0);
+	switch (event.key) {
+		case 262:
+			direction.x = 1;
+			break;
+		case 263:
+			direction.x = -1;
+			break;
+		case 264:
+			direction.y = -1;
+			break;
+		case 265:
+			direction.y = 1;
+			break;
+	}
+	camera.move(direction * cameraSpeed);
+}
+
 DemoScene::DemoScene()
-		: camera(glm::vec3(0), glm::vec3(0), 85, 500, 500, 0.01, 100, 0.1, 100) {
+		: camera(glm::vec3(0), glm::vec3(0), 85, 500, 500, 0.01, 1000, 0.1, 100) {
 	layers.addLayer(&demoLayer);
 	layers.addLayer(&groundLayer);
 
@@ -15,6 +39,10 @@ DemoScene::DemoScene()
 			[&](Amber::window_events::FramebufferSizeEvent& e) {
 				camera.setAspectRatio((float) e.width, (float) e.height);
 			}));
+
+	handlers.addHandler(Amber::window_events::KeyHandler(
+			[this](Amber::window_events::KeyEvent& e) { cameraControl(e); }
+	));
 };
 
 DemoScene::~DemoScene() {
