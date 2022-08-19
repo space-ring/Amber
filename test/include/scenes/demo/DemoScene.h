@@ -8,18 +8,15 @@
 
 #include "Scene.h"
 #include "Engine.h"
-#include "DemoLayer.h"
 #include "GroundLayer.h"
 
 
 class DemoScene : public Amber::Scene {
-	friend DemoLayer;
 	friend GroundLayer;
 
-	DemoLayer demoLayer;
 	GroundLayer groundLayer;
 
-	float cameraSpeed = 1.0 / 60;
+	float cameraSpeed = 1.5 / 60;
 
 	Amber::Camera camera;
 
@@ -27,7 +24,7 @@ class DemoScene : public Amber::Scene {
 
 	~DemoScene() override;
 
-	void cameraControl(Amber::window_events::KeyEvent& event);
+	void cameraControl();
 
 public:
 
@@ -46,11 +43,11 @@ public:
 
 	void hide() override;
 
-	void render() override;
+	void update() override;
 
 	void pick(int x, int y) override;
 
-	void update() override;
+	void render() override;
 };
 
 

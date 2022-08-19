@@ -7,7 +7,7 @@
 
 #include "glm/glm.hpp"
 #include "ITransformable.h"
-#include <vector>
+#include <list>
 
 //todo detach from dead parent
 
@@ -23,11 +23,14 @@ namespace Amber {
 
 		friend class ModelManager;
 
-		ModelTransform* parent{nullptr};
-		std::vector<ModelTransform*> children;
+		friend class Model;
 
-		glm::mat4 own; //for when not managed
-		glm::mat4* matrix; //todo use ref
+		ModelTransform* parent = nullptr;
+		ModelManager* manager = nullptr;
+		Model* model = nullptr;
+		std::list<ModelTransform*> children;
+	public:
+		glm::mat4 own;
 
 		glm::vec3 translation;
 		glm::vec3 rotation; //todo use quaternions
@@ -66,8 +69,6 @@ namespace Amber {
 		void attachParent(ModelTransform& transform, bool inherit);
 
 		void detachParent(bool inherit);
-
-		glm::mat4& getMatrix();
 
 	};
 

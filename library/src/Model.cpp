@@ -9,13 +9,18 @@ namespace Amber {
 	unsigned long Model::counter{0};
 
 	Model::Model()
-			: id(counter++) {}
+			: id(counter++) { transform.model = this; }
 
 	Model::Model(Mesh* mesh)
-			: mesh(mesh), id(counter++) {}
+			: mesh(mesh), id(counter++) { transform.model = this; }
 
 	Model::~Model() {
 		if (manager) manager->remove(*this);
+	}
+
+	void Model::setManager(ModelManager* manager) {
+		this->manager = manager;
+		transform.manager = manager;
 	}
 
 	void Model::setMesh(Mesh* newMesh, unsigned long limit) {

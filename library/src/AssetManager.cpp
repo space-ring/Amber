@@ -20,17 +20,21 @@ namespace Amber {
 	void AssetManager::buildAll() {
 		Shader::getDefault()->build();
 		for (const auto& shader: *shaderPaths) {
-			addShader(shader.first, *loadShaderFile(shader.second));
-			getShader(shader.first)->build();
+			if (!shaders->contains(shader.first)) {
+				addShader(shader.first, *loadShaderFile(shader.second));
+				getShader(shader.first)->build();
+			}
 		}
 		Mesh::getDefault()->build();
 		for (const auto& mesh: *meshPaths) {
-			addMesh(mesh.first, *loadMeshFile(mesh.second)); //add if not constructed
-			getMesh(mesh.first)->build(); //and build (whether previously retrieved or not)
-		}
+			if (!meshes->contains(mesh.first)) {
+				addMesh(mesh.first, *loadMeshFile(mesh.second)); //add if not constructed
+				getMesh(mesh.first)->build(); //and build (whether previously retrieved or not)}
+			}
 //    for (auto texture: *textures) {
 //        texture.renderState->build();
 //    }
+		}
 	}
 
 //todo batch (name block instead of line)

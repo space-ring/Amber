@@ -13,9 +13,10 @@
 namespace Amber {
 	class Layer {
 
-	public:
-
+	protected:
 		ModelManager models;
+
+	public:
 		EventManager handlers;
 
 		bool active = true;
@@ -24,11 +25,17 @@ namespace Amber {
 
 		virtual ~Layer() = default;
 
-		virtual void render() = 0;
+		virtual void build() = 0;
+
+		virtual void show() = 0;
+
+		virtual void hide() = 0;
+
+		virtual void update() = 0;
 
 		virtual Model* pick(int x, int y) = 0;
 
-		virtual void update() = 0;
+		virtual void render() = 0;
 
 	};
 

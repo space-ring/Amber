@@ -20,20 +20,27 @@ namespace Amber {
 
 		virtual ~LayerStack();
 
+		void build();
+
+		void show();
+
+		void hide();
+
+		void update();
+
+		Model* pick(int x, int y);
+
 		void render();
 
 		template<class T>
 		void onEvent(T& event) {
 			for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
+				auto& layer = *it;
 				if (event.handled) break;
-				if (!(*it)->active) continue;
-				(*it)->handlers.onEvent(event);
+				if (!layer->active) continue;
+				layer->handlers.onEvent(event);
 			}
 		}
-
-		Model* pick(int x, int y);
-
-		void update();
 
 		void addLayer(Layer* layer);
 

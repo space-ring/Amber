@@ -4,6 +4,7 @@
 
 #include "ModelTransform.h"
 #include "maths.h"
+#include "ModelManager.h"
 
 namespace Amber {
 	ModelTransform ModelTransform::sumTree() {
@@ -20,14 +21,14 @@ namespace Amber {
 			  t(glm::translate(translation)),
 			  s(glm::scale(m_scale)),
 			  r(glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z)),
-			  own(glm::mat4(1)), matrix(&own) { setMatrix(); }
+			  own(glm::mat4(1)) { setMatrix(); }
 
 	ModelTransform::ModelTransform(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
 			: translation(translation), rotation(rotation), m_scale(scale),
 			  t(glm::translate(translation)),
 			  s(glm::scale(scale)),
 			  r(glm::eulerAngleXYX(rotation.x, rotation.y, rotation.z)),
-			  own(glm::mat4(1)), matrix(&own) { setMatrix(); }
+			  own(glm::mat4(1)) { setMatrix(); }
 
 
 	void ModelTransform::attachParent(ModelTransform& transform, bool inherit) {
@@ -49,22 +50,58 @@ namespace Amber {
 			m_scale = sum.m_scale;
 			s = glm::scale(m_scale);
 		}
-		auto it = std::find(parent->children.begin(), parent->children.end(), this);
-		std::swap(*it, parent->children.back());
-		parent->children.pop_back();
+		parent->children.remove(this);
 		parent = nullptr;
 		setMatrix();
 	}
 
 	void ModelTransform::propagate() {
-		if (parent) *matrix = *parent->matrix * *matrix; //todo move this line to set_matrix?
+		//if parent, if parent.manager, get index of parent.model
+		if (parent) {
+			glm::mat4 parentMatrix(1);
+			if (parent->manager) {
+				glBindBuffer(GL_ARRAY_BUFFER, parent->model->getMesh()->getInstanceVbo());
+				unsigned int i = parent->manager->getInstanceOffset(*parent->model);
+				auto* p = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER,
+				                                                   i * sizeof(glm::mat4),
+				                                                   sizeof(glm::mat4), GL_MAP_READ_BIT));
+				parentMatrix = *p;
+				glUnmapBuffer(GL_ARRAY_BUFFER);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+			} else {
+				parentMatrix = parent->own;
+			}
+
+			if (manager) {
+				glBindBuffer(GL_ARRAY_BUFFER, model->getMesh()->getInstanceVbo());
+				unsigned int i = manager->getInstanceOffset(*model);
+				auto* p = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, i * sizeof(glm::mat4),
+				                                                   sizeof(glm::mat4),
+				                                                   GL_MAP_WRITE_BIT | GL_MAP_READ_BIT));
+				p[0] = parentMatrix * p[0];
+				glUnmapBuffer(GL_ARRAY_BUFFER);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+			} else {
+				own = parentMatrix * own;
+			}
+		}
 		for (auto child: children) {
 			child->setMatrix();
 		}
 	}
 
 	void ModelTransform::setMatrix() {
-		*matrix = t * s * r;
+		if (manager) {
+			glBindBuffer(GL_ARRAY_BUFFER, model->getMesh()->getInstanceVbo());
+			unsigned int i = manager->getInstanceOffset(*model);
+			auto* p = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, i * sizeof(glm::mat4),
+			                                                   sizeof(glm::mat4), GL_MAP_WRITE_BIT));
+			*p = t * s * r;
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		} else {
+			own = t * s * r;
+		}
 		propagate();
 	}
 
@@ -102,10 +139,6 @@ namespace Amber {
 		m_scale *= v;
 		s = glm::scale(v);
 		setMatrix();
-	}
-
-	glm::mat4& ModelTransform::getMatrix() {
-		return *matrix;
 	}
 
 }

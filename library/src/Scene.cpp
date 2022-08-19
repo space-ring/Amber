@@ -15,25 +15,35 @@ namespace Amber {
 
 	Scene::~Scene() = default;
 
-	void Scene::render() {
-		layers.render();
-	}
-
-	void Scene::pick(int x, int y) {
-		Model* picked = layers.pick(x, y);
-	}
-
-	LayerStack& Scene::getLayers() {
-		return layers;
-	}
-
 	void Scene::build() {
 		if (built) return;
 		built = true;
+		layers.build();
+	}
+
+	void Scene::show() {
+		layers.show();
+	}
+
+	void Scene::hide() {
+		layers.hide();
 	}
 
 	void Scene::update() {
 		layers.update();
+	}
+
+	void Scene::pick(int x, int y) {
+		Model* picked = layers.pick(x, y);
+		//todo
+	}
+
+	void Scene::render() {
+		layers.render();
+	}
+
+	LayerStack& Scene::getLayers() {
+		return layers;
 	}
 
 }

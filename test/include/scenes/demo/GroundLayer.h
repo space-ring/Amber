@@ -15,13 +15,19 @@ class GroundLayer : public Amber::Layer {
 
 public:
 
-	GroundLayer();
+	GroundLayer() = default;
 
-	void render() override;
+	void build() override;
+
+	void show() override;
+
+	void hide() override;
+
+	void update() override;
 
 	Amber::Model* pick(int x, int y) override;
 
-	void update() override;
+	void render() override;
 };
 
 

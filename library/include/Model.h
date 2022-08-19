@@ -31,6 +31,8 @@ namespace Amber {
 
 		ModelTransform* _getTransform() { return &transform; }
 
+		void setManager(ModelManager* manager);
+
 		RenderState state = RenderState::VISIBLE;
 
 	public:

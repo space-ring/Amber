@@ -60,19 +60,22 @@ namespace Amber {
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+
+		if (front) front->build();
 	}
 
 	void Stage::render() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (front) {
-			front->build(); //todo poor
 			front->render();
 		}
 		glfwSwapBuffers(window);
 	}
 
 	void Stage::update() {
-		if (front) front->update();
+		if (front) {
+			front->update();
+		}
 	}
 
 	void Stage::poll() {
@@ -95,7 +98,6 @@ namespace Amber {
 				glGetFloatv(GL_COLOR_CLEAR_VALUE, &colour[0]);
 				glGetDoublev(GL_DEPTH_CLEAR_VALUE, &depth);
 				glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencil);
-				front->build();
 				front->pick(mx, height - my);
 				//restore old clear values
 				glClearColor(colour[0], colour[1], colour[2], colour[3]);
@@ -125,6 +127,7 @@ namespace Amber {
 		if (scenes->contains(scene)) {
 			if (front) front->hide();
 			front = scenes->at(scene);
+			if (window) front->build();
 			front->show();
 		}
 	}

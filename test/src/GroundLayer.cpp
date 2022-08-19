@@ -7,32 +7,7 @@
 #include "Engine.h"
 #include "Stage.h"
 
-GroundLayer::GroundLayer() {
-//    ground.setMesh(Amber::Engine::getInstance().assets->getMesh("plane"), 10);
-//    ground.translate(glm::vec3(0, 0, -5));
-//    ground.rotate(glm::vec3(0, 0, 0));
-//    ground.m_scale(glm::vec3(2, 2, 2));
-//    models.add(ground, 10);
-//    bg.setMesh(Amber::Engine::getInstance().assets->getMesh("plane"), 10);
-//    bg.translate(glm::vec3(0, 0, -25));
-//    bg.m_scale(glm::vec3(30, 30, 10));
-//    models.add(bg, 10);
-
-//    int x = 2, y = 2;
-//    float hx = (float) x / 2, hy = (float) y/2;
-//
-//    master.translate(glm::vec3(-hx, -hy, -50));
-//    master.scale(glm::vec3(0.5));
-//
-//    for (int i = 0; i < x; ++i) {
-//        for (int j = 0; j < y; ++j) {
-//            Amber::Model m(Amber::Engine::getInstance().assets->getMesh("plane"));
-//            m.getTransform()->attachParent(master, false);
-//            m.translate(glm::vec3(j * 2 - hx, i * 2 - hy, 0));
-//            models.add(m, 11000);
-//        }
-//    }
-
+void GroundLayer::build() {
 	Amber::Mesh* mesh = Amber::Engine::getInstance().assets->getMesh("plane");
 	m1.setMesh(mesh);
 	m2.setMesh(mesh);
@@ -40,61 +15,77 @@ GroundLayer::GroundLayer() {
 	m4.setMesh(mesh);
 
 	m1.setState(Amber::RenderState::VISIBLE);
-	m3.setState(Amber::RenderState::INVISIBLE);
-	m2.setState(Amber::RenderState::VISIBLE);
+	m3.setState(Amber::RenderState::VISIBLE);
+	m2.setState(Amber::RenderState::VISIBLE_SOLID);
 
-	m2.getTransform()->attachParent(*m1.getTransform(), true);
-	m3.getTransform()->attachParent(*m1.getTransform(), true);
-	m4.getTransform()->attachParent(*m1.getTransform(), true);
+	m2.getTransform()->attachParent(*m1.getTransform(), false);
+	m3.getTransform()->attachParent(*m1.getTransform(), false);
+	m4.getTransform()->attachParent(*m1.getTransform(), false);
 
-	m1.translate(glm::vec3(0, 0, -5));
+	m1.translate(glm::vec3(0, 0, -10));
 	m2.translate(glm::vec3(2, 0, -1));
 	m3.translate(glm::vec3(0, 2, -1));
 	m4.translate(glm::vec3(2, 2, -1));
 
-//	for (int i = -50; i < 50; ++i) {
-//		for (int j = -50; j < 50; ++j) {
-//			Amber::Model& m = models.newModel();
-//			m.setMesh(mesh);
-//			m.getTransform()->attachParent(*m1.getTransform(), true);
-//			m.translate(glm::vec3(j*2, i*2, 0));
-//			models.add(m, 10000);
-//		}
-//	}
+//	m1.setTranslation(glm::vec3(0, 0, -2));
+
+	for (int i = -50; i < 50; ++i) {
+		for (int j = -50; j < 50; ++j) {
+			Amber::Model& m = models.newModel();
+			m.setMesh(mesh);
+			m.getTransform()->attachParent(*m1.getTransform(), true);
+			m.translate(glm::vec3(j*2, i*2, 0));
+			models.add(m, 10000);
+		}
+	}
 
 	models.add(m1);
-//	models.add(m2);
-//	models.add(m3);
-//	models.add(m4);
+	models.add(m2);
+	models.add(m3);
+	models.add(m4);
+	glCheckError();
+
+//	glBindBuffer(GL_ARRAY_BUFFER, mesh->getInstanceVbo());
+//	glBufferData(GL_ARRAY_BUFFER, 100* sizeof (glm::mat4), nullptr, GL_DYNAMIC_DRAW);
+//	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4), &m1.getTransform()->own);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glCheckError();
 
 	ground.setMesh(mesh, 100);
 	ground.setRotation(glm::vec3(90, 0, 0));
 	ground.setScale(glm::vec3(100));
 	ground.setTranslation(glm::vec3(0, -5, 0));
+
+	handlers.addHandler(Amber::window_events::KeyHandler(
+			[&](Amber::window_events::KeyEvent& e) {
+				if (e.key == GLFW_KEY_UP) {
+					models.remove(m2);
+				} else if (e.key == GLFW_KEY_DOWN) {
+					models.add(m2);
+				}
+			}
+	));
+
 }
 
-void GroundLayer::render() {
-	Amber::Engine& engine = Amber::Engine::getInstance();
-	DemoScene& scene = DemoScene::getInstance();
-	Amber::Mesh* plane = engine.assets->getMesh("plane");
+void GroundLayer::show() {
 
-	Amber::Shader* shader = engine.assets->getShader("basic")->start();
+}
 
-	glBindVertexArray(plane->getVao());
+void GroundLayer::hide() {
 
-	models.buffer(plane);//this buffer should be moved to pick
+}
 
-	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
-	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
-
-	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
-	                        models.getRenderCount(plane));
-
-	glBindVertexArray(0);
-	shader->stop();
+void GroundLayer::update() {
+//	m1.translate(glm::vec3(0.1/60, 0, 0));
+	if (DemoScene::getInstance().keys.down.contains(GLFW_KEY_J)) {
+		m1.rotate(glm::vec3(0, 0, 45.0/60));
+	}
 }
 
 Amber::Model* GroundLayer::pick(int x, int y) {
+	return 0;
 	Layer::pick(x, y);
 
 	//todo first choose models to render using ray tracing and BBs.
@@ -108,8 +99,6 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	shader->start();
 
 	glBindVertexArray(plane->getVao());
-
-	models.buffer(plane); //buffer here only once per frame (in whichever function comes first after bufferCopy
 
 	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
 	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
@@ -141,6 +130,21 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	return nullptr;
 }
 
-void GroundLayer::update() {
-//	m1.rotate(glm::vec3(0, 1, 0));
+void GroundLayer::render() {
+	Amber::Engine& engine = Amber::Engine::getInstance();
+	DemoScene& scene = DemoScene::getInstance();
+	Amber::Mesh* plane = engine.assets->getMesh("plane");
+
+	Amber::Shader* shader = engine.assets->getShader("basic")->start();
+
+	glBindVertexArray(plane->getVao());
+	glCheckError();
+	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
+	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
+
+	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
+	                        models.getRenderCount(plane));
+	glCheckError();
+	glBindVertexArray(0);
+	shader->stop();
 }

@@ -18,9 +18,14 @@
 #include "rendering.h"
 #include "ModelManager.h"
 #include "LayerStack.h"
-
+#include <set>
+#include "event.h"
 
 namespace Amber {
+
+	struct KeyRegistry {
+		std::set<int> down;
+	};
 
 	class Scene {
 	protected:
@@ -38,6 +43,8 @@ namespace Amber {
 		ModelTransform* last_focused = nullptr;
 
 	public:
+
+		KeyRegistry keys;
 
 		Scene();
 
@@ -58,7 +65,18 @@ namespace Amber {
 		template<class T>
 		void onEvent(T& event) {
 			layers.template onEvent(event);
+			if (static_cast<Event&>(event).handled) return;
 			handlers.template onEvent(event);
+		}
+
+		void onEvent(window_events::KeyEvent& e){
+			if (e.action == 1 && !keys.down.contains(e.key)){
+				keys.down.insert(e.key);
+			} else if (e.action == 0){
+				keys.down.erase(e.key);
+			}
+			layers.template onEvent(e);
+			handlers.template onEvent(e);
 		}
 
 		LayerStack& getLayers();

@@ -38,15 +38,16 @@ namespace Amber {
 			}
 			std::cout << "game stop" << std::endl;
 		}
+		int frames = 0;
 
 		void renderLoop() {
 			Engine& engine = Engine::getInstance();
 			engine.init();
+			unsigned long long int frame = 0;
 
 			std::cout << "running engine on thread " << std::this_thread::get_id() << std::endl;
 
 			std::time_t start = std::time(nullptr);
-			int frames = 0;
 
 			Amber::Stage* stage = engine.stage;
 
@@ -64,6 +65,7 @@ namespace Amber {
 					frames = 0;
 					start = std::time(nullptr);
 				}
+				++frame;
 			}
 
 			std::cout << "render stop" << std::endl;

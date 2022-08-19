@@ -9,16 +9,35 @@ namespace Amber {
 
 	LayerStack::~LayerStack() = default;
 
-	void LayerStack::render() {
+	void LayerStack::build() {
+		for (auto layer: stack) {
+			layer->build();
+		}
+	}
+
+	void LayerStack::show() {
+		for (auto layer: stack) {
+			layer->show();
+		}
+	}
+
+	void LayerStack::hide() {
+		for (auto layer: stack) {
+			layer->hide();
+		}
+	}
+
+	void LayerStack::update() {
 		for (auto layer: stack) {
 			if (!layer->active) continue;
-			layer->render();
+			layer->update();
 		}
 	}
 
 	Model* LayerStack::pick(int x, int y) {
 		Model* picked = nullptr;
-		for (auto layer: stack) {
+		for (int i = stack.size() - 1; i > -1; --i) {
+			auto& layer = stack[i];
 			if (!layer->active) continue;
 			picked = layer->pick(x, y);
 			if (picked) break;
@@ -26,10 +45,10 @@ namespace Amber {
 		return picked;
 	}
 
-	void LayerStack::update() {
+	void LayerStack::render() {
 		for (auto layer: stack) {
 			if (!layer->active) continue;
-			layer->update();
+			layer->render();
 		}
 	}
 
