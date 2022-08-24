@@ -16,7 +16,7 @@ class DemoScene : public Amber::Scene {
 
 	GroundLayer groundLayer;
 
-	float cameraSpeed = 1.5 / 60;
+	float cameraSpeed = 5.0 / 60;
 
 	Amber::Camera camera;
 

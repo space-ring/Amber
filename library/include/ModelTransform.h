@@ -16,7 +16,7 @@ namespace Amber {
 
 	class ModelManager;
 
-	class ModelTransform : public ITransformable<ModelTransform> { //this is wrong usage of crtp
+	class ModelTransform : public ITransformable<ModelTransform> { //todo this is wrong usage of crtp
 		friend class ITransformable<ModelTransform>;
 
 		friend class ITransformable<Model>;
@@ -25,12 +25,15 @@ namespace Amber {
 
 		friend class Model;
 
+		static unsigned long long counter;
+
 		ModelTransform* parent = nullptr;
 		ModelManager* manager = nullptr;
 		Model* model = nullptr;
 		std::list<ModelTransform*> children;
 	public:
 		glm::mat4 own;
+		glm::mat4 chained = own; //avoids unnecessary t*s*r
 
 		glm::vec3 translation;
 		glm::vec3 rotation; //todo use quaternions
@@ -56,8 +59,6 @@ namespace Amber {
 
 		void setMatrix();
 
-		void propagate();
-
 		ModelTransform sumTree();
 
 	public:
@@ -69,6 +70,10 @@ namespace Amber {
 		void attachParent(ModelTransform& transform, bool inherit);
 
 		void detachParent(bool inherit);
+
+		void propagate();
+
+		ModelTransform* root();
 
 	};
 

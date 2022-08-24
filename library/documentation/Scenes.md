@@ -8,7 +8,7 @@ separation between worlds which may use the same components but different instan
 To display a scene is to display all [frames](Frames.md) of it: separate pictures computed from renderState calls saved as
 FBOs. Every frame has its own image to display and viewport coordinates.
 
-![minecraft inventory screen](ti-sign-ingame.webp)
+![minecraft inventory screen](assets/ti-sign-ingame.webp)
 
 In this scene, the background is visible and composited with the inventory screen. All user input is confined to the
 inventory screen and user game_events pass through to the engine.

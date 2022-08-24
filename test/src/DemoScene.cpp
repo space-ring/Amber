@@ -21,6 +21,10 @@ void DemoScene::cameraControl() {
 		direction.y += 1;
 	if (keys.down.contains(GLFW_KEY_S))
 		direction.y += -1;
+	if (keys.down.contains(GLFW_KEY_Q))
+		direction.z += -1;
+	if (keys.down.contains(GLFW_KEY_E))
+		direction.z += 1;
 	camera.move(direction * cameraSpeed);
 }
 
@@ -55,12 +59,7 @@ void DemoScene::hide() {
 
 void DemoScene::update() {
 	Scene::update();
-//	camera.move(glm::vec3(1.0/60, 0, 0));
 	cameraControl();
-//    std::cout<<camera.position.x << " " << camera.position.y << " " << camera.position.z << " " << std::endl;
-//    std::cout<<camera.rotation.x << " " << camera.rotation.y << " " << camera.rotation.z << " " << std::endl;
-//    camera.move(glm::vec3(0.0f, 0.0f, -0.1f));
-//    camera.rotate(glm::vec3(0, 0, 9.0/60));
 }
 
 void DemoScene::pick(int x, int y) {

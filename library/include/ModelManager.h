@@ -18,6 +18,23 @@
 //todo nodes in trees should be stored together but what if they have different render states?
 namespace Amber {
 
+	struct TransformTracker {
+		using index = unsigned long long int;
+		index min, max;
+		std::list<index> list;
+
+		void track(index i) {
+			if (i < min) min = i;
+			if (i > max) max = i;
+			list.push_back(i);
+		}
+
+		void untrack(index i){
+			//don't change min, max too expensive
+			list.remove(i);
+		}
+	};
+
 	class ModelManager {
 		friend Model;
 		friend ModelTransform;
@@ -31,18 +48,19 @@ namespace Amber {
 		std::map<Mesh*, std::map<index, ModelTransform*>*> references; //maps back to ref of matrix
 		std::map<Mesh*, index> pickCount;
 		std::map<Mesh*, index> renderCount;
+		std::map<Mesh*, TransformTracker> trackers;
 
-		void reserve(Mesh* mesh, const index limit);
+		void reserve(Mesh* mesh, index limit);
 
-		glm::mat4 read(Mesh* mesh, const ModelManager::index index);
+		glm::mat4 read(Mesh* mesh, ModelManager::index index);
 
-		void write(Mesh* mesh, const ModelManager::index index, ModelTransform& transform);
+		void write(Mesh* mesh, ModelManager::index index, ModelTransform& transform);
 
-		void copy(Mesh* mesh, const index from, const index to);
+		void copy(Mesh* mesh, index from, index to);
 
 		index getInstanceOffset(Model& model);
 
-		void updateRef(Mesh* mesh, const index from, const index to);
+		void updateRef(Mesh* mesh, index from, index to);
 
 	public:
 
@@ -57,6 +75,8 @@ namespace Amber {
 		unsigned long long getRenderCount(Mesh* mesh);
 
 		unsigned long long getPickCount(Mesh* mesh);
+
+		void buffer(Mesh* mesh);
 
 	};
 

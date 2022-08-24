@@ -22,20 +22,31 @@ void GroundLayer::build() {
 	m3.getTransform()->attachParent(*m1.getTransform(), false);
 	m4.getTransform()->attachParent(*m1.getTransform(), false);
 
-	m1.translate(glm::vec3(0, 0, -10));
+	m1.translate(glm::vec3(0, 0, -200));
 	m2.translate(glm::vec3(2, 0, -1));
 	m3.translate(glm::vec3(0, 2, -1));
 	m4.translate(glm::vec3(2, 2, -1));
 
 //	m1.setTranslation(glm::vec3(0, 0, -2));
 
-	for (int i = -50; i < 50; ++i) {
-		for (int j = -50; j < 50; ++j) {
+	for (int i = -100; i < 100; ++i) {
+		Amber::Model& row = models.newModel();
+		row.setMesh(mesh);
+		row.translate(glm::vec3(0, i * 2, 0));
+		row.getTransform()->attachParent(*m1.getTransform(), true);
+		models.add(row, 50000);
+//		for (int j = 0; j < 1; ++j) {
+//			Amber::Model& asd = models.newModel();
+//			asd.setMesh(mesh);
+//			asd.translate(glm::vec3(0, i * 2, 0));
+//			models.add(asd, 10000);
+//		}
+		for (int j = -100; j < 100; ++j) {
 			Amber::Model& m = models.newModel();
 			m.setMesh(mesh);
-			m.getTransform()->attachParent(*m1.getTransform(), true);
-			m.translate(glm::vec3(j*2, i*2, 0));
-			models.add(m, 10000);
+			m.translate(glm::vec3(j * 2, 0, 0));
+			m.getTransform()->attachParent(*row.getTransform(), true);
+			models.add(m);
 		}
 	}
 
@@ -67,6 +78,8 @@ void GroundLayer::build() {
 			}
 	));
 
+	m1.getTransform()->propagate();
+	models.buffer(m1.getMesh());
 }
 
 void GroundLayer::show() {
@@ -80,7 +93,9 @@ void GroundLayer::hide() {
 void GroundLayer::update() {
 //	m1.translate(glm::vec3(0.1/60, 0, 0));
 	if (DemoScene::getInstance().keys.down.contains(GLFW_KEY_J)) {
-		m1.rotate(glm::vec3(0, 0, 45.0/60));
+		m1.rotate(glm::vec3(0, 0, 45.0 / 60));
+		m1.getTransform()->propagate();
+		models.buffer(m1.getMesh());
 	}
 }
 

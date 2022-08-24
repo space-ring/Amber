@@ -4,20 +4,36 @@
 
 #include "ModelManager.h"
 #include "Model.h"
+#include "Timer.h"
 
 namespace Amber {
+
+	ModelManager::~ModelManager() {
+		models.clear();
+		for (auto& pair: indices) {
+			delete pair.second;
+		}
+		for (auto& pair: references) {
+			delete pair.second;
+		}
+	}
 
 	ModelManager::index ModelManager::getInstanceOffset(Model& model) { //todo check if model managed
 		return indices.at(model.mesh)->at(&model.transform);
 	}
 
-	void ModelManager::updateRef(Mesh* mesh, const index from, const index to) {
+	void ModelManager::updateRef(Mesh* mesh, index from, index to) {
 		auto* list = indices.at(mesh);
 		auto* refs = references.at(mesh);
+		auto& tracker = trackers.at(mesh);
 		auto transform = refs->at(from);
 		refs->erase(from);
 		refs->insert_or_assign(to, transform);
 		list->insert_or_assign(transform, to);
+		//if some transforms are tracked before their indices change, tracker has stale data.
+		//have to remove old index in case it is now a hole (no longer in refs, seg fault)
+		tracker.track(to);
+		tracker.untrack(from);
 	}
 
 	Model& ModelManager::newModel() {
@@ -25,7 +41,7 @@ namespace Amber {
 		return models.back();
 	}
 
-	void ModelManager::reserve(Mesh* mesh, const index limit) {
+	void ModelManager::reserve(Mesh* mesh, index limit) {
 		if (indices.contains(mesh)) return;
 
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->getInstanceVbo());
@@ -33,6 +49,7 @@ namespace Amber {
 
 		indices.insert(std::pair(mesh, new std::map<ModelTransform*, index>));
 		references.insert(std::pair(mesh, new std::map<index, ModelTransform*>));
+		trackers.insert(std::pair(mesh, TransformTracker{limit, 0}));
 
 		pickCount.insert(std::pair(mesh, 0));
 		renderCount.insert(std::pair(mesh, 0));
@@ -40,7 +57,7 @@ namespace Amber {
 		limits.insert(std::pair(mesh, limit));
 	}
 
-	glm::mat4 ModelManager::read(Mesh* mesh, const ModelManager::index index) {
+	glm::mat4 ModelManager::read(Mesh* mesh, ModelManager::index index) {
 		glm::mat4 ret(0);
 		if (indices.contains(mesh)) {
 			glBindBuffer(GL_ARRAY_BUFFER, mesh->getInstanceVbo());
@@ -50,7 +67,7 @@ namespace Amber {
 		return ret;
 	}
 
-	void ModelManager::write(Mesh* mesh, const ModelManager::index index, ModelTransform& transform) {
+	void ModelManager::write(Mesh* mesh, ModelManager::index index, ModelTransform& transform) {
 		if (!indices.contains(mesh)) return;
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->getInstanceVbo());
 		glBufferSubData(GL_ARRAY_BUFFER, index * sizeof(glm::mat4), sizeof(glm::mat4), &transform.own);
@@ -59,7 +76,7 @@ namespace Amber {
 		references.at(mesh)->insert_or_assign(index, &transform);
 	}
 
-	void ModelManager::copy(Mesh* mesh, const ModelManager::index from, const ModelManager::index to) {
+	void ModelManager::copy(Mesh* mesh, ModelManager::index from, ModelManager::index to) {
 		if (!indices.contains(mesh)) return;
 		glBindBuffer(GL_COPY_READ_BUFFER, mesh->getInstanceVbo());
 		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh->getInstanceVbo());
@@ -200,14 +217,27 @@ namespace Amber {
 		model.setManager(nullptr);
 	}
 
-	ModelManager::~ModelManager() {
-		models.clear();
-		for (auto& pair: indices) {
-			delete pair.second;
+	//upload only changed models
+	//should be called after tree propagation
+	void ModelManager::buffer(Mesh* mesh) {
+		auto* refs = references.at(mesh);
+		auto& tracker = trackers.at(mesh);
+		if (tracker.list.empty()) return;
+		//writing to unsorted memory loses around 0.0008s on i3-10105f
+//		shuffle(tracker.list);
+//		tracker.list.sort();
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->getInstanceVbo());
+		auto* video = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, tracker.min,
+		                                                       tracker.max - tracker.min, GL_MAP_WRITE_BIT));
+		for (auto i: tracker.list) {
+//			memcpy(video + i, &refs->at(i)->chained, sizeof(glm::mat4));
+			video[i] = refs->at(i)->chained;
 		}
-		for (auto& pair: references) {
-			delete pair.second;
-		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		tracker.min = limits.at(mesh);
+		tracker.max = 0;
+		tracker.list = std::list<index>();
 	}
 
 	unsigned long long ModelManager::getRenderCount(Mesh* mesh) {

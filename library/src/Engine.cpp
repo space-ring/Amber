@@ -31,7 +31,10 @@ namespace Amber {
 		stage->init();
 
 		handlers->addHandler(
-				window_events::CloseHandler([&](window_events::CloseEvent&) { running = false; })
+				window_events::CloseHandler([&](window_events::CloseEvent&) {
+					stage->hide();
+					running = false;
+				})
 		);
 		handlers->addHandler(
 				window_events::FocusHandler([&](window_events::FocusEvent& e) { stage->focused = e.focused; })
