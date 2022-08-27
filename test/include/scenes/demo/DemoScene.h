@@ -9,9 +9,10 @@
 #include "Scene.h"
 #include "Engine.h"
 #include "GroundLayer.h"
+#include "Singleton.h"
 
-
-class DemoScene : public Amber::Scene {
+class DemoScene : public Amber::Scene, public Singleton<DemoScene> {
+	friend Singleton<DemoScene>;
 	friend GroundLayer;
 
 	GroundLayer groundLayer;
@@ -27,15 +28,6 @@ class DemoScene : public Amber::Scene {
 	void cameraControl();
 
 public:
-
-	static DemoScene& getInstance() {
-		static DemoScene instance;
-		return instance;
-	}
-
-	DemoScene(const DemoScene&) = delete;
-
-	void operator=(const DemoScene&) = delete;
 
 	void build() override;
 

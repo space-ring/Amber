@@ -1,4 +1,4 @@
-# Engine
+# Amber: the primitive rendering engine
 
 ## Index
 
