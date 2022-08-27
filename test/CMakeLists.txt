@@ -5,9 +5,16 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_CXX_FLAGS "-static")
 
-file (GLOB test_sources "src/*.cpp")
-
-add_executable(Test ${test_sources})
+add_executable(Test
+        include/scenes/demo/DemoScene.h
+        include/scenes/demo/GroundLayer.h
+        include/scenes/demo/UILayer.h
+        include/Sandbox.h
+        src/DemoScene.cpp
+        src/GroundLayer.cpp
+        src/Sandbox.cpp
+        src/test.cpp
+        src/UILayer.cpp)
 
 target_include_directories(Test PRIVATE include)
 

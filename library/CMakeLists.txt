@@ -6,13 +6,63 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-static")
 # todo GLOB bad
 file(GLOB depsources "deps/glad/src/glad.c" "deps/stb/stb_image.cpp")
-file(GLOB engine_sources "src/*.cpp")
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL " " FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL " " FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
 
-add_library(Engine ${engine_sources} ${depsources})
+add_library(Engine ${depsources}
+        include/AssetManager.h
+        include/Camera.h
+        include/CaptureMethod.h
+        include/Engine.h
+        include/engineIO.h
+        include/engineUtils.h
+        include/event.h
+        include/EventManager.h
+        include/Frame.h
+        include/graphics.h
+        include/ITransformable.h
+        include/Layer.h
+        include/LayerStack.h
+        include/light.h
+        include/maths.h
+        include/Mesh.h
+        include/Model.h
+        include/ModelManager.h
+        include/ModelTransform.h
+        include/rendering.h
+        include/Scene.h
+        include/Shader.h
+        include/Singleton.h
+        include/Stage.h
+        include/StateBuffer.h
+        include/Texture.h
+        include/ThreadedEngine.h
+        include/Timer.h
+        include/variadic.h
+        src/AssetManager.cpp
+        src/Camera.cpp
+        src/CaptureMethod.cpp
+        src/Engine.cpp
+        src/engineIO.cpp
+        src/engineUtils.cpp
+        src/event.cpp
+        src/EventManager.cpp
+        src/Frame.cpp
+        src/graphics.cpp
+        src/Layer.cpp
+        src/LayerStack.cpp
+        src/Mesh.cpp
+        src/Model.cpp
+        src/ModelManager.cpp
+        src/ModelTransform.cpp
+        src/rendering.cpp
+        src/Scene.cpp
+        src/Shader.cpp
+        src/Stage.cpp
+        src/Texture.cpp
+        src/ThreadedEngine.cpp)
 
 add_subdirectory(deps/glfw-3.3.6)
 

@@ -6,16 +6,19 @@
 #define ENGINETEST_GROUNDLAYER_H
 
 #include "Layer.h"
+#include "Singleton.h"
 
-class GroundLayer : public Amber::Layer {
+class GroundLayer : public Amber::Layer, public Singleton<GroundLayer> {
+	friend class Singleton<GroundLayer>;
+
 	friend class DemoScene;
 
 	Amber::Model ground;
 	Amber::Model m1, m2, m3, m4;
 
-public:
-
 	GroundLayer() = default;
+
+public:
 
 	void build() override;
 
