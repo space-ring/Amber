@@ -30,8 +30,6 @@
 //todo move away from string references
 //todo resource classes should adhere to the big 5.
 namespace Amber {
-	class Stage;
-
 	class Engine : public Singleton<Engine> {
 		using string = std::string;
 
@@ -45,9 +43,7 @@ namespace Amber {
 		virtual ~Engine();
 
 	public:
-		AssetManager assets;
 		EventManager handlers;
-		Stage* stage;
 
 		/* Initialises all listed resources, scenes and stages. Enters main renderState loop */
 		void init();

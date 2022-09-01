@@ -13,8 +13,8 @@ namespace Amber {
 
 	DEFNODEFAULT(Engine, "", 0, 0, 0, 0);
 
-	Engine::Engine(const string& name, int x, int y, int width, int height) :
-			stage(new Stage(name, x, y, width, height)) {
+	Engine::Engine(const string& name, int x, int y, int width, int height) {
+		Stage::getInstance(name, x, y, width, height);
 		std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;
 	}
 
@@ -23,16 +23,17 @@ namespace Amber {
 	};
 
 	void Engine::init() {
-		stage->init();
+		Stage& stage = Stage::getInstance();
+		stage.init();
 
 		handlers.addHandler(
 				window_events::CloseHandler([&](window_events::CloseEvent&) {
-					stage->hide();
+					stage.hide();
 					running = false;
 				})
 		);
 		handlers.addHandler(
-				window_events::FocusHandler([&](window_events::FocusEvent& e) { stage->focused = e.focused; })
+				window_events::FocusHandler([&](window_events::FocusEvent& e) { stage.focused = e.focused; })
 		);
 		handlers.addHandler(
 				window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
@@ -40,7 +41,7 @@ namespace Amber {
 				})
 		);
 
-		stage->show();
+		stage.show();
 
 		running = true;
 	}

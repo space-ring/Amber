@@ -48,14 +48,14 @@ namespace Amber {
 
 			std::time_t start = std::time(nullptr);
 
-			Amber::Stage* stage = engine.stage;
+			Amber::Stage& stage = Stage::getInstance();
 
 			while (engine.getRunning()) {
 				buffer.bufferCopy();
-				stage->update();
-				stage->pick();
-				stage->poll();
-				stage->render();
+				stage.update();
+				stage.pick();
+				stage.poll();
+				stage.render();
 
 				++frames;
 				std::time_t now = std::time(nullptr);

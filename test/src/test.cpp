@@ -4,6 +4,7 @@
 #include "Sandbox.h"
 #include "scenes/demo/DemoScene.h"
 #include "ThreadedEngine.h"
+#include "AssetManager.h"
 
 int main() {
 
@@ -14,10 +15,12 @@ int main() {
 	Amber::ThreadedEngine<Sandbox> app("Test game", 1030, 470, 500, 500);
 	Amber::Engine& engine = Amber::Engine::getInstance();
 	Sandbox& game = app.game;
+	auto& assets = Amber::AssetManager::getInstance();
+	auto& stage = Amber::Stage::getInstance();
 
-	engine.assets.addManifest("assets/manifest");
-	engine.stage->addScene("demo", &DemoScene::getInstance());
-	engine.stage->setFrontScene("demo");
+	assets.addManifest("assets/manifest");
+	stage.addScene("demo", &DemoScene::getInstance());
+	stage.setFrontScene("demo");
 
 	app.run();
 

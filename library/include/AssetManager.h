@@ -10,10 +10,12 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "engineIO.h"
+#include "Singleton.h"
 
 namespace Amber {
 
-	class AssetManager {
+	class AssetManager : public Singleton<AssetManager> {
+		friend Singleton<AssetManager>;
 		using string = std::string;
 		template<class T> using stringMap = std::map<string, T>;
 
@@ -25,10 +27,11 @@ namespace Amber {
 		stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
 		stringMap<Texture*>* textures = new stringMap<Texture*>;
 
-	public:
 		AssetManager();
 
 		virtual ~AssetManager();
+
+	public:
 
 		void buildAll();
 

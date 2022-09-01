@@ -16,7 +16,8 @@
 
 namespace Amber {
 
-	class Stage {
+	class Stage : public Singleton<Stage> {
+		friend Singleton<Stage>;
 		using string = std::string;
 
 	private:
@@ -29,21 +30,22 @@ namespace Amber {
 		template<class T, class... Args>
 		static void onGLFWevent(GLFWwindow* window, Args... args) {
 			auto& engine = Engine::getInstance();
+			auto& stage = Stage::getInstance();
 			T event{window, args...};
-			if (engine.stage->getFront()) {
-				engine.stage->getFront()->template onEvent(event);
+			if (stage.getFront()) {
+				stage.getFront()->template onEvent(event);
 			}
 			if (!event.handled)
 				engine.handlers.template onEvent(event);
 		}
 
-	public:
-
-		bool focused;
-
 		Stage(const string& name, int x, int y, int width, int height);
 
 		virtual ~Stage();
+
+	public:
+
+		bool focused;
 
 		/* Initialises GLFW window and OpenGL context */
 		void init();
@@ -70,6 +72,7 @@ namespace Amber {
 
 	};
 
+	DECNODEFAULT(Stage)
 }
 
 #endif //ENGINE_STAGE_H
