@@ -14,7 +14,7 @@ add_executable(Test
         src/GroundLayer.cpp
         src/Sandbox.cpp
         src/test.cpp
-        src/UILayer.cpp)
+        src/UILayer.cpp include/snake.h src/SnakeScene.cpp include/scenes/demo/SnakeScene.h)
 
 target_include_directories(Test PRIVATE include)
 

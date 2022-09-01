@@ -8,10 +8,6 @@
 
 
 void DemoScene::cameraControl() {
-	//up 265
-	//left 263
-	//down 264
-	//right 262
 	glm::vec3 direction(0);
 	if (keys.down.contains(GLFW_KEY_D))
 		direction.x += 1;
@@ -26,6 +22,12 @@ void DemoScene::cameraControl() {
 	if (keys.down.contains(GLFW_KEY_E))
 		direction.z += 1;
 	camera.move(direction * cameraSpeed);
+
+	if (keys.down.contains(GLFW_KEY_Z)) {
+		groundLayer.active = false;
+	} else if (keys.down.contains(GLFW_KEY_X)) {
+		groundLayer.active = true;
+	}
 }
 
 DemoScene::DemoScene()
@@ -45,7 +47,7 @@ DemoScene::~DemoScene() {
 
 void DemoScene::build() {
 	if (built) return;
-	Amber::Engine::getInstance().assets->buildAll();
+	Amber::Engine::getInstance().assets.buildAll();
 	Amber::Scene::build();
 }
 

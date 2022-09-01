@@ -69,14 +69,15 @@ namespace Amber {
 			handlers.template onEvent(event);
 		}
 
-		void onEvent(window_events::KeyEvent& e){
-			if (e.action == 1 && !keys.down.contains(e.key)){
-				keys.down.insert(e.key);
-			} else if (e.action == 0){
-				keys.down.erase(e.key);
+		void onEvent(window_events::KeyEvent& event){
+			if (event.action == 1 && !keys.down.contains(event.key)){
+				keys.down.insert(event.key);
+			} else if (event.action == 0){
+				keys.down.erase(event.key);
 			}
-			layers.template onEvent(e);
-			handlers.template onEvent(e);
+			layers.template onEvent(event);
+			if (static_cast<Event&>(event).handled) return;
+			handlers.template onEvent(event);
 		}
 
 		LayerStack& getLayers();

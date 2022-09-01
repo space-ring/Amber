@@ -15,6 +15,7 @@
 #include "EventManager.h"
 
 namespace Amber {
+
 	class Stage {
 		using string = std::string;
 
@@ -27,13 +28,13 @@ namespace Amber {
 
 		template<class T, class... Args>
 		static void onGLFWevent(GLFWwindow* window, Args... args) {
-			auto& p = Engine::getInstance();
+			auto& engine = Engine::getInstance();
 			T event{window, args...};
-			if (p.stage->getFront()) {
-				p.stage->getFront()->template onEvent(event);
+			if (engine.stage->getFront()) {
+				engine.stage->getFront()->template onEvent(event);
 			}
 			if (!event.handled)
-				p.handlers->template onEvent(event);
+				engine.handlers.template onEvent(event);
 		}
 
 	public:

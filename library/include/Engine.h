@@ -17,6 +17,7 @@
 #include "StateBuffer.h"
 #include "EventManager.h"
 #include "AssetManager.h"
+#include "Singleton.h"
 
 //todo default members for resources (VAO = 0, etc)
 //todo initialise members that don't depend on constructor in class declaration ^^^
@@ -31,8 +32,10 @@
 namespace Amber {
 	class Stage;
 
-	class Engine {
+	class Engine : public Singleton<Engine> {
 		using string = std::string;
+
+		friend Singleton<Engine>;
 
 	private:
 		volatile bool running = false;
@@ -42,18 +45,9 @@ namespace Amber {
 		virtual ~Engine();
 
 	public:
-		AssetManager* assets;
-		EventManager* handlers;
+		AssetManager assets;
+		EventManager handlers;
 		Stage* stage;
-
-		static Engine& getInstance(const string& name, int x, int y, int width, int height) {
-			static Engine engine(name, x, y, width, height);
-			return engine;
-		}
-
-		static Engine& getInstance() {
-			return getInstance("", 100, 100, 100, 100);
-		}
 
 		/* Initialises all listed resources, scenes and stages. Enters main renderState loop */
 		void init();
@@ -65,6 +59,7 @@ namespace Amber {
 
 	};
 
+	DECNODEFAULT(Engine)
 }
 
 #endif //ENGINE_ENGINE_H

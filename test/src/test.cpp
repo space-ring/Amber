@@ -15,7 +15,7 @@ int main() {
 	Amber::Engine& engine = Amber::Engine::getInstance();
 	Sandbox& game = app.game;
 
-	engine.assets->addManifest("assets/manifest");
+	engine.assets.addManifest("assets/manifest");
 	engine.stage->addScene("demo", &DemoScene::getInstance());
 	engine.stage->setFrontScene("demo");
 

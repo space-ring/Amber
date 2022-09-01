@@ -9,13 +9,16 @@
 #include "Scene.h"
 #include "Engine.h"
 #include "GroundLayer.h"
+#include "UILayer.h"
 #include "Singleton.h"
 
-class DemoScene : public Amber::Scene, public Singleton<DemoScene> {
+//todo what is the relationship between scene and layer? composite? private?
+class DemoScene : public Amber::Scene, public Amber::Singleton<DemoScene> {
 	friend Singleton<DemoScene>;
 	friend GroundLayer;
 
 	GroundLayer groundLayer;
+	UILayer buttons;
 
 	float cameraSpeed = 5.0 / 60;
 

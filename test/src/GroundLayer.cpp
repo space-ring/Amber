@@ -8,7 +8,7 @@
 #include "Stage.h"
 
 void GroundLayer::build() {
-	Amber::Mesh* mesh = Amber::Engine::getInstance().assets->getMesh("plane");
+	Amber::Mesh* mesh = Amber::Engine::getInstance().assets.getMesh("plane");
 	m1.setMesh(mesh);
 	m2.setMesh(mesh);
 	m3.setMesh(mesh);
@@ -108,9 +108,9 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	//todo example of standardised picking (model manager):
 	Amber::Engine& engine = Amber::Engine::getInstance();
 	DemoScene& scene = DemoScene::getInstance();
-	Amber::Mesh* plane = engine.assets->getMesh("plane");
+	Amber::Mesh* plane = engine.assets.getMesh("plane");
 
-	Amber::Shader* shader = engine.assets->getShader("pick");
+	Amber::Shader* shader = engine.assets.getShader("pick");
 	shader->start();
 
 	glBindVertexArray(plane->getVao());
@@ -148,9 +148,9 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 void GroundLayer::render() {
 	Amber::Engine& engine = Amber::Engine::getInstance();
 	DemoScene& scene = DemoScene::getInstance();
-	Amber::Mesh* plane = engine.assets->getMesh("plane");
+	Amber::Mesh* plane = engine.assets.getMesh("plane");
 
-	Amber::Shader* shader = engine.assets->getShader("basic")->start();
+	Amber::Shader* shader = engine.assets.getShader("basic")->start();
 
 	glBindVertexArray(plane->getVao());
 	glCheckError();

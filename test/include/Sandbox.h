@@ -11,7 +11,7 @@
 struct Sandbox {
 
 	bool running = true;
-	Amber::EventManager events;
+	Amber::EventManager handlers;
 
 	Sandbox();
 

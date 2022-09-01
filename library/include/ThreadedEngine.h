@@ -23,7 +23,7 @@ namespace Amber {
 		std::deque<Event> game_events;
 		std::mutex event_mutex;
 
-		void handleEvents() {
+		void gameHandleEvents() {
 			std::lock_guard lock(event_mutex);
 			for (auto& event: game_events) {
 				buffer.getLogicState().handlers.onEvent(event);
@@ -32,18 +32,17 @@ namespace Amber {
 
 		void gameLoop() {
 			while (game.running) {
-				handleEvents();
+				gameHandleEvents();
 				game.update();
 				buffer.bufferUpdate();
 			}
 			std::cout << "game stop" << std::endl;
 		}
-		int frames = 0;
 
 		void renderLoop() {
 			Engine& engine = Engine::getInstance();
 			engine.init();
-			unsigned long long int frame = 0;
+			unsigned long long int frames = 0;
 
 			std::cout << "running engine on thread " << std::this_thread::get_id() << std::endl;
 
@@ -65,7 +64,6 @@ namespace Amber {
 					frames = 0;
 					start = std::time(nullptr);
 				}
-				++frame;
 			}
 
 			std::cout << "render stop" << std::endl;
@@ -75,9 +73,9 @@ namespace Amber {
 		Game& game = buffer.getLogicState();
 
 		void run() {
-//            gameThread = std::jthread{&ThreadedEngine::gameLoop, this}; todo RELEASE uncomment this
+			gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
 			renderLoop();
-			game.running = false;
+			game.running = false; //todo remove this
 			if (gameThread.joinable()) gameThread.join();
 		};
 
