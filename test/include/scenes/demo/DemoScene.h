@@ -20,7 +20,7 @@ class DemoScene : public Amber::Scene, public Amber::Singleton<DemoScene> {
 	GroundLayer groundLayer;
 	UILayer buttons;
 
-	float cameraSpeed = 5.0 / 60;
+	float cameraSpeed = 5.0 / 20;
 
 	Amber::Camera camera;
 

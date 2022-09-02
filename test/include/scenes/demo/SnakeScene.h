@@ -6,11 +6,11 @@
 #define ENGINETEST_SNAKESCENE_H
 
 #include "Scene.h"
-#include "Singleton.h"
+#include "NoDefaultSingleton.h"
 
 using namespace Amber;
 
-class SnakeScene : public Scene, public Singleton<SnakeScene> {
+class SnakeScene : public Scene, public NoDefaultSingleton<SnakeScene> {
 
 	friend Singleton<SnakeScene>;
 

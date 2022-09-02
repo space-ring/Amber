@@ -72,19 +72,20 @@ namespace Amber {
 	public:
 		Game& game = buffer.getLogicState();
 
-		void run() {
-			gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
-			renderLoop();
-			game.running = false; //todo remove this
-			if (gameThread.joinable()) gameThread.join();
-		};
-
-		ThreadedEngine(const string& name, int x, int y, int width, int height) {
+		ThreadedEngine(Game& game, const string& name, int x, int y, int width, int height)
+				: buffer(game) {
 			Engine::getInstance(name, x, y, width, height);
 		};
 
 		virtual ~ThreadedEngine() {
 			game.running = false;
+			if (gameThread.joinable()) gameThread.join();
+		};
+
+		void run() {
+			gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
+			renderLoop();
+			game.running = false; //todo remove this
 			if (gameThread.joinable()) gameThread.join();
 		};
 

@@ -10,12 +10,13 @@
 namespace Amber {
 	template<class T>
 	class StateBuffer {
-		T logicState, copy, renderState;
+		T logicState;
+		typename T::R copy, renderState;
 		std::mutex copy_mutex;
 
 	public:
 
-		StateBuffer() : logicState(T()), copy(T()), renderState(T()) {}
+		StateBuffer(T game) : logicState(game), copy(game.getRenderComponent()), renderState(copy) {}
 
 		void bufferUpdate() {
 			std::lock_guard lock(copy_mutex);

@@ -22,19 +22,28 @@ enum cell {
 	EMPTY, SNAKE, FRUIT
 };
 
-class snake {
+class Snake {
 	//body, first one is head
 	std::list<point> segments;
-	direction direction = DOWN;
+	direction dir = DOWN;
 
 public:
-	snake(const point& point) {
+	struct R {
+		std::list<point> segments;
+		direction dir;
+	};
+
+	R getR() {
+		return R{segments, dir};
+	}
+
+	Snake(const point& point) {
 		segments.push_back(point);
 	}
 
 	void move() {
 		point next = segments.front();
-		switch (direction) {
+		switch (dir) {
 			case LEFT:
 				next.x -= 1;
 				break;
@@ -55,6 +64,10 @@ public:
 		segments.front() = next;
 	}
 
+	void turn(direction d) {
+		dir = d;
+	}
+
 	void grow(point tail) {
 		segments.push_back(tail);
 	}
@@ -68,14 +81,19 @@ public:
 	}
 };
 
-class game final {
+class SnakeGame final {
 	uint width, height;
 	cell* board;
-	snake snake;
-	bool running = false;
-
+	Snake snake;
 public:
-	game(uint width, uint height)
+
+	bool running = false;
+	struct R {
+		uint width, height;
+		Snake::R snake;
+	};
+
+	SnakeGame(uint width, uint height)
 			: width(width), height(height),
 			  snake({(int) width / 2, (int) height / 2}) {
 		board = new cell[width * height];
@@ -102,7 +120,11 @@ public:
 		} else return false;
 	}
 
-	~game() {
+	R getR() {
+		return R{width, height, snake.getR()};
+	}
+
+	~SnakeGame() {
 		delete[] board;
 	}
 };

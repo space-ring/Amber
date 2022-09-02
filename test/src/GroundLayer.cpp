@@ -29,19 +29,21 @@ void GroundLayer::build() {
 
 //	m1.setTranslation(glm::vec3(0, 0, -2));
 
-	for (int i = -100; i < 100; ++i) {
+	int x = 100;
+
+	for (int i = -x; i < x; ++i) {
 		Amber::Model& row = models.newModel();
 		row.setMesh(mesh);
 		row.translate(glm::vec3(0, i * 2, 0));
 		row.getTransform()->attachParent(*m1.getTransform(), true);
-		models.add(row, 50000);
+		models.add(row, 250000);
 //		for (int j = 0; j < 1; ++j) {
 //			Amber::Model& asd = models.newModel();
 //			asd.setMesh(mesh);
 //			asd.translate(glm::vec3(0, i * 2, 0));
 //			models.add(asd, 10000);
 //		}
-		for (int j = -100; j < 100; ++j) {
+		for (int j = -x; j < x; ++j) {
 			Amber::Model& m = models.newModel();
 			m.setMesh(mesh);
 			m.translate(glm::vec3(j * 2, 0, 0));
