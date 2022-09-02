@@ -16,7 +16,7 @@
 
 namespace Amber {
 
-	class Stage : public Singleton<Stage> {
+	class Stage : public NoDefaultSingleton<Stage> {
 		friend Singleton<Stage>;
 		using string = std::string;
 
@@ -32,9 +32,9 @@ namespace Amber {
 			auto& engine = Engine::getInstance();
 			auto& stage = Stage::getInstance();
 			T event{window, args...};
-			if (stage.getFront()) {
+			if (stage.getFront())
 				stage.getFront()->template onEvent(event);
-			}
+
 			if (!event.handled)
 				engine.handlers.template onEvent(event);
 		}
@@ -71,8 +71,6 @@ namespace Amber {
 		Scene* getFront() const;
 
 	};
-
-	DECNODEFAULT(Stage)
 }
 
 #endif //ENGINE_STAGE_H

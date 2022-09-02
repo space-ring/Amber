@@ -10,8 +10,6 @@
 
 namespace Amber {
 
-	DEFNODEFAULT(Stage, "", 0, 0, 0, 0);
-
 	Stage::Stage(const string& name, int x, int y, int width, int height)
 			: name(name), x(x), y(y), width(width), height(height) {
 	}

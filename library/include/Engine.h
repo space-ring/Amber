@@ -17,7 +17,7 @@
 #include "StateBuffer.h"
 #include "EventManager.h"
 #include "AssetManager.h"
-#include "Singleton.h"
+#include "NoDefaultSingleton.h"
 
 //todo default members for resources (VAO = 0, etc)
 //todo initialise members that don't depend on constructor in class declaration ^^^
@@ -30,7 +30,7 @@
 //todo move away from string references
 //todo resource classes should adhere to the big 5.
 namespace Amber {
-	class Engine : public Singleton<Engine> {
+	class Engine : public NoDefaultSingleton<Engine> {
 		using string = std::string;
 
 		friend Singleton<Engine>;
@@ -54,8 +54,6 @@ namespace Amber {
 		bool getRunning() const;
 
 	};
-
-	DECNODEFAULT(Engine)
 }
 
 #endif //ENGINE_ENGINE_H

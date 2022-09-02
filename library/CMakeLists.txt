@@ -62,7 +62,7 @@ add_library(Engine ${depsources}
         src/Shader.cpp
         src/Stage.cpp
         src/Texture.cpp
-        src/ThreadedEngine.cpp)
+        src/ThreadedEngine.cpp include/NoDefaultSingleton.h)
 
 add_subdirectory(deps/glfw-3.3.6)
 

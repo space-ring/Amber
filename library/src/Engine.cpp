@@ -11,8 +11,6 @@
 
 namespace Amber {
 
-	DEFNODEFAULT(Engine, "", 0, 0, 0, 0);
-
 	Engine::Engine(const string& name, int x, int y, int width, int height) {
 		Stage::getInstance(name, x, y, width, height);
 		std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;

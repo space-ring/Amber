@@ -8,25 +8,25 @@
 #include <functional>
 #include <string>
 
-#define DECNODEFAULT(T) template<> template<> T& Amber::Singleton<T>::getInstance<>();
-#define DEFNODEFAULT(T, ...) template<> template<> T& Amber::Singleton<T>::getInstance<>(){ \
-    if (!initialised) throw std::runtime_error(std::string("Cannot recall instance of non-initialised ") + #T + " with no default constructor");\
-    return Amber::Singleton<T>::getInstance(__VA_ARGS__);}
-
 namespace Amber {
+
+	template<class U>
+	class NoDefaultSingleton;
+
 /**
- * A singleton template superclass. Subclass must implement a private default constructor and declare this superclass as a friend.
+ * A singleton template superclass. The subclass must implement a private default constructor and declare Singleton as a friend.
  * @tparam T - Subclass to be singleton.
  */
 	template<class T>
 	class Singleton {
 
-		static bool initialised;
-
 		//constructor cannot be called by anyone else (avoid A:Singleton<B>)
 		friend T;
 
-		Singleton() { initialised = true; };
+		//except NoDefaultSingleton
+		friend NoDefaultSingleton<T>;
+
+		Singleton() = default;
 
 		~Singleton() = default;
 
@@ -60,9 +60,6 @@ namespace Amber {
 
 		Singleton& operator=(Singleton&&) = delete;
 	};
-
-	template<class T>
-	bool Singleton<T>::initialised = false;
 }
 
 #endif //ENGINETEST_SINGLETON_H
