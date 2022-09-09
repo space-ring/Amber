@@ -1,26 +1,27 @@
 #include <iostream>
 #include <thread>
-#include "Engine.h"
-#include "scenes/demo/DemoScene.h"
-#include "ThreadedEngine.h"
+#include "Application.h"
 #include "AssetManager.h"
 #include "snake.h"
+#include "scenes/demo/SnakeScene.h"
+#include "scenes/demo/DemoScene.h"
 
 int main() {
 
 	std::cout << "main thread " << std::this_thread::get_id() << std::endl;
 
-	// 1030,470
+	int width = 300, height = 300;
 
-	Amber::ThreadedEngine<SnakeGame> app(SnakeGame{100, 100}, "Snake", 1030, 470, 500, 500);
-	Amber::Engine& engine = Amber::Engine::getInstance();
-	auto& game = app.game;
+	Amber::Application<SnakeGame> app("Snake", 1030, 470, width, height, width, height);
+
 	auto& assets = Amber::AssetManager::getInstance();
-	auto& stage = Amber::Stage::getInstance();
-
 	assets.addManifest("assets/manifest");
-	stage.addScene("demo", &DemoScene::getInstance());
-	stage.setFrontScene("demo");
+
+	SnakeScene::getInstance(width, height);
+
+	auto& stage = Amber::Stage::getInstance();
+	stage.addScene("snake", &SnakeScene::getInstance());
+	stage.setFrontScene("snake");
 
 	app.run();
 

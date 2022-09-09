@@ -16,11 +16,11 @@ class SnakeScene : public Scene, public NoDefaultSingleton<SnakeScene> {
 
 	Camera camera;
 
-	SnakeScene();
+	std::list<Model> segments;
+
+	SnakeScene(unsigned int width, unsigned int height);
 
 	~SnakeScene();
-
-	void controlCamera();
 
 public:
 	void build() override;

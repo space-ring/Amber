@@ -2,41 +2,39 @@
 // Created by croissant on 19/07/2022.
 //
 
-#ifndef ENGINETEST_THREADEDENGINE_H
-#define ENGINETEST_THREADEDENGINE_H
+#ifndef ENGINETEST_APPLICATION_H
+#define ENGINETEST_APPLICATION_H
 
 #include <mutex>
 #include <thread>
 #include "StateBuffer.h"
 #include "Engine.h"
 #include "Stage.h"
+#include "snake.h"
 
 namespace Amber {
 
-	//todo make this singleton too
-	//todo merge with engine?
 	template<class Game>
-	class ThreadedEngine {
+	class Application : public NoDefaultSingleton<Application<Game>> {
+		friend Singleton<Application<Game>>;
 
-		StateBuffer<Game> buffer;
+		StateBuffer<Game>& buffer;
 		std::jthread gameThread;
 		std::deque<Event> game_events;
 		std::mutex event_mutex;
 
-		void gameHandleEvents() {
-			std::lock_guard lock(event_mutex);
-			for (auto& event: game_events) {
-				buffer.getLogicState().handlers.onEvent(event);
-			}
-		}
-
 		void gameLoop() {
+			game.start();
 			while (game.running) {
-				gameHandleEvents();
+				std::lock_guard lock(event_mutex);
+				for (auto& event: game_events) {
+					buffer.getLogicState().handlers.onEvent(event);
+				}
 				game.update();
 				buffer.bufferUpdate();
 			}
 			std::cout << "game stop" << std::endl;
+			Engine::getInstance().kill(); //todo remove
 		}
 
 		void renderLoop() {
@@ -71,25 +69,32 @@ namespace Amber {
 
 	public:
 		Game& game = buffer.getLogicState();
+		typename Game::R& R = buffer.getRenderState();
 
-		ThreadedEngine(Game& game, const string& name, int x, int y, int width, int height)
-				: buffer(game) {
+		template<class... Args>
+		Application(const string& name, int x, int y, int width, int height, Args... args) :
+				buffer(StateBuffer<Game>::getInstance(args...)) {
 			Engine::getInstance(name, x, y, width, height);
-		};
+		}
 
-		virtual ~ThreadedEngine() {
+		virtual ~Application() {
 			game.running = false;
 			if (gameThread.joinable()) gameThread.join();
 		};
 
 		void run() {
-			gameThread = std::jthread{&ThreadedEngine::gameLoop, this};
+			gameThread = std::jthread{&Application::gameLoop, this};
 			renderLoop();
 			game.running = false; //todo remove this
 			if (gameThread.joinable()) gameThread.join();
 		};
 
+		void putEvent(const Event& event) {
+			std::lock_guard lock(event_mutex);
+			game_events.push_back(event);
+		}
+
 	};
 }
 
-#endif //ENGINETEST_THREADEDENGINE_H
+#endif //ENGINETEST_APPLICATION_H

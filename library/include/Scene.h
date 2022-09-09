@@ -36,6 +36,7 @@ namespace Amber {
 		bool built = false;
 		LayerStack layers;
 		EventManager handlers;
+		ModelManager models;
 
 		ModelTransform* last_picked = nullptr;
 		ModelTransform* dragged = nullptr;

@@ -6,21 +6,25 @@
 #define ENGINE_STATEBUFFER_H
 
 #include <mutex>
+#include "NoDefaultSingleton.h"
 
 namespace Amber {
 	template<class T>
-	class StateBuffer {
+	class StateBuffer : public NoDefaultSingleton<StateBuffer<T>> {
+		friend Singleton<StateBuffer<T>>;
+
 		T logicState;
 		typename T::R copy, renderState;
 		std::mutex copy_mutex;
 
-	public:
+		template<class... Args>
+		StateBuffer(Args... args) : logicState(args...), copy(logicState.getR()), renderState(copy) {}
 
-		StateBuffer(T game) : logicState(game), copy(game.getRenderComponent()), renderState(copy) {}
+	public:
 
 		void bufferUpdate() {
 			std::lock_guard lock(copy_mutex);
-			copy = logicState;
+			copy = logicState.getR();
 		}
 
 		void bufferCopy() {
@@ -30,6 +34,10 @@ namespace Amber {
 
 		T& getLogicState() {
 			return logicState;
+		}
+
+		typename T::R& getRenderState() {
+			return renderState;
 		}
 	};
 

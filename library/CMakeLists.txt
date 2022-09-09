@@ -38,7 +38,7 @@ add_library(Engine ${depsources}
         include/Stage.h
         include/StateBuffer.h
         include/Texture.h
-        include/ThreadedEngine.h
+        include/Application.h
         include/Timer.h
         include/variadic.h
         src/AssetManager.cpp
@@ -62,7 +62,7 @@ add_library(Engine ${depsources}
         src/Shader.cpp
         src/Stage.cpp
         src/Texture.cpp
-        src/ThreadedEngine.cpp include/NoDefaultSingleton.h)
+        src/Application.cpp include/NoDefaultSingleton.h)
 
 add_subdirectory(deps/glfw-3.3.6)
 

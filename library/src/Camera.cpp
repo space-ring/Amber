@@ -20,7 +20,7 @@ namespace Amber {
 	}
 
 	void Camera::updateOrthogonal() {
-		orthogonal = glm::ortho(-width / 2, width / 2, -height / 2, height / 2, near_o, far_o);
+		orthogonal = glm::ortho(0.0f, width, 0.0f, height, near_o, far_o);
 	}
 
 	void Camera::updateView() {

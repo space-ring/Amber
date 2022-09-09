@@ -58,8 +58,8 @@ public:
 				break;
 		}
 
-		for (auto it = segments.rbegin(); it != segments.rend()++; ++it) {
-			*it = *std::next(it);
+		for (auto it = --segments.end(); it != segments.begin(); --it) {
+			*it = *std::prev(it);
 		}
 		segments.front() = next;
 	}
@@ -85,7 +85,10 @@ class SnakeGame final {
 	uint width, height;
 	cell* board;
 	Snake snake;
+
 public:
+
+	Amber::EventManager handlers;
 
 	bool running = false;
 	struct R {
@@ -120,6 +123,16 @@ public:
 		} else return false;
 	}
 
+	void update() {
+		using namespace std::chrono;
+		static time_point<system_clock> start = system_clock::now();
+		time_point<system_clock> now = system_clock::now();
+		if (now - start >= 0.05s) {
+			running = step();
+			start = now;
+		}
+	}
+
 	R getR() {
 		return R{width, height, snake.getR()};
 	}
@@ -128,5 +141,13 @@ public:
 		delete[] board;
 	}
 };
+
+namespace SnakeEvents {
+	struct DirEvent : public Amber::Event {
+		const direction dir;
+
+		DirEvent(const direction direction) : dir(direction) {}
+	};
+}
 
 #endif //ENGINETEST_SNAKE_H
