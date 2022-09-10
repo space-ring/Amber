@@ -7,17 +7,19 @@
 
 #include "graphics.h"
 #include <string>
-#include "event.h"
+#include "events.h"
 #include <list>
 #include <queue>
 #include <map>
-#include "Engine.h"
 #include "EventManager.h"
 
 namespace Amber {
 
-	class Stage : public NoDefaultSingleton<Stage> {
-		friend Singleton<Stage>;
+	class Engine;
+
+	class Scene;
+
+	class Stage {
 		using string = std::string;
 
 	private:
@@ -26,26 +28,15 @@ namespace Amber {
 		GLFWwindow* window = nullptr;
 		std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
 		Scene* front = nullptr;
-
-		template<class T, class... Args>
-		static void onGLFWevent(GLFWwindow* window, Args... args) {
-			auto& engine = Engine::getInstance();
-			auto& stage = Stage::getInstance();
-			T event{window, args...};
-			if (stage.getFront())
-				stage.getFront()->template onEvent(event);
-
-			if (!event.handled)
-				engine.handlers.template onEvent(event);
-		}
-
-		Stage(const string& name, int x, int y, int width, int height);
-
-		virtual ~Stage();
-
 	public:
 
-		bool focused;
+		Engine& engine;
+
+		bool focused = false;
+
+		Stage(Engine& engine, const string& name, int x, int y, int width, int height);
+
+		virtual ~Stage();
 
 		/* Initialises GLFW window and OpenGL context */
 		void init();

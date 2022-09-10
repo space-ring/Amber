@@ -8,4 +8,11 @@ namespace Amber {
 	void EventManager::clearHandlers(unsigned long id) {
 		//todo
 	}
+
+	EventManager::~EventManager() {
+		for (std::pair s: *handlers) {
+			delete s.second;
+		}
+		delete handlers;
+	}
 }

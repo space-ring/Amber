@@ -16,9 +16,11 @@ namespace Amber {
 		std::vector<Layer*> stack;
 
 	public:
-		LayerStack();
+		Scene& scene;
 
-		virtual ~LayerStack();
+		LayerStack(Scene& scene);
+
+		virtual ~LayerStack() = default;
 
 		void build();
 
@@ -32,8 +34,7 @@ namespace Amber {
 
 		void render();
 
-		template<class T>
-		void onEvent(T& event) {
+		void onEvent(Event& event) {
 			for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
 				auto& layer = *it;
 				if (event.handled) break;

@@ -8,15 +8,21 @@
 #include "graphics.h"
 #include "variadic.h"
 #include  <iostream>
+#include "IClonable.h"
 
 namespace Amber {
 	struct Event { //todo list init / constructors ?
-		bool handled;
+		bool handled = false;
 
-		Event();
+		Event() = default;
 
-		virtual ~Event();
+		virtual ~Event() = default;
+
+		virtual Event* clone() const = 0;
 	};
+
+	template<class T>
+	using CloneEvent = IClonable<Event, T>;
 
 	template<class T>
 	class EventHandler {
@@ -31,8 +37,7 @@ namespace Amber {
 		}
 
 	public:
-		static const unsigned long type;
-		bool active{true};
+		bool active = true;
 
 		static base_handler upcast(const derived_handler& handler) { // existence of handler already checks T : Event
 			return [handler](Event& event) -> void {
@@ -47,10 +52,6 @@ namespace Amber {
 			function(event);
 		}
 	};
-
-	extern unsigned long handler_counter;
-	template<class T>
-	const unsigned long EventHandler<T>::type = handler_counter++;
 
 	using GenericHandler = EventHandler<Event>;
 
@@ -69,40 +70,29 @@ namespace Amber {
 
 	namespace window_events {
 
-		enum class event_type {
-			CLOSE,
-			ENTER,
-			FOCUS,
-			KEY,
-			CHAR,
-			CLICK,
-			SCROLL,
-			MOTION
-		};
-
-		struct Event : public Amber::Event {
+		struct Event : IClonable<Amber::Event, Event> {
 			const GLFWwindow* window;
 
 			Event(const GLFWwindow* window);
 		};
 
-		struct EnterEvent : public Event {
+		struct EnterEvent : IClonable<Event, EnterEvent> {
 			const int entered;
 
 			EnterEvent(const GLFWwindow* window, const int entered);
 		};
 
-		struct FocusEvent : Event {
+		struct FocusEvent : IClonable<Event, FocusEvent> {
 			const int focused;
 
 			FocusEvent(const GLFWwindow* window, const int focused);
 		};
 
-		struct CloseEvent : Event {
+		struct CloseEvent : IClonable<Event, CloseEvent> {
 			CloseEvent(const GLFWwindow* window);
 		};
 
-		struct KeyEvent : Event {
+		struct KeyEvent : IClonable<Event, KeyEvent> {
 			const int key;
 			const int scancode;
 			const int action;
@@ -111,20 +101,20 @@ namespace Amber {
 			KeyEvent(const GLFWwindow* window, const int key, const int scancode, const int action, const int mods);
 		};
 
-		struct CharEvent : Event {
+		struct CharEvent : IClonable<Event, CharEvent> {
 			const unsigned int codepoint;
 
 			CharEvent(const GLFWwindow* window, const unsigned int codepoint);
 		};
 
-		struct MotionEvent : Event {
+		struct MotionEvent : IClonable<Event, MotionEvent> {
 			const double xpos;
 			const double ypos;
 
 			MotionEvent(const GLFWwindow* window, const double xpos, const double ypos);
 		};
 
-		struct ClickEvent : Event {
+		struct ClickEvent : IClonable<Event, ClickEvent> {
 			const int button;
 			const int action;
 			const int mods;
@@ -132,14 +122,14 @@ namespace Amber {
 			ClickEvent(const GLFWwindow* window, const int button, const int action, const int mods);
 		};
 
-		struct ScrollEvent : Event {
+		struct ScrollEvent : IClonable<Event, ScrollEvent> {
 			const double xoffset;
 			const double yoffset;
 
 			ScrollEvent(const GLFWwindow* window, const double xoffset, const double yoffset);
 		};
 
-		struct FramebufferSizeEvent : Event {
+		struct FramebufferSizeEvent : IClonable<Event, FramebufferSizeEvent> {
 			const int width;
 			const int height;
 

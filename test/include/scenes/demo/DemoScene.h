@@ -13,8 +13,7 @@
 #include "Singleton.h"
 
 //todo what is the relationship between scene and layer? composite? private?
-class DemoScene : public Amber::Scene, public Amber::Singleton<DemoScene> {
-	friend Singleton<DemoScene>;
+class DemoScene : public Amber::Scene {
 	friend GroundLayer;
 
 	GroundLayer groundLayer;
@@ -24,13 +23,13 @@ class DemoScene : public Amber::Scene, public Amber::Singleton<DemoScene> {
 
 	Amber::Camera camera;
 
-	DemoScene();
-
-	~DemoScene() override;
-
 	void cameraControl();
 
 public:
+
+	DemoScene();
+
+	~DemoScene() override;
 
 	void build() override;
 

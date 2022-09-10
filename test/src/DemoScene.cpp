@@ -31,7 +31,7 @@ void DemoScene::cameraControl() {
 }
 
 DemoScene::DemoScene()
-		: camera(glm::vec3(0), glm::vec3(0), 85, 500, 500, 0.01, 1000, 0.01, 100) {
+		: camera(glm::vec3(0), glm::vec3(0), 85, 500, 500, 0.01, 1000, 0.01, 100), Scene() {
 	layers.addLayer(&groundLayer);
 
 	handlers.addHandler(Amber::window_events::FramebufferSizeHandler(
@@ -47,7 +47,7 @@ DemoScene::~DemoScene() {
 
 void DemoScene::build() {
 	if (built) return;
-	Amber::AssetManager::getInstance().buildAll();
+	stage->engine.assets.buildAll();
 	Amber::Scene::build();
 }
 

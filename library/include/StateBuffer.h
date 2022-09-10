@@ -10,25 +10,24 @@
 
 namespace Amber {
 	template<class T>
-	class StateBuffer : public NoDefaultSingleton<StateBuffer<T>> {
-		friend Singleton<StateBuffer<T>>;
+	class StateBuffer {
 
 		T logicState;
 		typename T::R copy, renderState;
-		std::mutex copy_mutex;
+		std::mutex mutex;
+
+	public:
 
 		template<class... Args>
 		StateBuffer(Args... args) : logicState(args...), copy(logicState.getR()), renderState(copy) {}
 
-	public:
-
 		void bufferUpdate() {
-			std::lock_guard lock(copy_mutex);
+			std::lock_guard lock(mutex);
 			copy = logicState.getR();
 		}
 
 		void bufferCopy() {
-			std::lock_guard lock(copy_mutex);
+			std::lock_guard lock(mutex);
 			renderState = copy;
 		}
 

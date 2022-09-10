@@ -10,19 +10,18 @@
 
 using namespace Amber;
 
-class SnakeScene : public Scene, public NoDefaultSingleton<SnakeScene> {
-
-	friend Singleton<SnakeScene>;
+class SnakeScene : public Amber::Scene {
 
 	Camera camera;
 
 	std::list<Model> segments;
 
+public:
+
 	SnakeScene(unsigned int width, unsigned int height);
 
 	~SnakeScene();
 
-public:
 	void build() override;
 
 	void show() override;

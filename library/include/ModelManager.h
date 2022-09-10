@@ -20,16 +20,16 @@ namespace Amber {
 
 	struct TransformTracker {
 		using index = unsigned long long int;
-		index min, max;
+		index min = LONG_LONG_MAX, max = 0;
 		std::list<index> list;
 
 		void track(index i) {
 			if (i < min) min = i;
-			if (i > max) max = i;
+			if (i >= max) max = i + 1;
 			list.push_back(i);
 		}
 
-		void untrack(index i){
+		void untrack(index i) {
 			//don't change min, max too expensive
 			list.remove(i);
 		}

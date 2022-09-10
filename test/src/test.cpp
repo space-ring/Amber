@@ -1,26 +1,22 @@
 #include <iostream>
 #include <thread>
 #include "Application.h"
-#include "AssetManager.h"
 #include "snake.h"
 #include "scenes/demo/SnakeScene.h"
 #include "scenes/demo/DemoScene.h"
 
 int main() {
 
-	std::cout << "main thread " << std::this_thread::get_id() << std::endl;
+	int bw = 50, bh = 50;
+	int width = 500, height = 500;
 
-	int width = 300, height = 300;
+	Amber::Application<SnakeGame> app("Worm", 1030, 470, width, height, bw, bh);
 
-	Amber::Application<SnakeGame> app("Snake", 1030, 470, width, height, width, height);
-
-	auto& assets = Amber::AssetManager::getInstance();
+	auto& assets = app.engine.assets;
 	assets.addManifest("assets/manifest");
 
-	SnakeScene::getInstance(width, height);
-
-	auto& stage = Amber::Stage::getInstance();
-	stage.addScene("snake", &SnakeScene::getInstance());
+	auto& stage = app.engine.stage;
+	stage.addScene("snake", new SnakeScene(bw, bh));
 	stage.setFrontScene("snake");
 
 	app.run();

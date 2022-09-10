@@ -14,8 +14,7 @@
 
 namespace Amber {
 
-	class AssetManager : public Singleton<AssetManager> {
-		friend Singleton<AssetManager>;
+	class AssetManager {
 		using string = std::string;
 		template<class T> using stringMap = std::map<string, T>;
 
@@ -27,11 +26,11 @@ namespace Amber {
 		stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
 		stringMap<Texture*>* textures = new stringMap<Texture*>;
 
+	public:
+
 		AssetManager();
 
 		virtual ~AssetManager();
-
-	public:
 
 		void buildAll();
 

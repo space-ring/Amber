@@ -5,9 +5,7 @@
 #include "LayerStack.h"
 
 namespace Amber {
-	LayerStack::LayerStack() = default;
-
-	LayerStack::~LayerStack() = default;
+	LayerStack::LayerStack(Scene& scene) : scene(scene) {};
 
 	void LayerStack::build() {
 		for (auto layer: stack) {
@@ -54,12 +52,14 @@ namespace Amber {
 
 	void LayerStack::addLayer(Layer* layer) {
 		stack.push_back(layer);
+		layer->scene = &scene;
 	}
 
 	void LayerStack::removeLayer(Layer* layer) {
 		auto it = std::find(stack.begin(), stack.end(), layer);
 		if (it != stack.end()) {
 			stack.erase(it);
+			layer->scene = nullptr;
 		}
 	}
 

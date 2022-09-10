@@ -19,12 +19,16 @@
 #include "ModelManager.h"
 #include "LayerStack.h"
 #include <set>
-#include "event.h"
+#include "events.h"
 
 namespace Amber {
 
+	class Stage;
+
 	struct KeyRegistry {
+		std::set<int> pressed;
 		std::set<int> down;
+		std::set<int> released;
 	};
 
 	class Scene {
@@ -45,6 +49,8 @@ namespace Amber {
 
 	public:
 
+		Stage* stage;
+
 		KeyRegistry keys;
 
 		Scene();
@@ -63,22 +69,22 @@ namespace Amber {
 
 		virtual void render() = 0;
 
-		template<class T>
-		void onEvent(T& event) {
-			layers.template onEvent(event);
+		void onEvent(Event& event) {
+			layers.onEvent(event);
 			if (static_cast<Event&>(event).handled) return;
-			handlers.template onEvent(event);
+			handlers.onEvent(event);
 		}
 
 		void onEvent(window_events::KeyEvent& event){
-			if (event.action == 1 && !keys.down.contains(event.key)){
-				keys.down.insert(event.key);
+			if (event.action == 1){
+				keys.pressed.insert(event.key);
 			} else if (event.action == 0){
 				keys.down.erase(event.key);
+				keys.released.insert(event.key);
 			}
-			layers.template onEvent(event);
+			layers.onEvent(event);
 			if (static_cast<Event&>(event).handled) return;
-			handlers.template onEvent(event);
+			handlers.onEvent(event);
 		}
 
 		LayerStack& getLayers();

@@ -18,7 +18,7 @@ add_library(Engine ${depsources}
         include/Engine.h
         include/engineIO.h
         include/engineUtils.h
-        include/event.h
+        include/events.h
         include/EventManager.h
         include/Frame.h
         include/graphics.h
@@ -47,7 +47,7 @@ add_library(Engine ${depsources}
         src/Engine.cpp
         src/engineIO.cpp
         src/engineUtils.cpp
-        src/event.cpp
+        src/events.cpp
         src/EventManager.cpp
         src/Frame.cpp
         src/graphics.cpp
@@ -62,7 +62,7 @@ add_library(Engine ${depsources}
         src/Shader.cpp
         src/Stage.cpp
         src/Texture.cpp
-        src/Application.cpp include/NoDefaultSingleton.h)
+        src/Application.cpp include/NoDefaultSingleton.h include/IApplication.h src/IApplication.cpp include/IMessage.h include/IClonable.h)
 
 add_subdirectory(deps/glfw-3.3.6)
 

@@ -5,18 +5,21 @@
 #ifndef ENGINE_LAYER_H
 #define ENGINE_LAYER_H
 
-#include "event.h"
+#include "events.h"
 #include "ModelManager.h"
 #include "EventManager.h"
 #include <map>
 
 namespace Amber {
+	class Scene;
+
 	class Layer {
 
 	protected:
 		ModelManager models;
 
 	public:
+		Scene* scene;
 		EventManager handlers;
 
 		bool active = true;

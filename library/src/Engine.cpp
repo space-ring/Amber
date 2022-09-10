@@ -5,14 +5,13 @@
 #include <iostream>
 #include "Engine.h"
 #include "Shader.h"
-#include "Stage.h"
 #include "EventManager.h"
 
 
 namespace Amber {
 
-	Engine::Engine(const string& name, int x, int y, int width, int height) {
-		Stage::getInstance(name, x, y, width, height);
+	Engine::Engine(IApplication& app, const string& name, int x, int y, int width, int height)
+			: application(app), stage(*this, name, x, y, width, height) {
 		std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;
 	}
 
@@ -21,7 +20,6 @@ namespace Amber {
 	};
 
 	void Engine::init() {
-		Stage& stage = Stage::getInstance();
 		stage.init();
 
 		handlers.addHandler(

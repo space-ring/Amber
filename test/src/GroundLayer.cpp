@@ -8,7 +8,7 @@
 #include "Stage.h"
 
 void GroundLayer::build() {
-	Amber::Mesh* mesh = Amber::AssetManager::getInstance().getMesh("plane");
+	Amber::Mesh* mesh = scene->stage->engine.assets.getMesh("plane");
 	m1.setMesh(mesh);
 	m2.setMesh(mesh);
 	m3.setMesh(mesh);
@@ -94,7 +94,7 @@ void GroundLayer::hide() {
 
 void GroundLayer::update() {
 //	m1.translate(glm::vec3(0.1/60, 0, 0));
-	if (DemoScene::getInstance().keys.down.contains(GLFW_KEY_J)) {
+	if (scene->keys.down.contains(GLFW_KEY_J)) {
 		m1.rotate(glm::vec3(0, 0, 45.0 / 60));
 		m1.getTransform()->propagate();
 		models.buffer(m1.getMesh());
@@ -108,17 +108,16 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	//todo first choose models to render using ray tracing and BBs.
 	//todo render to a framebuffer? don't really need to, not swapping buffers here
 	//todo example of standardised picking (model manager):
-	Amber::Engine& engine = Amber::Engine::getInstance();
-	DemoScene& scene = DemoScene::getInstance();
-	Amber::Mesh* plane = Amber::AssetManager::getInstance().getMesh("plane");
+	Amber::Engine& engine = scene->stage->engine;
+	Amber::Mesh* plane = engine.assets.getMesh("plane");
 
-	Amber::Shader* shader = Amber::AssetManager::getInstance().getShader("pick");
+	Amber::Shader* shader = engine.assets.getShader("pick");
 	shader->start();
 
 	glBindVertexArray(plane->getVao());
 
-	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
-	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
+	glUniformMatrix4fv(14, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getView()));
+	glUniformMatrix4fv(18, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getPerspective()));
 
 	int offset = 1;
 	glUniform1i(19, offset);
@@ -148,16 +147,15 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 }
 
 void GroundLayer::render() {
-	Amber::Engine& engine = Amber::Engine::getInstance();
-	DemoScene& scene = DemoScene::getInstance();
-	Amber::Mesh* plane = Amber::AssetManager::getInstance().getMesh("plane");
+	Amber::Engine& engine = scene->stage->engine;;
+	Amber::Mesh* plane = engine.assets.getMesh("plane");
 
-	Amber::Shader* shader = Amber::AssetManager::getInstance().getShader("basic")->start();
+	Amber::Shader* shader = engine.assets.getShader("basic")->start();
 
 	glBindVertexArray(plane->getVao());
 	glCheckError();
-	glUniformMatrix4fv(14, 1, false, glm::value_ptr(scene.camera.getView()));
-	glUniformMatrix4fv(18, 1, false, glm::value_ptr(scene.camera.getPerspective()));
+	glUniformMatrix4fv(14, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getView()));
+	glUniformMatrix4fv(18, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getPerspective()));
 
 	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
 	                        models.getRenderCount(plane));

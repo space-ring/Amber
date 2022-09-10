@@ -7,15 +7,26 @@
 #include "EventManager.h"
 #include <iostream>
 #include <ctime>
+#include "Engine.h"
 
 namespace Amber {
 
-	Stage::Stage(const string& name, int x, int y, int width, int height)
-			: name(name), x(x), y(y), width(width), height(height) {
+	template<class T, class... Args>
+	static void onGLFWevent(GLFWwindow* window, Args... args) {
+		auto* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+		T event{window, args...};
+		if (engine->stage.getFront())
+			engine->stage.getFront()->onEvent(event);
+
+		if (!event.handled)
+			engine->handlers.onEvent(event);
 	}
 
+	Stage::Stage(Engine& engine, const string& name, int x, int y, int width, int height)
+			: engine(engine), name(name), x(x), y(y), width(width), height(height) {}
+
 	Stage::~Stage() {
-		//todo removed delete scene here. ownership.
+		//todo remove delete scene here. ownership.
 		delete scenes;
 		glfwTerminate();
 	}
@@ -47,6 +58,8 @@ namespace Amber {
 		int pixWidth, pixHeight;
 		glfwGetFramebufferSize(window, &pixWidth, &pixHeight);
 		glViewport(0, 0, pixWidth, pixHeight);
+
+		glfwSetWindowUserPointer(window, &engine);
 
 		//game_events
 		glfwSetCursorEnterCallback(window, onGLFWevent<window_events::EnterEvent, int>);
@@ -122,6 +135,7 @@ namespace Amber {
 
 	void Stage::addScene(const string& id, Scene* scene) {
 		scenes->insert(std::pair(id, scene));
+		scene->stage = this;
 	}
 
 	void Stage::setFrontScene(const string& scene) {

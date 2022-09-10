@@ -7,46 +7,37 @@
 
 #include <map>
 #include <vector>
-#include "event.h"
+#include "events.h"
+#include <typeinfo>
+#include <typeindex>
 
 namespace Amber {
 	class EventManager {
-		using handlerMap = std::map<unsigned long, std::vector<GenericHandler>*>;
+		using handlerMap = std::map<std::type_index, std::vector<GenericHandler>*>;
 		handlerMap* handlers = new handlerMap();
 
 	public:
+		~EventManager();
+
 		// add any handler
 		template<class T>
 		void addHandler(const EventHandler <T>& handler) {
-			if (!handlers->contains(handler.type))
-				handlers->insert(std::pair(handler.type, new std::vector<GenericHandler>));
+			if (!handlers->contains(typeid(T)))
+				(*handlers)[typeid(T)] = new std::vector<GenericHandler>;
 
-			auto* list = handlers->at(handler.type);
+			auto* list = handlers->at(typeid(T));
 			//upcast to change template parameter (T is any here)
 			list->push_back(EventHandler<T>::upcast(handler));
 		}
 
 		void clearHandlers(unsigned long id);
 
-		// call any handler
-		/*
-		 * handler is GenericHandler so event parameter enforces T:Event
-		 * although handler(event) below enforces T:Event, keep template to find id.
-		 * todo unless game_events hold id and handlers reference them (removes template)
-		 */
-		template<class T>
-		void onEvent(T& event) {
-			long id = EventHandler<T>::type;
-			if (!handlers->contains(id)) return;
-			for (auto& handler: *handlers->at(id)) {
+		void onEvent(Event& event) {
+			if (!handlers->contains(typeid(event))) return;
+			for (auto& handler: *handlers->at(typeid(event))) {
 				handler(event);
 			}
 		}
-
-		/*
-		 * call to onEvent enforces T:Event
-		 */
-
 	};
 
 }

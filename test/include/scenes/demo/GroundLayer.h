@@ -8,8 +8,7 @@
 #include "Layer.h"
 #include "Singleton.h"
 
-class GroundLayer : public Amber::Layer, public Amber::Singleton<GroundLayer> {
-	friend class Singleton<GroundLayer>;
+class GroundLayer : public Amber::Layer {
 
 	friend class DemoScene;
 

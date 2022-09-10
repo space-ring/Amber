@@ -11,7 +11,7 @@ namespace Amber {
 	using string = std::string;
 
 
-	Scene::Scene() {}
+	Scene::Scene() : layers(*this) {}
 
 	Scene::~Scene() = default;
 
