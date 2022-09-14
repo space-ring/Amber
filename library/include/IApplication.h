@@ -10,6 +10,7 @@
 #include <mutex>
 #include "events.h"
 #include "IMessage.h"
+#include <chrono>
 
 namespace Amber {
 	class IApplication : public IMessage {
@@ -17,7 +18,7 @@ namespace Amber {
 	protected:
 		std::jthread gameThread;
 
-		virtual void gameLoop() = 0;
+		virtual void gameLoop(std::chrono::milliseconds rate) = 0;
 
 		virtual void renderLoop() = 0;
 	};

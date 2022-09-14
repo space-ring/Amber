@@ -18,21 +18,17 @@ namespace Amber {
 	template<class Game>
 	class Application : public IApplication {
 
-		void gameLoop() override {
+		void gameLoop(std::chrono::milliseconds rate) override {
 			game.start();
 			while (game.running) {
 				std::lock_guard lock(mutex);
-//				for (auto& [k, v]: events) {
-//					std::cout << typeid(v).name() << std::endl;
-//					auto x = static_cast<decltype(v)>(v);
-//					std::cout << typeid(x).name() << std::endl;
-//					for (auto& event : (static_cast<decltype(v)>(v))->data){
-//						buffer.getLogicState().handlers.onEvent(event);
-//					}
-//				}
-				events.clear();
+				for (auto& [type, e]: events) {
+					game.handlers.handleType(type, e);
+					clearEvents(type);
+				}
 				game.update();
 				buffer.bufferUpdate();
+				std::this_thread::sleep_for(rate); //todo this is buggy, sometimes takes longer than rate
 			}
 			std::cout << "game stop" << std::endl;
 			engine.kill(); //todo remove
@@ -71,10 +67,13 @@ namespace Amber {
 		StateBuffer<Game> buffer;
 		Engine engine;
 		Game& game = buffer.getLogicState();
+		std::chrono::milliseconds rate;
 		typename Game::R& R = buffer.getRenderState();
 
 		template<class... Args>
-		Application(const string& name, int x, int y, int width, int height, Args... args) :
+		Application(const string& name, int x, int y, int width, int height, std::chrono::milliseconds rate,
+		            Args... args) :
+				rate(rate),
 				buffer(args...),
 				engine(*this, name, x, y, width, height) {
 		}
@@ -85,7 +84,7 @@ namespace Amber {
 		}
 
 		void run() {
-			gameThread = std::jthread{&Application::gameLoop, this};
+			gameThread = std::jthread{&Application::gameLoop, this, rate};
 			renderLoop();
 			game.running = false; //todo remove this
 			if (gameThread.joinable()) gameThread.join();

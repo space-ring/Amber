@@ -5,40 +5,16 @@
 #include "scenes/demo/SnakeScene.h"
 #include "scenes/demo/DemoScene.h"
 
-struct C {
-	virtual ~C() {
-
-	}
-};
-
-struct A : C {};
-
 int main() {
 
-	A a;
-	C& c = a;
-
-	decltype(c) p = static_cast<decltype(c)>(c);
-
-	std::cout << typeid(p).name() << std::endl;
-
-	Amber::EventManager manager;
-	manager.getHandlers<window_events::KeyEvent>();
-
-	auto handler = Amber::Handler<Amber::window_events::KeyEvent>(
-			[](window_events::KeyEvent& event) {}
-	);
-
-	EventManager d;
-	d.addHandler(
-			Handler<window_events::EnterEvent>
-					([](Amber::window_events::EnterEvent&) {}));
+	using namespace Amber;
+	EventManager m;
 
 
 	int bw = 50, bh = 50;
 	int width = 500, height = 500;
 
-	Amber::Application<SnakeGame> app("Worm", 1030, 470, width, height, bw, bh);
+	Amber::Application<SnakeGame> app("Worm", 1030, 470, width, height, std::chrono::milliseconds(8), bw, bh);
 
 	auto& assets = app.engine.assets;
 	assets.addManifest("assets/manifest");

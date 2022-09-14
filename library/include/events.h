@@ -38,7 +38,7 @@ namespace Amber {
 			bool handled = false;
 		};
 
-		using EventHandler = Handler<Amber::scene_events::Event>;
+		using SceneEventHandler = Handler<Amber::scene_events::Event>;
 
 	}
 
@@ -130,7 +130,7 @@ namespace Amber {
 
 		//todo joystick, gamepad
 
-		using EventHandler = Handler<Amber::window_events::Event>;
+		using WindowEventHandler = Handler<Amber::window_events::Event>;
 		using EnterHandler = Handler<EnterEvent>;
 		using FocusHandler = Handler<FocusEvent>;
 		using CloseHandler = Handler<CloseEvent>;

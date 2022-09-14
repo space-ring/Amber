@@ -11,14 +11,13 @@
 #include "type_erased.h"
 #include <map>
 #include <typeindex>
+#include <set>
 
 namespace Amber {
 	class IMessage {
-		using eventTypes = std::set<std::type_index>;
 		using eventMap = std::map<std::type_index, type_erased*>;
 
 	protected:
-		eventTypes types;
 		eventMap events;
 		std::mutex mutex;
 
@@ -43,9 +42,7 @@ namespace Amber {
 			getEvents<T>().push_back(T(event));
 		}
 
-		const eventTypes& getTypes() const {
-			return types;
-		}
+		void clearEvents(std::type_index type);
 	};
 }
 
