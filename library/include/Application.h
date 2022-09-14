@@ -12,23 +12,48 @@
 #include "Stage.h"
 #include "snake.h"
 #include "IApplication.h"
+#include "synchapi.h"
+#include <chrono>
 
 namespace Amber {
 
 	template<class Game>
 	class Application : public IApplication {
 
+		std::chrono::steady_clock::time_point now() {
+			return std::chrono::steady_clock::now();
+		}
+
 		void gameLoop(std::chrono::milliseconds rate) override {
+			using namespace std::chrono_literals;
+			unsigned long long int frames = 0;
+			auto start = now();
+
 			game.start();
 			while (game.running) {
-				std::lock_guard lock(mutex);
-				for (auto& [type, e]: events) {
-					game.handlers.handleType(type, e);
-					clearEvents(type);
+				auto frame_start = now();
+
+				{
+					std::lock_guard lock(mutex);
+					for (auto& [type, e]: events) {
+						game.handlers.handleType(type, e);
+						clearEvents(type);
+					}
 				}
 				game.update();
 				buffer.bufferUpdate();
-				std::this_thread::sleep_for(rate); //todo this is buggy, sometimes takes longer than rate
+
+				++frames;
+
+				std::this_thread::sleep_until(frame_start + rate - std::chrono::milliseconds(5));
+				while (frame_start + rate - now() > 0ms) {
+				}
+
+				if (now() - start >= 1s) {
+					std::cout << "game fps " << frames << std::endl;
+					frames = 0;
+					start = now();
+				}
 			}
 			std::cout << "game stop" << std::endl;
 			engine.kill(); //todo remove
@@ -54,7 +79,7 @@ namespace Amber {
 				++frames;
 				std::time_t now = std::time(nullptr);
 				if (std::difftime(now, start) >= 1.0) {
-					std::cout << frames << std::endl;
+					std::cout << "render fps " << frames << std::endl;
 					frames = 0;
 					start = std::time(nullptr);
 				}

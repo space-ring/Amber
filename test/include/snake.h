@@ -100,7 +100,7 @@ public:
 	}
 
 	void turn(direction d) {
-		if (!opposite(old, d))
+		if (!opposite(old, d) && d != old)
 			dir = d;
 	}
 
