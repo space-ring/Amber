@@ -22,11 +22,14 @@ namespace Amber {
 			game.start();
 			while (game.running) {
 				std::lock_guard lock(mutex);
-				for (auto* event: events) {
-					Event& e = *event;
-					buffer.getLogicState().handlers.onEvent(e);
-					delete event;
-				}
+//				for (auto& [k, v]: events) {
+//					std::cout << typeid(v).name() << std::endl;
+//					auto x = static_cast<decltype(v)>(v);
+//					std::cout << typeid(x).name() << std::endl;
+//					for (auto& event : (static_cast<decltype(v)>(v))->data){
+//						buffer.getLogicState().handlers.onEvent(event);
+//					}
+//				}
 				events.clear();
 				game.update();
 				buffer.bufferUpdate();

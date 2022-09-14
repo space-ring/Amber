@@ -16,7 +16,7 @@ namespace Amber {
 		auto* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
 		T event{window, args...};
 		if (engine->stage.getFront())
-			engine->stage.getFront()->onEvent(event);
+			engine->stage.getFront()->onEvent<T>(event);
 
 		if (!event.handled)
 			engine->handlers.onEvent(event);

@@ -34,7 +34,8 @@ namespace Amber {
 
 		void render();
 
-		void onEvent(Event& event) {
+		template<class T>
+		void onEvent(T& event) {
 			for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
 				auto& layer = *it;
 				if (event.handled) break;

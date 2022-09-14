@@ -7,11 +7,16 @@
 
 #include <list>
 #include "IClonable.h"
+#include "Object.h"
 
 using uint = unsigned int;
 
 struct point {
 	int x, y;
+};
+
+struct segment : Amber::Object {
+
 };
 
 enum direction {
@@ -42,7 +47,8 @@ enum cell {
 
 namespace SnakeEvents {
 	//
-	struct DirEvent : Amber::IClonable<Amber::Event, DirEvent> {
+	struct DirEvent {
+		bool handled = false;
 		const direction dir;
 
 		DirEvent(const direction direction) : dir(direction) {}
@@ -154,7 +160,7 @@ public:
 
 		genFruit();
 
-		handlers.addHandler(Amber::EventHandler<SnakeEvents::DirEvent>(
+		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
 				[&](SnakeEvents::DirEvent& event) {
 					snake.turn(event.dir);
 				})

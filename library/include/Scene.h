@@ -69,25 +69,27 @@ namespace Amber {
 
 		virtual void render() = 0;
 
-		void onEvent(Event& event) {
-			layers.onEvent(event);
-			if (static_cast<Event&>(event).handled) return;
-			handlers.onEvent(event);
-		}
-
-		void onEvent(window_events::KeyEvent& event){
-			if (event.action == 1){
-				keys.pressed.insert(event.key);
-			} else if (event.action == 0){
-				keys.down.erase(event.key);
-				keys.released.insert(event.key);
-			}
-			layers.onEvent(event);
-			if (static_cast<Event&>(event).handled) return;
-			handlers.onEvent(event);
+		template<class T>
+		void onEvent(T& event) {
+			layers.template onEvent(event);
+			if (event.handled) return;
+			handlers.template onEvent(event);
 		}
 
 		LayerStack& getLayers();
 	};
+
+//	template<>
+//	void Scene::onEvent<window_events::KeyEvent>(window_events::KeyEvent& event) {
+//		if (event.action == 1){
+//			keys.pressed.insert(event.key);
+//		} else if (event.action == 0){
+//			keys.down.erase(event.key);
+//			keys.released.insert(event.key);
+//		}
+//		layers.onEvent(event);
+//		if (event.handled) return;
+//		handlers.template onEvent(event);
+//	}
 }
 #endif //ENGINE_SCENE_H
