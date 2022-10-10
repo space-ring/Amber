@@ -48,11 +48,8 @@ SnakeScene::~SnakeScene() {
 void SnakeScene::build() {
 	auto& assets = stage->engine.assets;
 	assets.buildAll();
-	Model& m = models.newModel();
-	m.translate(glm::vec3(0, 0, -1));
-	m.scale(glm::vec3(5, 5, 1));
-	m.setMesh(assets.getMesh("plane")->build());
-//	models.add(m);
+	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
+	models.addMesh(stage->engine.assets.getMesh("plane"), app.R.height * app.R.height+2);
 }
 
 void SnakeScene::show() {
@@ -67,22 +64,24 @@ void SnakeScene::update() {
 	//send key events
 	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
 
-	SnakeGame::R& game = app.buffer.getRenderState();
+	SnakeGame::R& game = app.R;
 	segments.clear();
 
 	Amber::Mesh* plane = stage->engine.assets.getMesh("plane")->build();
 
 	for (auto& p: game.snake.segments) {
-		auto& segment = segments.emplace_back(plane);
-		segment.translate(glm::vec3(p.x, p.y, -1));
-		segment.scale(glm::vec3(0.5));
-		models.add(segment, camera.width * camera.height + 1);
+		auto& segment = segments.emplace_back();
+		segment.setMesh(plane);
+		segment.transform.translate(glm::vec3(p.x, p.y, -1));
+		segment.transform.scale(glm::vec3(0.5));
+		models.addModel(segment);
 	}
 
-	auto& fruit = segments.emplace_back(plane);
-	fruit.scale(glm::vec3(0.5));
-	fruit.translate(glm::vec3(game.fruit.x, game.fruit.y, -1));
-	models.add(fruit);
+	auto& fruit = segments.emplace_back();
+	fruit.setMesh(plane);
+	fruit.transform.scale(glm::vec3(0.5));
+	fruit.transform.translate(glm::vec3(game.fruit.x, game.fruit.y, -1));
+	models.addModel(fruit);
 
 	models.buffer(plane);
 }
@@ -95,12 +94,16 @@ void SnakeScene::render() {
 	auto& assets = stage->engine.assets;
 
 	Amber::Mesh* plane = assets.getMesh("plane")->build();
-	Amber::Shader* shader = assets.getShader("basic")->start();
+	Amber::Shader* shader = assets.getShader("basic")->build()->start();
 
 	glBindVertexArray(plane->getVao());
 	glUniformMatrix4fv(14, 1, false, glm::value_ptr(camera.getView()));
 	glUniformMatrix4fv(18, 1, false, glm::value_ptr(camera.getOrthogonal()));
-	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, 0, models.getRenderCount(plane));
+	models.link(plane);
+	glDrawElementsInstanced(GL_TRIANGLES,
+							plane->getElementCount(),
+							GL_UNSIGNED_INT, 0,
+							models.getRenderCount(plane));
 	glBindVertexArray(0);
 	shader->stop();
 

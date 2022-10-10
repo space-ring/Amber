@@ -12,11 +12,11 @@
 #include "light.h"
 #include "Frame.h"
 #include "Mesh.h"
-#include "ModelTransform.h"
+#include "Transform.h"
 #include "variadic.h"
 #include "AssetManager.h"
 #include "rendering.h"
-#include "ModelManager.h"
+#include "DirectorInstanced.h"
 #include "LayerStack.h"
 #include <set>
 #include "events.h"
@@ -40,12 +40,12 @@ namespace Amber {
 		bool built = false;
 		LayerStack layers;
 		EventManager handlers;
-		ModelManager models;
+		DirectorInstanced models;
 
-		ModelTransform* last_picked = nullptr;
-		ModelTransform* dragged = nullptr;
-		ModelTransform* primed = nullptr;
-		ModelTransform* last_focused = nullptr;
+		Transform* last_picked = nullptr;
+		Transform* dragged = nullptr;
+		Transform* primed = nullptr;
+		Transform* last_focused = nullptr;
 
 	public:
 
@@ -55,7 +55,7 @@ namespace Amber {
 
 		Scene();
 
-		virtual ~Scene();
+		virtual ~Scene() = default;
 
 		virtual void build() = 0;
 

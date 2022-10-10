@@ -3,48 +3,43 @@
 //
 
 #include "Model.h"
-#include "ModelManager.h"
+#include "Transform.h"
 
 namespace Amber {
-	unsigned long Model::counter{0};
 
-	Model::Model()
-			: id(counter++) { transform.model = this; }
-
-	Model::Model(Mesh* mesh)
-			: mesh(mesh), id(counter++) { transform.model = this; }
+	Model::Model(Mesh* mesh, const Transform& t)
+			: mesh(mesh), transform(t.getTranslation(), t.getRotation(), t.getScale()) {
+	}
 
 	Model::~Model() {
-		if (manager) manager->remove(*this);
+		//todo
+		if (_directorRemoveCallback)
+			_directorRemoveCallback(*this);
 	}
 
-	void Model::setManager(ModelManager* manager) {
-		this->manager = manager;
-		transform.manager = manager;
-	}
-
-	void Model::setMesh(Mesh* newMesh, unsigned long limit) {
-		if (manager) manager->remove(*this);
-		this->mesh = newMesh;
-		if (manager) manager->add(*this, limit);
-	}
-
-	Mesh* Model::getMesh() const {
+	const Mesh* Model::getMesh() const {
 		return mesh;
 	}
 
-	Amber::RenderState Model::getState() const {
+	void Model::setMesh(Mesh* m) {
+		auto f = _directorAddCallback;
+		if (_directorRemoveCallback)
+			_directorRemoveCallback(*this);
+		mesh = m;
+		if (f)
+			f(*this);
+	}
+
+	RenderState Model::getRenderState() const {
 		return state;
 	}
 
-	void Model::setState(Amber::RenderState state) {
-		ModelManager* temp = manager;
-		if (manager) manager->remove(*this);
-		this->state = state;
-		if (temp) temp->add(*this);
-	}
-
-	void Model::free() {
-		if (manager) manager->remove(*this);
+	void Model::setRenderState(RenderState s) {
+		auto f = _directorAddCallback;
+		if (_directorRemoveCallback)
+			_directorRemoveCallback(*this);
+		state = s;
+		if (f)
+			f(*this);
 	}
 }

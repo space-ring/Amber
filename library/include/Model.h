@@ -5,46 +5,35 @@
 #ifndef ENGINE_MODEL_H
 #define ENGINE_MODEL_H
 
-
 #include "Mesh.h"
-#include "ModelTransform.h"
+#include "Transform.h"
 
 namespace Amber {
-	class ModelManager;
 
-	enum RenderState {
+	enum class RenderState {
 		VISIBLE_SOLID,
 		VISIBLE,
 		INVISIBLE
 	};
 
-	class Model : public ITransformable<Model> {
-		friend class ITransformable<Model>;
+	class Model {
 
-		friend class ModelManager;
-
-		static unsigned long counter;
-		ModelManager* manager = nullptr;
 		Mesh* mesh = nullptr;
-
-		ModelTransform transform;
-
-		ModelTransform* _getTransform() { return &transform; }
-
-		void setManager(ModelManager* manager);
-
 		RenderState state = RenderState::VISIBLE;
 
 	public:
-		const unsigned long id;
+		std::function<void(Model&)> _directorRemoveCallback;
+		std::function<void(Model&)> _directorAddCallback;
 
-		Model();
+		Transform transform;
 
-		Model(Mesh* mesh);
+		Model() = default;
 
-		virtual ~Model();
+		Model(Mesh* mesh, const Transform& t);
 
-		//todo copy and move
+		~Model();
+
+		//not safe to do copy or move because they may be managed
 		Model(const Model&) = delete;
 
 		Model(Model&&) = delete;
@@ -53,18 +42,14 @@ namespace Amber {
 
 		Model& operator=(Model&&) = delete;
 
-		void setMesh(Mesh* newMesh, unsigned long limit = 100);
+		const Mesh* getMesh() const;
 
-		Mesh* getMesh() const;
+		void setMesh(Mesh* m);
 
-		RenderState getState() const;
+		RenderState getRenderState() const;
 
-		void setState(RenderState state);
-
-		void free();
-
+		void setRenderState(RenderState s);
 	};
-
 }
 
 

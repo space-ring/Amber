@@ -6,11 +6,7 @@
 #include "scenes/demo/DemoScene.h"
 
 int main() {
-
 	using namespace Amber;
-	EventManager m;
-
-
 	int bw = 50, bh = 50;
 	int width = 500, height = 500;
 

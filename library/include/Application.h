@@ -20,6 +20,8 @@ namespace Amber {
 	template<class Game>
 	class Application : public IApplication {
 
+		StateBuffer<Game> buffer;
+
 		std::chrono::steady_clock::time_point now() {
 			return std::chrono::steady_clock::now();
 		}
@@ -89,10 +91,9 @@ namespace Amber {
 		}
 
 	public:
-		StateBuffer<Game> buffer;
+		std::chrono::milliseconds rate;
 		Engine engine;
 		Game& game = buffer.getLogicState();
-		std::chrono::milliseconds rate;
 		typename Game::R& R = buffer.getRenderState();
 
 		template<class... Args>

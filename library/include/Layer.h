@@ -6,7 +6,7 @@
 #define ENGINE_LAYER_H
 
 #include "events.h"
-#include "ModelManager.h"
+#include "DirectorInstanced.h"
 #include "EventManager.h"
 #include <map>
 
@@ -16,15 +16,13 @@ namespace Amber {
 	class Layer {
 
 	protected:
-		ModelManager models;
+		DirectorInstanced models;
 
 	public:
 		Scene* scene;
 		EventManager handlers;
 
 		bool active = true;
-
-		Layer() = default;
 
 		virtual ~Layer() = default;
 

@@ -13,8 +13,6 @@ namespace Amber {
 
 	Scene::Scene() : layers(*this) {}
 
-	Scene::~Scene() = default;
-
 	void Scene::build() {
 		if (built) return;
 		built = true;

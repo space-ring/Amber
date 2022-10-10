@@ -17,7 +17,7 @@ namespace Amber {
 		IClonable(Args... args) : A(args...) {}
 
 		/**
-		 * Clones the subclass using copy construction
+		 * Clones the subclass using copyGPU construction
 		 * @return A new A pointer of type B
 		 */
 		A* clone() const override {

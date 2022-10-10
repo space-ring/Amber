@@ -14,8 +14,6 @@
 
 GLenum glCheckError_(const char* file, int line);
 
-void vvv();
-
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 #endif //ENGINE_GRAPHICS_H

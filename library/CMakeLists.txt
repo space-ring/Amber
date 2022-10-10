@@ -29,8 +29,8 @@ add_library(Engine ${depsources}
         include/maths.h
         include/Mesh.h
         include/Model.h
-        include/ModelManager.h
-        include/ModelTransform.h
+        include/DirectorInstanced.h
+        include/Transform.h
         include/rendering.h
         include/Scene.h
         include/Shader.h
@@ -55,14 +55,14 @@ add_library(Engine ${depsources}
         src/LayerStack.cpp
         src/Mesh.cpp
         src/Model.cpp
-        src/ModelManager.cpp
-        src/ModelTransform.cpp
+        src/DirectorInstanced.cpp
+        src/Transform.cpp
         src/rendering.cpp
         src/Scene.cpp
         src/Shader.cpp
         src/Stage.cpp
         src/Texture.cpp
-        src/Application.cpp include/NoDefaultSingleton.h include/IApplication.h src/IApplication.cpp include/IMessage.h include/IClonable.h include/Object.h include/type_erased.h src/IMessage.cpp)
+        src/Application.cpp include/NoDefaultSingleton.h include/IApplication.h src/IApplication.cpp include/IMessage.h include/IClonable.h include/Object.h include/type_erased.h src/IMessage.cpp include/ITree.h)
 
 add_subdirectory(deps/glfw-3.3.6)
 

@@ -8,41 +8,61 @@
 #include "glm/glm.hpp"
 
 namespace Amber {
-	class ModelTransform;
 
-	template<class C>
+	template<class Impl, class Value>
 	class ITransformable {
-		friend C;
+		friend Impl;
 
 		ITransformable() = default;
 
+		Impl* down() {
+			return static_cast<Impl*>(this);
+		}
+
+		const Impl* constDown() const {
+			return static_cast<const Impl*>(this);
+		}
+
 	public:
-		ModelTransform* getTransform() {
-			return static_cast<C*>(this)->_getTransform();
+
+		void setTranslation(Value v) {
+			down()->_setTranslation(v);
 		}
 
-		void setTranslation(glm::vec3 v) {
-			static_cast<C*>(this)->getTransform()->_setTranslation(v);
+		void translate(Value v) {
+			down()->_translate(v);
 		}
 
-		void translate(glm::vec3 v) {
-			static_cast<C*>(this)->getTransform()->_translate(v);
+		void setRotation(Value v) {
+			down()->_setRotation(v);
 		}
 
-		void setRotation(glm::vec3 v) {
-			static_cast<C*>(this)->getTransform()->_setRotation(v);
+		void rotate(Value v) {
+			down()->_rotate(v);
 		}
 
-		void rotate(glm::vec3 v) {
-			static_cast<C*>(this)->getTransform()->_rotate(v);
+		void setScale(Value v) {
+			down()->_setScale(v);
 		}
 
-		void setScale(glm::vec3 v) {
-			static_cast<C*>(this)->getTransform()->_setScale(v);
+		void scale(Value v) {
+			down()->_scale(v);
 		}
 
-		void scale(glm::vec3 v) {
-			static_cast<C*>(this)->getTransform()->_scale(v);
+		void addScale(Value v) {
+			down()->_addScale(v);
+		}
+
+		const Value& getTranslation() const {
+			return constDown()->_getTranslation();
+		}
+
+		const Value& getRotation() const {
+			return constDown()->_getRotation();
+		}
+
+		const Value& getScale() const {
+			return constDown()->_getScale();
 		}
 	};
 

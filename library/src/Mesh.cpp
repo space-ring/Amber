@@ -64,7 +64,6 @@ namespace Amber {
 
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &vertexVBO);
-		glGenBuffers(1, &instanceVBO);
 		glGenBuffers(1, &EBO);
 		glCheckError();
 		glBindVertexArray(VAO);
@@ -86,16 +85,6 @@ namespace Amber {
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, normal));
 
 		glCheckError();
-		//model transform instances
-		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		for (int i = 10; i < 14; ++i) {
-			glEnableVertexAttribArray(i);
-			glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*) ((i - 10) * sizeof(glm::vec4)));
-			glVertexAttribDivisor(i, 1);
-		}
-
-
-		glCheckError();
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -104,16 +93,23 @@ namespace Amber {
 		return this;
 	}
 
+	void Mesh::linkInstanceAttributes(GLuint vbo) {
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		for (int i = 10; i < 14; ++i) {
+			glEnableVertexAttribArray(i);
+			glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*) ((i - 10) * sizeof(glm::vec4)));
+			glVertexAttribDivisor(i, 1);
+		}
+		glCheckError();
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
 	Mesh::~Mesh() {
 		if (!VAO) return;
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &vertexVBO);
 		glDeleteBuffers(1, &EBO);
-		glDeleteBuffers(1, &instanceVBO);
-	}
-
-	GLuint Mesh::getInstanceVbo() const {
-		return instanceVBO;
 	}
 
 	GLuint Mesh::getVao() const {

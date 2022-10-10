@@ -39,7 +39,6 @@ namespace Amber {
 		 */
 		GLuint VAO{0},
 				vertexVBO{0},
-				instanceVBO{0},
 				EBO{0};
 
 	public:
@@ -51,13 +50,17 @@ namespace Amber {
 
 		Mesh* build();
 
-		GLuint getInstanceVbo() const;
-
 		GLuint getVao() const;
 
 		GLuint getElementCount() const;
 
 		GLuint getEbo() const;
+
+		/**
+		 * Binds to mesh VAO and given VBO; assigns attributes 10-14; unbinds VBO only.
+		 * @param vbo
+		 */
+		void linkInstanceAttributes(GLuint vbo);
 	};
 }
 

@@ -1,25 +1,28 @@
-# Transforms
+# Transform hierarchies, models and managed instancing
 
-A transform object is a wrapper around mat4 which allows for extended function:
+## Transforms
 
-- management under [Model manager](ModelManager.md)
-- association with other transforms, forming a transform tree (commonly used for scene graphs)
+A transform object is a wrapper around mat4 with extended functionality:
 
-# Models
+- basic translation, rotation and scaling operations
+- a tree-type structure, each child inheriting its parent's transform (commonly used for scene graphs)
+- instance management under [Model manager](ModelManager.md)
 
-A model is a uniquely identifiable object which provides an association between a [mesh](Meshes.md),
-a [transform](#transforms). Each model has only its own transform; should any models wish to share a transform, they
-must composite a transform tree (this is because a transform can only reference one matrix and managing the second model
-would overwrite the reference to the first)
+## Models
+
+A model is a composition of a [mesh](Meshes.md), a [transform](#transforms) and a [model manager](#Managers).
+
+## Managers
 
 ### transforms dev comments
 
-each transform stores its own matrix relative to the origin.
+each transform stores its own matrix relative to the origin. This speeds up propagation because updates to the parent
+don't affect the child's own transform so child's total transform recalc requires 2 MM (O*P) instead of 4 (T*R*S*P);
 
 the deferred approach: transforming the matrix does not update any video memory and does not pull or propagate through
 the tree. The client should call the propagate and upload functions when appropriate (before reading transforms which
 are relative to others or before rendering). Upload cannot switch between meshes so all propagation must be carried out
-before upload.
+before upload (trees are multi-mesh).
 
 + as opposed to immediate propagation, this solves the problem caused when the child node is moved before the parent. In
   such case, the child node would be calculated twice.

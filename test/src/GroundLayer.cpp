@@ -14,18 +14,18 @@ void GroundLayer::build() {
 	m3.setMesh(mesh);
 	m4.setMesh(mesh);
 
-	m1.setState(Amber::RenderState::VISIBLE);
-	m3.setState(Amber::RenderState::VISIBLE);
-	m2.setState(Amber::RenderState::VISIBLE_SOLID);
+	m1.setRenderState(Amber::RenderState::VISIBLE);
+	m3.setRenderState(Amber::RenderState::VISIBLE);
+	m2.setRenderState(Amber::RenderState::VISIBLE_SOLID);
 
-	m2.getTransform()->attachParent(*m1.getTransform(), false);
-	m3.getTransform()->attachParent(*m1.getTransform(), false);
-	m4.getTransform()->attachParent(*m1.getTransform(), false);
+	m2.transform.attachParent(m1.transform);
+	m3.transform.attachParent(m1.transform);
+	m4.transform.attachParent(m1.transform);
 
-	m1.translate(glm::vec3(0, 0, -200));
-	m2.translate(glm::vec3(2, 0, -1));
-	m3.translate(glm::vec3(0, 2, -1));
-	m4.translate(glm::vec3(2, 2, -1));
+	m1.transform.translate(glm::vec3(0, 0, -200));
+	m2.transform.translate(glm::vec3(2, 0, -1));
+	m3.transform.translate(glm::vec3(0, 2, -1));
+	m4.transform.translate(glm::vec3(2, 2, -1));
 
 //	m1.setTranslation(glm::vec3(0, 0, -2));
 
@@ -34,9 +34,10 @@ void GroundLayer::build() {
 	for (int i = -x; i < x; ++i) {
 		Amber::Model& row = models.newModel();
 		row.setMesh(mesh);
-		row.translate(glm::vec3(0, i * 2, 0));
-		row.getTransform()->attachParent(*m1.getTransform(), true);
-		models.add(row, 250000);
+		row.transform.translate(glm::vec3(0, i * 2, 0));
+		row.transform.attachParent(m1.transform);
+		models.addMesh(row.getMesh(), 250000);
+		models.addModel(row);
 //		for (int j = 0; j < 1; ++j) {
 //			Amber::Model& asd = models.newModel();
 //			asd.setMesh(mesh);
@@ -46,16 +47,16 @@ void GroundLayer::build() {
 		for (int j = -x; j < x; ++j) {
 			Amber::Model& m = models.newModel();
 			m.setMesh(mesh);
-			m.translate(glm::vec3(j * 2, 0, 0));
-			m.getTransform()->attachParent(*row.getTransform(), true);
-			models.add(m);
+			m.transform.translate(glm::vec3(j * 2, 0, 0));
+			m.transform.attachParent(row.transform);
+			models.addModel(m);
 		}
 	}
 
-	models.add(m1);
-	models.add(m2);
-	models.add(m3);
-	models.add(m4);
+	models.addModel(m1);
+	models.addModel(m2);
+	models.addModel(m3);
+	models.addModel(m4);
 	glCheckError();
 
 //	glBindBuffer(GL_ARRAY_BUFFER, mesh->getInstanceVbo());
@@ -65,22 +66,22 @@ void GroundLayer::build() {
 
 	glCheckError();
 
-	ground.setMesh(mesh, 100);
-	ground.setRotation(glm::vec3(90, 0, 0));
-	ground.setScale(glm::vec3(100));
-	ground.setTranslation(glm::vec3(0, -5, 0));
+	ground.setMesh(mesh);
+	ground.transform.setRotation(glm::vec3(90, 0, 0));
+	ground.transform.setScale(glm::vec3(100));
+	ground.transform.setTranslation(glm::vec3(0, -5, 0));
 
 	handlers.addHandler(Amber::window_events::KeyHandler(
 			[&](Amber::window_events::KeyEvent& e) {
 				if (e.key == GLFW_KEY_UP) {
-					models.remove(m2);
+					models.removeModel(m2);
 				} else if (e.key == GLFW_KEY_DOWN) {
-					models.add(m2);
+					models.addModel(m2);
 				}
 			}
 	));
 
-	m1.getTransform()->propagate();
+	m1.transform.propagate();
 	models.buffer(m1.getMesh());
 }
 
@@ -95,8 +96,8 @@ void GroundLayer::hide() {
 void GroundLayer::update() {
 //	m1.translate(glm::vec3(0.1/60, 0, 0));
 	if (scene->keys.down.contains(GLFW_KEY_J)) {
-		m1.rotate(glm::vec3(0, 0, 45.0 / 60));
-		m1.getTransform()->propagate();
+		m1.transform.rotate(glm::vec3(0, 0, 45.0 / 60));
+		m1.transform.propagate();
 		models.buffer(m1.getMesh());
 	}
 }
@@ -122,6 +123,7 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	int offset = 1;
 	glUniform1i(19, offset);
 
+	//link attributes to vbo
 	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
 	                        models.getPickCount(plane));
 
@@ -157,6 +159,7 @@ void GroundLayer::render() {
 	glUniformMatrix4fv(14, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getView()));
 	glUniformMatrix4fv(18, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getPerspective()));
 
+	models.link(plane);
 	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
 	                        models.getRenderCount(plane));
 	glCheckError();
