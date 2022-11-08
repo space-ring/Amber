@@ -15,7 +15,7 @@
 
 namespace Amber {
 	class IMessage {
-		using eventMap = std::map<std::type_index, type_erased*>;
+		using eventMap = std::map<std::type_index, ErasedContainer*>;
 
 	protected:
 		eventMap events;
@@ -24,7 +24,7 @@ namespace Amber {
 	public:
 
 		virtual ~IMessage() {
-			for (auto s: events) {
+			for (auto& s: events) {
 				delete s.second;
 			}
 		}
@@ -32,14 +32,14 @@ namespace Amber {
 		template<class T>
 		std::vector<T>& getEvents() {
 			if (!events.contains(typeid(T)))
-				events.emplace(typeid(T), new ErasedVector<T>);
-			return static_cast<ErasedVector<T>*>(events.at(typeid(T)))->data;
+				events.emplace(typeid(T), new Vector<T>);
+			return static_cast<Vector<T>*>(events.at(typeid(T)))->data;
 		}
 
 		template<class T>
 		void putEvent(const T& event) {
 			std::lock_guard lock(mutex);
-			getEvents<T>().push_back(T(event));
+			getEvents<T>().push_back(event);
 		}
 
 		void clearEvents(std::type_index type);

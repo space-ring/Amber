@@ -27,7 +27,7 @@ namespace Amber {
 		Handler(const handler& handler) : function(handler) {}
 
 		void operator()(T& event) {
-			function(event);
+			if (active) function(event);
 		}
 	};
 

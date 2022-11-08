@@ -8,13 +8,12 @@
 #include <map>
 #include <vector>
 #include "events.h"
-#include <typeinfo>
 #include <typeindex>
 #include "type_erased.h"
 
 namespace Amber {
 	class EventManager {
-		using handlerMap = std::map<std::type_index, IErasedHandlable*>;
+		using handlerMap = std::map<std::type_index, IHandlerContainer*>;
 		handlerMap handlers;
 
 	public:
@@ -24,8 +23,8 @@ namespace Amber {
 		template<class T>
 		std::vector<Handler<T>>& getHandlers() {
 			if (!handlers.contains(typeid(T)))
-				handlers.emplace(typeid(T), new ErasedHandlerVector<T>);
-			return static_cast<ErasedHandlerVector<T>*>(handlers.at(typeid(T)))->handlers;
+				handlers.emplace(typeid(T), new HandlerVector<T>);
+			return static_cast<HandlerVector<T>*>(handlers.at(typeid(T)))->handlers;
 		}
 
 		template<class T>
@@ -40,7 +39,7 @@ namespace Amber {
 			}
 		}
 
-		void handleType(std::type_index type, type_erased* erased_vector_events);
+		void handleType(std::type_index type, ErasedContainer* erased_vector_events);
 
 		void clear(std::type_index type);
 
