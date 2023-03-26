@@ -6,11 +6,13 @@
 #define ENGINE_TEXTURE_H
 
 #include "graphics.h"
-#include "Shader.h"
 
 namespace Amber {
 	enum SupportedTextures { //todo add more texture types
 		TEXTURE_2D = GL_TEXTURE_2D
+	};
+
+	struct RawTexture {
 	};
 
 	class Texture {

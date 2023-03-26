@@ -7,52 +7,81 @@
 
 #include <map>
 #include <string>
+#include <list>
+#include "Shader.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "engineIO.h"
-#include "Singleton.h"
 
 namespace Amber {
 
 	class AssetManager {
+		using token = unsigned long long int;
+		template<class T> using tokenMap = std::map<token, T>;
+		template<class T> using list = std::list<T>;
+		using view = std::string_view;
 		using string = std::string;
-		template<class T> using stringMap = std::map<string, T>;
 
-	private: //todo const maps?
-		stringMap<compoundShader>* shaderPaths = new stringMap<compoundShader>;
-		stringMap<string>* meshPaths = new stringMap<string>;
-		stringMap<string>* texturePaths = new stringMap<string>;
-		stringMap<Shader*>* shaders = new stringMap<Shader*>;
-		stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
-		stringMap<Texture*>* textures = new stringMap<Texture*>;
+		tokenMap<string> shaderPaths;
+		tokenMap<string> meshPaths;
+		tokenMap<string> texturePaths;
+
+		tokenMap<string> rawShaders;
+		//todo other raw asset types
+		tokenMap<RawMesh> rawMeshes;
+		tokenMap<RawTexture> rawTextures;
+
+		tokenMap<Shader> shaders;
+		tokenMap<Mesh> meshes;
+		tokenMap<Texture> textures;
 
 	public:
 
 		AssetManager();
 
-		virtual ~AssetManager();
+		~AssetManager();
 
-		void buildAll();
+		void addManifest(view path);
 
-		void addManifest(const string& manifest);
+		void addShaderPath(token id, view path);
 
-		void addShader(const string& name, const compoundShader& paths);
+		void addMeshPath(token id, view path);
 
-		void addShader(const string& name, Shader& shader);
+		void addTexturePath(token id, view path);
 
-		void addMesh(const string& name, const string& path);
+		view getRawShader(token id, bool load = true);
 
-		void addMesh(const string& name, Mesh& mesh);
+		RawMesh& getRawMesh(token id, bool load = true);
 
-		void addTexture(const string& name, const string& path);
+		RawTexture& getRawTexture(token id, bool load = true);
 
-		void addTexture(const string& name, Texture& texture);
+		//note maybe remove loading functions
+		view loadRawShader(token id);
 
-		Shader* getShader(const string& name);
+		RawMesh& loadRawMesh(token id);
 
-		Mesh* getMesh(const string& name);
+		RawTexture& loadRawTexture(token id);
 
-		Texture* getTexture(const string& name);
+		void unloadRawShader(token id);
+
+		void unloadRawMesh(token id);
+
+		void unloadRawTexture(token id);
+
+		Shader& createShader(token id,
+		                     const list<token>& vertex,
+		                     const list<token>& tessControl,
+		                     const list<token>& tessEval,
+		                     const list<token>& geometry,
+		                     const list<token>& fragment,
+		                     const list<token>& compute);
+//todo concatenate? manifest list [vid1,vid2,vid3],[f1,f2]
+
+
+		Shader& getShader(token id);
+
+		Mesh& getMesh(token id);
+
+		Texture& getTexture(token id);
 	};
 }
 

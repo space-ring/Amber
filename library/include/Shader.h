@@ -8,11 +8,11 @@
 #include <string>
 #include "graphics.h"
 
-namespace Amber {
-	struct compoundShader { //todo const
-		std::string vertex, fragment, geometry, tessControl, tessEval, compute;
-	};
+/* Shader takes individual shader code for each of SupportedShaders.
+ * Attachment compiles the code and attaches to program. Detach and delete on dtor.
+ */
 
+namespace Amber {
 	enum SupportedShaders {
 		VERTEX = GL_VERTEX_SHADER,
 		TESS_CONTROL = GL_TESS_CONTROL_SHADER,
@@ -22,36 +22,46 @@ namespace Amber {
 		COMPUTE = GL_COMPUTE_SHADER
 	};
 
+	struct ShaderAttachment {
+
+		using string = std::string;
+		using view = std::string_view;
+
+		GLuint program, shader;
+
+		ShaderAttachment(SupportedShaders type, GLuint program, view source);
+
+		~ShaderAttachment();
+
+		ShaderAttachment(const ShaderAttachment&) = delete;
+
+		ShaderAttachment& operator=(const ShaderAttachment&) = delete;
+	};
+
 	class Shader {
-	private:
 
-		compoundShader sources; //todo think about lifetime of this and sharing between shader programs
+		using string = std::string;
+		using view = std::string_view;
 
-		GLuint program = 0,
-				vertex = 0,
-				tessCtrl = 0,
-				tessEval = 0,
-				geometry = 0,
-				fragment = 0,
-				compute = 0;
-
-		GLuint addShader(SupportedShaders type, const GLchar* const* code);
+		GLuint program;
 
 	public:
-		static Shader* getDefault();
+		Shader(view srcVertex, view srcTessControl, view srcTessEval, view srcGeometry, view srcFragment,
+		       view srcCompute);
 
-		Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
-		       GLuint compute);
+		~Shader();
 
-		Shader(const compoundShader& sources);
+		Shader(const Shader&) = delete;
 
-		virtual ~Shader();
+		Shader(Shader&&) = delete;
 
-		Shader* build();
+		Shader& operator=(const Shader&) = delete;
 
-		Shader* start();
+		Shader& operator=(Shader&&) = delete;
 
-		Shader* stop();
+		void start();
+
+		void stop();
 	};
 
 }

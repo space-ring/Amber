@@ -4,18 +4,20 @@
 
 #include "Texture.h"
 
-Amber::Texture* Amber::Texture::getDefault() {
-	return nullptr;
-}
+namespace Amber {
+	Texture* Amber::Texture::getDefault() {
+		return nullptr;
+	}
 
-void Amber::Texture::deleteDefault() {
+	void Texture::deleteDefault() {
 
-}
+	}
 
-Amber::Texture::Texture(unsigned char* data) {
+	Texture::Texture(unsigned char* data) {
 
-}
+	}
 
-Amber::Texture* Amber::Texture::build() {
-	return nullptr;
+	Texture* Amber::Texture::build() {
+		return nullptr;
+	}
 }

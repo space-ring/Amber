@@ -10,39 +10,73 @@
 #include "engineUtils.h"
 
 namespace Amber {
-	AssetManager::AssetManager() {}
 
-	/*
-	 * The problem here was that if an asset was retrieved before calling this method,
-	 * freshly constructed and built meshes could not be added since there would've already been a mapping.
-	 * So split the calls into 2, one for setting the mapping (if it doesn't already exist) and then build.
-	 */
-	void AssetManager::buildAll() {
-		Shader::getDefault()->build();
-		for (const auto& shader: *shaderPaths) {
-			if (!shaders->contains(shader.first)) {
-				addShader(shader.first, *loadShaderFile(shader.second));
-				getShader(shader.first)->build();
+	RawMesh parseMeshOBJ(view mesh) {
+		string str(mesh);
+		std::stringstream ss(str);
+		string line;
+		std::vector<glm::vec3> positions, normals;
+		std::vector<glm::vec2> uv;
+		std::map<string, unsigned int> seen; // indices to vertices vector
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		unsigned int index = 0;
+
+		while (std::getline(ss, line, '\n')) {
+			if (line.empty()) continue;
+			auto spaced_line = split(line, ' ');
+			if (spaced_line[0] == "v") {
+				glm::vec3 vec3;
+				vec3.x = std::stof(spaced_line[1]);
+				vec3.y = std::stof(spaced_line[2]);
+				vec3.z = std::stof(spaced_line[3]);
+				positions.push_back(vec3);
+
+			} else if (spaced_line[0] == "vt") {
+				glm::vec2 vec2;
+				vec2.x = std::stof(spaced_line[1]);
+				vec2.y = std::stof(spaced_line[2]);
+				uv.push_back(vec2);
+
+			} else if (spaced_line[0] == "vn") {
+				glm::vec3 vec3;
+				vec3.x = std::stof(spaced_line[1]);
+				vec3.y = std::stof(spaced_line[2]);
+				vec3.z = std::stof(spaced_line[3]);
+				normals.push_back(vec3);
+
+			} else if (spaced_line[0] == "f") {
+				for (int i = 1; i < 4; ++i) {
+					if (seen.contains(spaced_line[i])) {
+						indices.push_back(seen[spaced_line[i]]);
+					} else {
+						Vertex vertex;
+						auto iface = isplit(spaced_line[i], '/');
+						vertex.position = positions[iface[0] - 1];
+						if (iface.size() == 2) {
+							vertex.normal = normals[iface[1] - 1];
+							vertex.texUV = glm::vec2(0, 0);
+						} else {
+							vertex.texUV = uv[iface[1] - 1];
+							vertex.normal = normals[iface[2] - 1];
+						}
+						vertices.push_back(vertex);
+						seen.insert(std::pair<string, unsigned int>(spaced_line[i], index));
+						indices.push_back(index++);
+					}
+				}
 			}
 		}
-		Mesh::getDefault()->build();
-		for (const auto& mesh: *meshPaths) {
-			if (!meshes->contains(mesh.first)) {
-				addMesh(mesh.first, *loadMeshFile(mesh.second)); //add if not constructed
-				getMesh(mesh.first)->build(); //and build (whether previously retrieved or not)}
-			}
-//    for (auto texture: *textures) {
-//        texture.renderState->build();
-//    }
-		}
+		return {vertices, indices};
 	}
 
-//todo batch (name block instead of line)
-//todo manifest includes (also check for circular includes) not high priority
-//todo component paths e.g. all meshes in assets/meshes
-//todo the whole manifest language!!! default to json maybe...
-	void AssetManager::addManifest(const string& path) { //todo textures
+	AssetManager::AssetManager() {
+		//todo insert defaults
+	}
+
+	void AssetManager::addManifest(view path) {
 		string manifest = readFile(path);
+
 		if (manifest.empty()) return;
 		string line;
 		std::stringstream ss(manifest);
@@ -50,88 +84,147 @@ namespace Amber {
 			if (line.starts_with("#") || line.empty()) continue;
 			auto items = split(line, ' ');
 			string type = items[0];
-			string name = items[1];
+			token id = std::stoull(items[1]);
 
-			if (type == "mesh") {
-				addMesh(name, items[2]);
+			if (type == "shader") {
+				addShaderPath(id, items[2]);
+			} else if (type == "program") {
 
-			} else if (type == "shader") {
-				string v, f, g, tc, te, c;
-				string* stores[]{&v, &f, &g, &tc, &te, &c};
-
-				for (int i = 0; i < items.size() - 2; ++i) {
-					*stores[i] = items[i + 2];
-				}
-
-				compoundShader paths{v, f, g, tc, te, c};
-				addShader(name, paths);
 			}
+
+			//todo mesh, texture.
 		}
 	}
 
-	void AssetManager::addShader(const string& name, const compoundShader& paths) {
-		shaderPaths->insert(std::pair<string, compoundShader>(name, paths));
+	void AssetManager::addShaderPath(token id, view path) {
+		shaderPaths.emplace(id, path);
 	}
 
-	void AssetManager::addShader(const string& name, Shader& shader) {
-		shaders->insert(std::pair<string, Shader*>(name, &shader));
+	void AssetManager::addMeshPath(token id, view path) {
+		meshPaths.emplace(id, path);
 	}
 
-	void AssetManager::addMesh(const string& name, const string& path) {
-		meshPaths->insert(std::pair<string, string>(name, path));
+	void AssetManager::addTexturePath(token id, view path) {
+		texturePaths.emplace(id, path);
 	}
 
-	void AssetManager::addMesh(const string& name, Mesh& mesh) {
-		meshes->insert(std::pair<string, Mesh*>(name, &mesh));
-	}
-
-	void AssetManager::addTexture(const string& name, const string& path) {
-		texturePaths->insert(std::pair<string, string>(name, path));
-	}
-
-	void AssetManager::addTexture(const string& name, Texture& texture) {
-		textures->insert(std::pair<string, Texture*>(name, &texture));
-	}
-
-	Shader* AssetManager::getShader(const string& name) {
-		if (!shaders->contains(name)) {
-			if (shaderPaths->contains(name)) {
-				addShader(name, *loadShaderFile(shaderPaths->at(name)));
-			} else return Shader::getDefault();
+	view AssetManager::getRawShader(token id, bool load) {
+		if (!rawShaders.contains(id)) {
+			if (load)
+				return loadRawShader(id);
+			else
+				return rawShaders.at(0);
 		}
-		return shaders->at(name);
+		return rawShaders.at(id);
 	}
 
-	Mesh* AssetManager::getMesh(const string& name) {
-		if (!meshes->contains(name)) {
-			if (meshPaths->contains(name)) {
-				addMesh(name, *loadMeshFile(meshPaths->at(name)));
-			} else return Mesh::getDefault();
+	RawMesh& AssetManager::getRawMesh(token id, bool load) {
+		if (!rawMeshes.contains(id)) {
+			if (load)
+				return loadRawMesh(id);
+			else
+				return rawMeshes.at(0);
 		}
-		return meshes->at(name);
+		return rawMeshes.at(id);
 	}
 
-	Texture* AssetManager::getTexture(const string& name) {
-		return nullptr;
-		if (!textures->contains(name)) {
-			if (texturePaths->contains(name)) {
-				addTexture(name, texturePaths->at(name));
-			} else return nullptr; //todo texture
+	RawTexture& AssetManager::getRawTexture(token id, bool load) {
+		if (!rawTextures.contains(id)) {
+			if (load)
+				return loadRawTexture(id);
+			else
+				return rawTextures.at(0);
 		}
-		return textures->at(name);
+		return rawTextures.at(id);
+	}
+
+	view AssetManager::loadRawShader(token id) {
+		if (!shaderPaths.contains(id)) return rawShaders.at(0);
+		rawShaders.emplace(id, readFile(shaderPaths.at(id)));
+		return rawShaders.at(id);
+	}
+
+	RawMesh& AssetManager::loadRawMesh(token id) {
+		if (!shaderPaths.contains(id)) return rawMeshes.at(0);
+		rawMeshes.emplace(id, parseMeshOBJ(readFile(meshPaths.at(id))));
+		return rawMeshes.at(id);
+	}
+
+	RawTexture& AssetManager::loadRawTexture(token id) {
+		throw 500;
+	}
+
+	void AssetManager::unloadRawShader(token id) {
+		rawShaders.erase(id);
+	}
+
+	void AssetManager::unloadRawMesh(token id) {
+		rawMeshes.erase(id);
+	}
+
+	void AssetManager::unloadRawTexture(token id) {
+		rawTextures.erase(id);
+	}
+
+	Shader& AssetManager::createShader(token id,
+	                                   const list<token>& vertex,
+	                                   const list<token>& tessControl,
+	                                   const list<token>& tessEval,
+	                                   const list<token>& geometry,
+	                                   const list<token>& fragment,
+	                                   const list<token>& compute) {
+
+		string srcVertex;
+		string srcTessControl;
+		string srcTessEval;
+		string srcGeometry;
+		string srcFragment;
+		string srcCompute;
+
+		//todo currently every rawshader has to be recompiled
+
+		for (token t: vertex)
+			srcVertex += getRawShader(t);
+
+		for (token t: tessControl)
+			srcTessControl += getRawShader(t);
+
+		for (token t: tessEval)
+			srcTessEval += getRawShader(t);
+
+		for (token t: geometry)
+			srcGeometry += getRawShader(t);
+
+		for (token t: fragment)
+			srcFragment += getRawShader(t);
+
+		for (token t: compute)
+			srcCompute += getRawShader(t);
+
+
+		shaders.emplace(std::piecewise_construct, std::make_tuple(id),
+		                std::make_tuple(srcVertex, srcTessControl, srcTessEval, srcGeometry, srcFragment, srcCompute));
+
+		return shaders.at(id);
+	}
+
+	Shader& AssetManager::getShader(token id) {
+		if (shaders.contains(id)) return shaders.at(id);
+		return shaders.at(0);
+	}
+
+	Mesh& AssetManager::getMesh(token id) {
+		if (meshes.contains(id)) return meshes.at(id);
+		return meshes.at(0);
+	}
+
+	Texture& AssetManager::getTexture(token id) {
+		if (textures.contains(id)) return textures.at(id);
+		return textures.at(0);
 	}
 
 	AssetManager::~AssetManager() {
-		int x = 0;
-		for (const auto& shader: *shaders) {
-			delete shader.second;
-		}
-		delete shaders;
 
-		for (const auto& mesh: *meshes) {
-			delete mesh.second;
-		}
-		delete meshes;
 	}
 
 }

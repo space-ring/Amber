@@ -25,9 +25,6 @@ namespace Amber {
 
 	class Mesh {
 	private:
-
-		RawMesh data;
-
 		/**
 		 * VAO Standard attributes:
 		 * 0 = vertex positions
@@ -37,30 +34,26 @@ namespace Amber {
 		 * 14 - 17 = camera transforms
 		 * 18 - 21 = projection transforms
 		 */
-		GLuint VAO{0},
-				vertexVBO{0},
-				EBO{0};
+		GLuint VAO, vertexVBO, EBO;
 
 	public:
-		static Mesh* getDefault();
+		const unsigned int elementCount;
 
 		Mesh(const RawMesh& data);
 
-		virtual ~Mesh();
+		~Mesh();
 
-		Mesh* build();
+		Mesh(const Mesh&) = delete;
+
+		Mesh(Mesh&&) = delete;
+
+		Mesh& operator=(const Mesh&) = delete;
+
+		Mesh& operator=(Mesh&&) = delete;
 
 		GLuint getVao() const;
 
-		GLuint getElementCount() const;
-
-		GLuint getEbo() const;
-
-		/**
-		 * Binds to mesh VAO and given VBO; assigns attributes 10-14; unbinds VBO only.
-		 * @param vbo
-		 */
-		void linkInstanceAttributes(GLuint vbo);
+		void linkInstanceTransforms(GLuint vbo);
 	};
 }
 
