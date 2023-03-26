@@ -21,65 +21,64 @@ namespace Amber {
 		using view = std::string_view;
 		using string = std::string;
 
-		tokenMap<string> shaderPaths;
+		struct ShaderFormula {
+			list<token> V, TC, TE, G, F, C;
+		};
+
+		tokenMap<string> sourcePaths;
 		tokenMap<string> meshPaths;
 		tokenMap<string> texturePaths;
 
-		tokenMap<string> rawShaders;
+		tokenMap<string> sources;
 		//todo other raw asset types
 		tokenMap<RawMesh> rawMeshes;
 		tokenMap<RawTexture> rawTextures;
 
+		tokenMap<ShaderFormula> shaderFormulas;
 		tokenMap<Shader> shaders;
 		tokenMap<Mesh> meshes;
 		tokenMap<Texture> textures;
 
 	public:
 
-		AssetManager();
-
-		~AssetManager();
-
 		void addManifest(view path);
 
-		void addShaderPath(token id, view path);
+		// SHADERS //
+		void addSourcePath(token id, view path);
 
-		void addMeshPath(token id, view path);
+		view loadSource(token id);
 
-		void addTexturePath(token id, view path);
+		void unloadSource(token id);
 
-		view getRawShader(token id, bool load = true);
+		view getSource(token id);
 
-		RawMesh& getRawMesh(token id, bool load = true);
+		void addShaderFormula(token id, const ShaderFormula& formula);
 
-		RawTexture& getRawTexture(token id, bool load = true);
+		Shader& loadShader(token id);
 
-		//note maybe remove loading functions
-		view loadRawShader(token id);
-
-		RawMesh& loadRawMesh(token id);
-
-		RawTexture& loadRawTexture(token id);
-
-		void unloadRawShader(token id);
-
-		void unloadRawMesh(token id);
-
-		void unloadRawTexture(token id);
-
-		Shader& createShader(token id,
-		                     const list<token>& vertex,
-		                     const list<token>& tessControl,
-		                     const list<token>& tessEval,
-		                     const list<token>& geometry,
-		                     const list<token>& fragment,
-		                     const list<token>& compute);
-//todo concatenate? manifest list [vid1,vid2,vid3],[f1,f2]
-
+		void unloadShader(token id);
 
 		Shader& getShader(token id);
 
+		// MESHES //
+		void addMeshPath(token id, view path);
+
+		RawMesh& loadRawMesh(token id);
+
+		void unloadRawMesh(token id);
+
+		RawMesh& getRawMesh(token id);
+
 		Mesh& getMesh(token id);
+
+		// TEXTURES //
+		void addTexturePath(token id, view path);
+
+		RawTexture& loadRawTexture(token id);
+
+		void unloadRawTexture(token id);
+
+		RawTexture& getRawTexture(token id);
 
 		Texture& getTexture(token id);
 	};

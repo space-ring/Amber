@@ -9,6 +9,16 @@
 #include <sstream>
 #include "engineUtils.h"
 
+int strToShaderType(std::string_view str) {
+	if (str == "V") return 0;
+	if (str == "TC") return 1;
+	if (str == "TE") return 2;
+	if (str == "G") return 3;
+	if (str == "F") return 4;
+	if (str == "C") return 5;
+	throw std::runtime_error("Unknown shader type " + std::string(str));
+}
+
 namespace Amber {
 
 	RawMesh parseMeshOBJ(view mesh) {
@@ -50,7 +60,7 @@ namespace Amber {
 					if (seen.contains(spaced_line[i])) {
 						indices.push_back(seen[spaced_line[i]]);
 					} else {
-						Vertex vertex;
+						Vertex vertex{};
 						auto iface = isplit(spaced_line[i], '/');
 						vertex.position = positions[iface[0] - 1];
 						if (iface.size() == 2) {
@@ -70,10 +80,6 @@ namespace Amber {
 		return {vertices, indices};
 	}
 
-	AssetManager::AssetManager() {
-		//todo insert defaults
-	}
-
 	void AssetManager::addManifest(view path) {
 		string manifest = readFile(path);
 
@@ -83,146 +89,125 @@ namespace Amber {
 		while (std::getline(ss, line, '\n')) {
 			if (line.starts_with("#") || line.empty()) continue;
 			auto items = split(line, ' ');
-			string type = items[0];
-			token id = std::stoull(items[1]);
+			token id = std::stoull(items[0]);
+			string asset = items[1];
 
-			if (type == "shader") {
-				addShaderPath(id, items[2]);
-			} else if (type == "program") {
+			if (asset == "shader") {
+				addSourcePath(id, items[2]);
 
+			} else if (asset == "program") {
+
+				list<token> refs[6];
+				// note this conversion assumes order of shaders
+				int type = strToShaderType(items[2]);
+				for (int i = 3; i < items.size(); ++i) {
+					if (items[i][0] < 58)
+						refs[type].push_back(std::stoull(items[i]));
+					else {
+						type = strToShaderType(items[i]);
+					}
+				}
+				addShaderFormula(id, {refs[0], refs[1], refs[2], refs[3], refs[4], refs[5]});
+
+			} else if (asset == "mesh") {
+				addMeshPath(id, items[2]);
 			}
 
-			//todo mesh, texture.
+			//todo texture
 		}
 	}
 
-	void AssetManager::addShaderPath(token id, view path) {
-		shaderPaths.emplace(id, path);
+	void AssetManager::addSourcePath(token id, view path) {
+		sourcePaths.emplace(id, path);
 	}
 
-	void AssetManager::addMeshPath(token id, view path) {
-		meshPaths.emplace(id, path);
+	view AssetManager::loadSource(token id) {
+		if (!sourcePaths.contains(id))
+			throw std::runtime_error("Cannot load unknown shader source " + std::to_string(id));
+		sources.emplace(id, readFile(sourcePaths.at(id)));
+		return sources.at(id);
 	}
 
-	void AssetManager::addTexturePath(token id, view path) {
-		texturePaths.emplace(id, path);
+	void AssetManager::unloadSource(token id) {
+		sources.erase(id);
 	}
 
-	view AssetManager::getRawShader(token id, bool load) {
-		if (!rawShaders.contains(id)) {
-			if (load)
-				return loadRawShader(id);
-			else
-				return rawShaders.at(0);
-		}
-		return rawShaders.at(id);
+	view AssetManager::getSource(token id) {
+		if (sources.contains(id)) return sources.at(id);
+		return loadSource(id);
 	}
 
-	RawMesh& AssetManager::getRawMesh(token id, bool load) {
-		if (!rawMeshes.contains(id)) {
-			if (load)
-				return loadRawMesh(id);
-			else
-				return rawMeshes.at(0);
-		}
-		return rawMeshes.at(id);
+	void AssetManager::addShaderFormula(AssetManager::token id, const AssetManager::ShaderFormula& formula) {
+		shaderFormulas.emplace(id, formula);
 	}
 
-	RawTexture& AssetManager::getRawTexture(token id, bool load) {
-		if (!rawTextures.contains(id)) {
-			if (load)
-				return loadRawTexture(id);
-			else
-				return rawTextures.at(0);
-		}
-		return rawTextures.at(id);
-	}
+	Shader& AssetManager::loadShader(token id) {
 
-	view AssetManager::loadRawShader(token id) {
-		if (!shaderPaths.contains(id)) return rawShaders.at(0);
-		rawShaders.emplace(id, readFile(shaderPaths.at(id)));
-		return rawShaders.at(id);
-	}
+		if (!shaderFormulas.contains(id))
+			throw std::runtime_error("Cannot create unknown shader " + std::to_string(id));
 
-	RawMesh& AssetManager::loadRawMesh(token id) {
-		if (!shaderPaths.contains(id)) return rawMeshes.at(0);
-		rawMeshes.emplace(id, parseMeshOBJ(readFile(meshPaths.at(id))));
-		return rawMeshes.at(id);
-	}
-
-	RawTexture& AssetManager::loadRawTexture(token id) {
-		throw 500;
-	}
-
-	void AssetManager::unloadRawShader(token id) {
-		rawShaders.erase(id);
-	}
-
-	void AssetManager::unloadRawMesh(token id) {
-		rawMeshes.erase(id);
-	}
-
-	void AssetManager::unloadRawTexture(token id) {
-		rawTextures.erase(id);
-	}
-
-	Shader& AssetManager::createShader(token id,
-	                                   const list<token>& vertex,
-	                                   const list<token>& tessControl,
-	                                   const list<token>& tessEval,
-	                                   const list<token>& geometry,
-	                                   const list<token>& fragment,
-	                                   const list<token>& compute) {
+		auto vertex = shaderFormulas.at(id).V;
+		auto tessControl = shaderFormulas.at(id).TC;
+		auto tessEval = shaderFormulas.at(id).TE;
+		auto geometry = shaderFormulas.at(id).G;
+		auto fragment = shaderFormulas.at(id).F;
+		auto compute = shaderFormulas.at(id).C;
 
 		//todo currently every rawshader has to be recompiled
 		int i = 0;
 		const char** vsource = new const char* [vertex.size()];
 		int* vlength = new int[vertex.size()];
 		for (auto t: vertex) {
-			vsource[i++] = rawShaders[t].c_str();
+			vlength[i] = getSource(t).size();
+			vsource[i++] = getSource(t).data();
 		}
 		ShaderStitch vStitch{static_cast<int>(vertex.size()), vsource, vlength};
 
 
 		i = 0;
-		const char** tcsource = new const char* [vertex.size()];
-		int* tclength = new int[vertex.size()];
-		for (auto t: vertex) {
-			vsource[i++] = rawShaders[t].c_str();
+		const char** tcsource = new const char* [tessControl.size()];
+		int* tclength = new int[tessControl.size()];
+		for (auto t: tessControl) {
+			tclength[i] = getSource(t).size();
+			tcsource[i++] = getSource(t).data();
 		}
-		ShaderStitch tcStitch{static_cast<int>(vertex.size()), vsource, tclength};
+		ShaderStitch tcStitch{static_cast<int>(tessControl.size()), tcsource, tclength};
 
 		i = 0;
-		const char** tesource = new const char* [vertex.size()];
-		int* telength = new int[vertex.size()];
-		for (auto t: vertex) {
-			vsource[i++] = rawShaders[t].c_str();
+		const char** tesource = new const char* [tessEval.size()];
+		int* telength = new int[tessEval.size()];
+		for (auto t: tessEval) {
+			telength[i] = getSource(t).size();
+			tesource[i++] = getSource(t).data();
 		}
-		ShaderStitch teStitch{static_cast<int>(vertex.size()), vsource, telength};
+		ShaderStitch teStitch{static_cast<int>(tessEval.size()), tesource, telength};
 
 		i = 0;
-		const char** gsource = new const char* [vertex.size()];
-		int* glength = new int[vertex.size()];
-		for (auto t: vertex) {
-			vsource[i++] = rawShaders[t].c_str();
+		const char** gsource = new const char* [geometry.size()];
+		int* glength = new int[geometry.size()];
+		for (auto t: geometry) {
+			glength[i] = getSource(t).size();
+			gsource[i++] = getSource(t).data();
 		}
-		ShaderStitch gStitch{static_cast<int>(vertex.size()), gsource, glength};
+		ShaderStitch gStitch{static_cast<int>(geometry.size()), gsource, glength};
 
 		i = 0;
-		const char** fsource = new const char* [vertex.size()];
-		int* flength = new int[vertex.size()];
-		for (auto t: vertex) {
-			vsource[i++] = rawShaders[t].c_str();
+		const char** fsource = new const char* [fragment.size()];
+		int* flength = new int[fragment.size()];
+		for (auto t: fragment) {
+			flength[i] = getSource(t).size();
+			fsource[i++] = getSource(t).data();
 		}
-		ShaderStitch fStitch{static_cast<int>(vertex.size()), fsource, flength};
+		ShaderStitch fStitch{static_cast<int>(fragment.size()), fsource, flength};
 
 		i = 0;
-		const char** csource = new const char* [vertex.size()];
-		int* clength = new int[vertex.size()];
-		for (auto t: vertex) {
-			vsource[i++] = rawShaders[t].c_str();
+		const char** csource = new const char* [compute.size()];
+		int* clength = new int[compute.size()];
+		for (auto t: compute) {
+			clength[i] = getSource(t).size();
+			csource[i++] = getSource(t).data();
 		}
-		ShaderStitch cStitch{static_cast<int>(vertex.size()), csource, clength};
+		ShaderStitch cStitch{static_cast<int>(compute.size()), csource, clength};
 
 
 		shaders.emplace(std::piecewise_construct, std::make_tuple(id),
@@ -246,21 +231,32 @@ namespace Amber {
 
 	Shader& AssetManager::getShader(token id) {
 		if (shaders.contains(id)) return shaders.at(id);
-		return shaders.at(0);
+		return loadShader(id);
+	}
+
+	void AssetManager::addMeshPath(token id, view path) {
+		meshPaths.emplace(id, path);
+	}
+
+	RawMesh& AssetManager::loadRawMesh(token id) {
+		if (!meshPaths.contains(id))
+			throw std::runtime_error("Cannot load unknown mesh data " + std::to_string(id));
+		rawMeshes.emplace(id, parseMeshOBJ(readFile(meshPaths.at(id))));
+		return rawMeshes.at(id);
+	}
+
+	void AssetManager::unloadRawMesh(token id) {
+		rawMeshes.erase(id);
+	}
+
+	RawMesh& AssetManager::getRawMesh(token id) {
+		if (rawMeshes.contains(id)) return rawMeshes.at(id);
+		return loadRawMesh(id);
 	}
 
 	Mesh& AssetManager::getMesh(token id) {
 		if (meshes.contains(id)) return meshes.at(id);
 		return meshes.at(0);
-	}
-
-	Texture& AssetManager::getTexture(token id) {
-		if (textures.contains(id)) return textures.at(id);
-		return textures.at(0);
-	}
-
-	AssetManager::~AssetManager() {
-
 	}
 
 }

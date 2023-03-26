@@ -5,11 +5,10 @@
 #include <iostream>
 #include <vector>
 #include "Shader.h"
-#include "engineIO.h"
 
 namespace Amber {
 
-	ShaderAttachment::ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source)
+	Shader::ShaderAttachment::ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source)
 			: program(program) {
 
 		shader = glCreateShader(type);
@@ -42,7 +41,7 @@ namespace Amber {
 		if (program) glAttachShader(type, program);
 	}
 
-	ShaderAttachment::~ShaderAttachment() {
+	Shader::ShaderAttachment::~ShaderAttachment() {
 		if (program && shader) glDetachShader(program, shader);
 		if (shader) glDeleteShader(shader);
 	}
@@ -56,15 +55,19 @@ namespace Amber {
 
 		program = glCreateProgram();
 
-		ShaderAttachment vertex(VERTEX, program, srcVertex);
-		ShaderAttachment tessControl(TESS_CONTROL, program, srcTessControl);
-		ShaderAttachment tessEval(TESS_EVALUATION, program, srcTessEval);
-		ShaderAttachment geometry(GEOMETRY, program, srcGeometry);
-		ShaderAttachment fragment(FRAGMENT, program, srcFragment);
-		ShaderAttachment compute(COMPUTE, program, srcCompute);
+		//todo move compilation, linking, attaching and detaching into functions?
 
-		// note pre-linkup here
-		glLinkProgram(program);
+		{
+			if (srcVertex.count) ShaderAttachment vertex(VERTEX, program, srcVertex);
+			if (srcTessControl.count) ShaderAttachment tessControl(TESS_CONTROL, program, srcTessControl);
+			if (srcTessEval.count) ShaderAttachment tessEval(TESS_EVALUATION, program, srcTessEval);
+			if (srcGeometry.count) ShaderAttachment geometry(GEOMETRY, program, srcGeometry);
+			if (srcFragment.count) ShaderAttachment fragment(FRAGMENT, program, srcFragment);
+			if (srcCompute.count) ShaderAttachment compute(COMPUTE, program, srcCompute);
+
+			// note pre-linkup here
+			glLinkProgram(program);
+		}
 
 		GLint flag = 0;
 		glGetProgramiv(program, GL_LINK_STATUS, &flag);

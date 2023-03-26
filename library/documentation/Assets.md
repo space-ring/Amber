@@ -20,14 +20,29 @@ deleted. This means that a fragment must be recompiled for every program it serv
 
 ## Manifest syntax:
 
+Every asset is assigned a token. Tokens must be unique among the same asset type.
+
+\# this is a comment
+
+An asset is described in one line:
 _token type details_
 
 where _type_ and _details_ are:
 
-- fshader
-    - filepath
 - shader
-  - 
+    - filepath
+
 - program
-- fmesh
+    - _shaderType_ tokens
+    - where _shaderType_ can be, in any order, from:
+        - V
+        - TC
+        - TE
+        - G
+        - F
+        - C
+
+5 program V 0 1 2 F 9 TC 6 TE 7
+
 - mesh
+    - filepath

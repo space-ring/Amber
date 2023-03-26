@@ -13,12 +13,15 @@
 #include "snake.h"
 #include "IApplication.h"
 #include "synchapi.h"
+#include <string>
 #include <chrono>
 
 namespace Amber {
 
 	template<class Game>
 	class Application : public IApplication {
+
+		using string = std::string;
 
 		StateBuffer<Game> buffer;
 

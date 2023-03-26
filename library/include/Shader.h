@@ -7,6 +7,7 @@
 
 #include <string>
 #include "graphics.h"
+#include <list>
 
 /* Shader takes individual shader code for each of SupportedShaders.
  * Attachment compiles the code and attaches to program. Detach and delete on dtor.
@@ -28,26 +29,24 @@ namespace Amber {
 		const int* lengths;
 	};
 
-	struct ShaderAttachment {
-
-		using string = std::string;
-		using view = std::string_view;
-
-		GLuint program, shader;
-
-		ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source);
-
-		~ShaderAttachment();
-
-		ShaderAttachment(const ShaderAttachment&) = delete;
-
-		ShaderAttachment& operator=(const ShaderAttachment&) = delete;
-	};
-
 	class Shader {
 
+		struct ShaderAttachment {
+
+			using string = std::string;
+
+			GLuint program, shader;
+
+			ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source);
+
+			~ShaderAttachment();
+
+			ShaderAttachment(const ShaderAttachment&) = delete;
+
+			ShaderAttachment& operator=(const ShaderAttachment&) = delete;
+		};
+
 		using string = std::string;
-		using view = std::string_view;
 
 		GLuint program;
 
