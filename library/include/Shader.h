@@ -68,9 +68,9 @@ namespace Amber {
 
 		Shader& operator=(Shader&&) = delete;
 
-		void start();
+		Shader& start();
 
-		void stop();
+		Shader& stop();
 	};
 
 }

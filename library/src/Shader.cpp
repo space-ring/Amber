@@ -90,12 +90,14 @@ namespace Amber {
 		if (program) glDeleteProgram(program);
 	}
 
-	void Shader::start() {
+	Shader& Shader::start() {
 		if (program) glUseProgram(program);
+		return *this;
 	}
 
-	void Shader::stop() {
+	Shader& Shader::stop() {
 		glUseProgram(0);
+		return *this;
 	}
 
 }

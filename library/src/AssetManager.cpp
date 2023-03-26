@@ -85,22 +85,27 @@ namespace Amber {
 
 		if (manifest.empty()) return;
 		string line;
+		string asset;
 		std::stringstream ss(manifest);
 		while (std::getline(ss, line, '\n')) {
 			if (line.starts_with("#") || line.empty()) continue;
 			auto items = split(line, ' ');
+			if (items.size() == 1) {
+				asset = items[0];
+				continue;
+			}
+
 			token id = std::stoull(items[0]);
-			string asset = items[1];
 
 			if (asset == "shader") {
-				addSourcePath(id, items[2]);
+				addSourcePath(id, items[1]);
 
 			} else if (asset == "program") {
 
 				list<token> refs[6];
 				// note this conversion assumes order of shaders
-				int type = strToShaderType(items[2]);
-				for (int i = 3; i < items.size(); ++i) {
+				int type = strToShaderType(items[1]);
+				for (int i = 2; i < items.size(); ++i) {
 					if (items[i][0] < 58)
 						refs[type].push_back(std::stoull(items[i]));
 					else {
@@ -110,7 +115,7 @@ namespace Amber {
 				addShaderFormula(id, {refs[0], refs[1], refs[2], refs[3], refs[4], refs[5]});
 
 			} else if (asset == "mesh") {
-				addMeshPath(id, items[2]);
+				addMeshPath(id, items[1]);
 			}
 
 			//todo texture

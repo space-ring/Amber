@@ -24,8 +24,10 @@ Every asset is assigned a token. Tokens must be unique among the same asset type
 
 \# this is a comment
 
-An asset is described in one line:
-_token type details_
+Assets are grouped by type\
+_type_\
+_token details_\
+_token details_
 
 where _type_ and _details_ are:
 
@@ -42,7 +44,7 @@ where _type_ and _details_ are:
         - F
         - C
 
-5 program V 0 1 2 F 9 TC 6 TE 7
+    `5 program V 0 1 2 F 9 TC 6 TE 7`
 
 - mesh
     - filepath
