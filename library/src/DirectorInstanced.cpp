@@ -253,7 +253,7 @@ namespace Amber {
 		auto* refs = references.at(mesh);
 		auto& tracker = trackers.at(mesh);
 		if (tracker.list.empty()) return;
-		//writing to unsorted memory loses around 0.0008s on i3-10105f
+		//todo writing to unsorted memory loses around 0.0008s on i3-10105f
 //		shuffle(tracker.list);
 //		tracker.list.sort();
 		Managed& m = managed.at(mesh);
@@ -275,7 +275,7 @@ namespace Amber {
 	void DirectorInstanced::link(Mesh* mesh) {
 		if (!mesh) return;
 		if (!managed.contains(mesh)) return;
-		mesh->linkInstanceAttributes(managed.at(mesh).memory);
+		mesh->linkInstanceTransforms(managed.at(mesh).memory);
 	}
 
 	DirectorInstanced::index DirectorInstanced::getRenderCount(Mesh* mesh) {

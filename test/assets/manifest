@@ -5,12 +5,16 @@
 # can be specified following the first path, separated by a space.
 
 #mesh box assets/meshes/box.obj
-mesh plane assets/meshes/plane.obj
-mesh triangle assets/meshes/triangle.obj
+#mesh plane assets/meshes/plane.obj
+#mesh triangle assets/meshes/triangle.obj
+#
+#shader basic assets/shaders/basic.vert assets/shaders/basic.frag
+#shader pick assets/shaders/pick.vert assets/shaders/pick.frag
+#
+##format of shader manifests:
+## shader program name vertex fragment geometry tess control tess eval compute
+##shader wire assets/shaders/wire.vert assets/shaders/wire.frag
 
-shader basic assets/shaders/basic.vert assets/shaders/basic.frag
-shader pick assets/shaders/pick.vert assets/shaders/pick.frag
-
-#format of shader manifests:
-# shader program name vertex fragment geometry tess control tess eval compute
-#shader wire assets/shaders/wire.vert assets/shaders/wire.frag
+shader 1 assets/shaders/basic.vert
+shader 2 assets/shader/basic.frag
+program 1 1 0 0 0 0 2

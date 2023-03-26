@@ -7,52 +7,80 @@
 
 #include <map>
 #include <string>
+#include <list>
+#include "Shader.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "engineIO.h"
-#include "Singleton.h"
 
 namespace Amber {
 
 	class AssetManager {
+		using token = unsigned long long int;
+		template<class T> using tokenMap = std::map<token, T>;
+		template<class T> using list = std::list<T>;
+		using view = std::string_view;
 		using string = std::string;
-		template<class T> using stringMap = std::map<string, T>;
 
-	private: //todo const maps?
-		stringMap<compoundShader>* shaderPaths = new stringMap<compoundShader>;
-		stringMap<string>* meshPaths = new stringMap<string>;
-		stringMap<string>* texturePaths = new stringMap<string>;
-		stringMap<Shader*>* shaders = new stringMap<Shader*>;
-		stringMap<Mesh*>* meshes = new stringMap<Mesh*>;
-		stringMap<Texture*>* textures = new stringMap<Texture*>;
+		struct ShaderFormula {
+			list<token> V, TC, TE, G, F, C;
+		};
+
+		tokenMap<string> sourcePaths;
+		tokenMap<string> meshPaths;
+		tokenMap<string> texturePaths;
+
+		tokenMap<string> sources;
+		//todo other raw asset types
+		tokenMap<RawMesh> rawMeshes;
+		tokenMap<RawTexture> rawTextures;
+
+		tokenMap<ShaderFormula> shaderFormulas;
+		tokenMap<Shader> shaders;
+		tokenMap<Mesh> meshes;
+		tokenMap<Texture> textures;
 
 	public:
 
-		AssetManager();
+		void addManifest(view path);
 
-		virtual ~AssetManager();
+		// SHADERS //
+		void addSourcePath(token id, view path);
 
-		void buildAll();
+		view loadSource(token id);
 
-		void addManifest(const string& manifest);
+		void unloadSource(token id);
 
-		void addShader(const string& name, const compoundShader& paths);
+		view getSource(token id);
 
-		void addShader(const string& name, Shader& shader);
+		void addShaderFormula(token id, const ShaderFormula& formula);
 
-		void addMesh(const string& name, const string& path);
+		Shader& loadShader(token id);
 
-		void addMesh(const string& name, Mesh& mesh);
+		void unloadShader(token id);
 
-		void addTexture(const string& name, const string& path);
+		Shader& getShader(token id);
 
-		void addTexture(const string& name, Texture& texture);
+		// MESHES //
+		void addMeshPath(token id, view path);
 
-		Shader* getShader(const string& name);
+		RawMesh& loadRawMesh(token id);
 
-		Mesh* getMesh(const string& name);
+		void unloadRawMesh(token id);
 
-		Texture* getTexture(const string& name);
+		RawMesh& getRawMesh(token id);
+
+		Mesh& getMesh(token id);
+
+		// TEXTURES //
+		void addTexturePath(token id, view path);
+
+		RawTexture& loadRawTexture(token id);
+
+		void unloadRawTexture(token id);
+
+		RawTexture& getRawTexture(token id);
+
+		Texture& getTexture(token id);
 	};
 }
 

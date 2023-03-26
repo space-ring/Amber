@@ -7,12 +7,13 @@
 
 #include <string>
 #include "graphics.h"
+#include <list>
+
+/* Shader takes individual shader code for each of SupportedShaders.
+ * Attachment compiles the code and attaches to program. Detach and delete on dtor.
+ */
 
 namespace Amber {
-	struct compoundShader { //todo const
-		std::string vertex, fragment, geometry, tessControl, tessEval, compute;
-	};
-
 	enum SupportedShaders {
 		VERTEX = GL_VERTEX_SHADER,
 		TESS_CONTROL = GL_TESS_CONTROL_SHADER,
@@ -22,36 +23,54 @@ namespace Amber {
 		COMPUTE = GL_COMPUTE_SHADER
 	};
 
+	struct ShaderStitch {
+		int count;
+		const char** string;
+		const int* lengths;
+	};
+
 	class Shader {
-	private:
 
-		compoundShader sources; //todo think about lifetime of this and sharing between shader programs
+		struct ShaderAttachment {
 
-		GLuint program = 0,
-				vertex = 0,
-				tessCtrl = 0,
-				tessEval = 0,
-				geometry = 0,
-				fragment = 0,
-				compute = 0;
+			using string = std::string;
 
-		GLuint addShader(SupportedShaders type, const GLchar* const* code);
+			GLuint program, shader;
+
+			ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source);
+
+			~ShaderAttachment();
+
+			ShaderAttachment(const ShaderAttachment&) = delete;
+
+			ShaderAttachment& operator=(const ShaderAttachment&) = delete;
+		};
+
+		using string = std::string;
+
+		GLuint program;
 
 	public:
-		static Shader* getDefault();
+		Shader(ShaderStitch srcVertex,
+		       ShaderStitch srcTessControl,
+		       ShaderStitch srcTessEval,
+		       ShaderStitch srcGeometry,
+		       ShaderStitch srcFragment,
+		       ShaderStitch srcCompute);
 
-		Shader(GLuint program, GLuint vertex, GLuint tessCtrl, GLuint tessEval, GLuint geometry, GLuint fragment,
-		       GLuint compute);
+		~Shader();
 
-		Shader(const compoundShader& sources);
+		Shader(const Shader&) = delete;
 
-		virtual ~Shader();
+		Shader(Shader&&) = delete;
 
-		Shader* build();
+		Shader& operator=(const Shader&) = delete;
 
-		Shader* start();
+		Shader& operator=(Shader&&) = delete;
 
-		Shader* stop();
+		Shader& start();
+
+		Shader& stop();
 	};
 
 }

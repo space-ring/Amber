@@ -9,129 +9,259 @@
 #include <sstream>
 #include "engineUtils.h"
 
-namespace Amber {
-	AssetManager::AssetManager() {}
+int strToShaderType(std::string_view str) {
+	if (str == "V") return 0;
+	if (str == "TC") return 1;
+	if (str == "TE") return 2;
+	if (str == "G") return 3;
+	if (str == "F") return 4;
+	if (str == "C") return 5;
+	throw std::runtime_error("Unknown shader type " + std::string(str));
+}
 
-	/*
-	 * The problem here was that if an asset was retrieved before calling this method,
-	 * freshly constructed and built meshes could not be added since there would've already been a mapping.
-	 * So split the calls into 2, one for setting the mapping (if it doesn't already exist) and then build.
-	 */
-	void AssetManager::buildAll() {
-		Shader::getDefault()->build();
-		for (const auto& shader: *shaderPaths) {
-			if (!shaders->contains(shader.first)) {
-				addShader(shader.first, *loadShaderFile(shader.second));
-				getShader(shader.first)->build();
+namespace Amber {
+
+	RawMesh parseMeshOBJ(view mesh) {
+		string str(mesh);
+		std::stringstream ss(str);
+		string line;
+		std::vector<glm::vec3> positions, normals;
+		std::vector<glm::vec2> uv;
+		std::map<string, unsigned int> seen; // indices to vertices vector
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		unsigned int index = 0;
+
+		while (std::getline(ss, line, '\n')) {
+			if (line.empty()) continue;
+			auto spaced_line = split(line, ' ');
+			if (spaced_line[0] == "v") {
+				glm::vec3 vec3;
+				vec3.x = std::stof(spaced_line[1]);
+				vec3.y = std::stof(spaced_line[2]);
+				vec3.z = std::stof(spaced_line[3]);
+				positions.push_back(vec3);
+
+			} else if (spaced_line[0] == "vt") {
+				glm::vec2 vec2;
+				vec2.x = std::stof(spaced_line[1]);
+				vec2.y = std::stof(spaced_line[2]);
+				uv.push_back(vec2);
+
+			} else if (spaced_line[0] == "vn") {
+				glm::vec3 vec3;
+				vec3.x = std::stof(spaced_line[1]);
+				vec3.y = std::stof(spaced_line[2]);
+				vec3.z = std::stof(spaced_line[3]);
+				normals.push_back(vec3);
+
+			} else if (spaced_line[0] == "f") {
+				for (int i = 1; i < 4; ++i) {
+					if (seen.contains(spaced_line[i])) {
+						indices.push_back(seen[spaced_line[i]]);
+					} else {
+						Vertex vertex{};
+						auto iface = isplit(spaced_line[i], '/');
+						vertex.position = positions[iface[0] - 1];
+						if (iface.size() == 2) {
+							vertex.normal = normals[iface[1] - 1];
+							vertex.texUV = glm::vec2(0, 0);
+						} else {
+							vertex.texUV = uv[iface[1] - 1];
+							vertex.normal = normals[iface[2] - 1];
+						}
+						vertices.push_back(vertex);
+						seen.insert(std::pair<string, unsigned int>(spaced_line[i], index));
+						indices.push_back(index++);
+					}
+				}
 			}
 		}
-		Mesh::getDefault()->build();
-		for (const auto& mesh: *meshPaths) {
-			if (!meshes->contains(mesh.first)) {
-				addMesh(mesh.first, *loadMeshFile(mesh.second)); //add if not constructed
-				getMesh(mesh.first)->build(); //and build (whether previously retrieved or not)}
-			}
-//    for (auto texture: *textures) {
-//        texture.renderState->build();
-//    }
-		}
+		return {vertices, indices};
 	}
 
-//todo batch (name block instead of line)
-//todo manifest includes (also check for circular includes) not high priority
-//todo component paths e.g. all meshes in assets/meshes
-//todo the whole manifest language!!! default to json maybe...
-	void AssetManager::addManifest(const string& path) { //todo textures
+	void AssetManager::addManifest(view path) {
 		string manifest = readFile(path);
+
 		if (manifest.empty()) return;
 		string line;
+		string asset;
 		std::stringstream ss(manifest);
 		while (std::getline(ss, line, '\n')) {
 			if (line.starts_with("#") || line.empty()) continue;
 			auto items = split(line, ' ');
-			string type = items[0];
-			string name = items[1];
-
-			if (type == "mesh") {
-				addMesh(name, items[2]);
-
-			} else if (type == "shader") {
-				string v, f, g, tc, te, c;
-				string* stores[]{&v, &f, &g, &tc, &te, &c};
-
-				for (int i = 0; i < items.size() - 2; ++i) {
-					*stores[i] = items[i + 2];
-				}
-
-				compoundShader paths{v, f, g, tc, te, c};
-				addShader(name, paths);
+			if (items.size() == 1) {
+				asset = items[0];
+				continue;
 			}
+
+			token id = std::stoull(items[0]);
+
+			if (asset == "shader") {
+				addSourcePath(id, items[1]);
+
+			} else if (asset == "program") {
+
+				list<token> refs[6];
+				// note this conversion assumes order of shaders
+				int type = strToShaderType(items[1]);
+				for (int i = 2; i < items.size(); ++i) {
+					if (items[i][0] < 58)
+						refs[type].push_back(std::stoull(items[i]));
+					else {
+						type = strToShaderType(items[i]);
+					}
+				}
+				addShaderFormula(id, {refs[0], refs[1], refs[2], refs[3], refs[4], refs[5]});
+
+			} else if (asset == "mesh") {
+				addMeshPath(id, items[1]);
+			}
+
+			//todo texture
 		}
 	}
 
-	void AssetManager::addShader(const string& name, const compoundShader& paths) {
-		shaderPaths->insert(std::pair<string, compoundShader>(name, paths));
+	void AssetManager::addSourcePath(token id, view path) {
+		sourcePaths.emplace(id, path);
 	}
 
-	void AssetManager::addShader(const string& name, Shader& shader) {
-		shaders->insert(std::pair<string, Shader*>(name, &shader));
+	view AssetManager::loadSource(token id) {
+		if (!sourcePaths.contains(id))
+			throw std::runtime_error("Cannot load unknown shader source " + std::to_string(id));
+		sources.emplace(id, readFile(sourcePaths.at(id)));
+		return sources.at(id);
 	}
 
-	void AssetManager::addMesh(const string& name, const string& path) {
-		meshPaths->insert(std::pair<string, string>(name, path));
+	void AssetManager::unloadSource(token id) {
+		sources.erase(id);
 	}
 
-	void AssetManager::addMesh(const string& name, Mesh& mesh) {
-		meshes->insert(std::pair<string, Mesh*>(name, &mesh));
+	view AssetManager::getSource(token id) {
+		if (sources.contains(id)) return sources.at(id);
+		return loadSource(id);
 	}
 
-	void AssetManager::addTexture(const string& name, const string& path) {
-		texturePaths->insert(std::pair<string, string>(name, path));
+	void AssetManager::addShaderFormula(AssetManager::token id, const AssetManager::ShaderFormula& formula) {
+		shaderFormulas.emplace(id, formula);
 	}
 
-	void AssetManager::addTexture(const string& name, Texture& texture) {
-		textures->insert(std::pair<string, Texture*>(name, &texture));
-	}
+	Shader& AssetManager::loadShader(token id) {
 
-	Shader* AssetManager::getShader(const string& name) {
-		if (!shaders->contains(name)) {
-			if (shaderPaths->contains(name)) {
-				addShader(name, *loadShaderFile(shaderPaths->at(name)));
-			} else return Shader::getDefault();
+		if (!shaderFormulas.contains(id))
+			throw std::runtime_error("Cannot create unknown shader " + std::to_string(id));
+
+		auto vertex = shaderFormulas.at(id).V;
+		auto tessControl = shaderFormulas.at(id).TC;
+		auto tessEval = shaderFormulas.at(id).TE;
+		auto geometry = shaderFormulas.at(id).G;
+		auto fragment = shaderFormulas.at(id).F;
+		auto compute = shaderFormulas.at(id).C;
+
+		//todo currently every rawshader has to be recompiled
+		int i = 0;
+		const char** vsource = new const char* [vertex.size()];
+		int* vlength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vlength[i] = getSource(t).size();
+			vsource[i++] = getSource(t).data();
 		}
-		return shaders->at(name);
+		ShaderStitch vStitch{static_cast<int>(vertex.size()), vsource, vlength};
+
+
+		i = 0;
+		const char** tcsource = new const char* [tessControl.size()];
+		int* tclength = new int[tessControl.size()];
+		for (auto t: tessControl) {
+			tclength[i] = getSource(t).size();
+			tcsource[i++] = getSource(t).data();
+		}
+		ShaderStitch tcStitch{static_cast<int>(tessControl.size()), tcsource, tclength};
+
+		i = 0;
+		const char** tesource = new const char* [tessEval.size()];
+		int* telength = new int[tessEval.size()];
+		for (auto t: tessEval) {
+			telength[i] = getSource(t).size();
+			tesource[i++] = getSource(t).data();
+		}
+		ShaderStitch teStitch{static_cast<int>(tessEval.size()), tesource, telength};
+
+		i = 0;
+		const char** gsource = new const char* [geometry.size()];
+		int* glength = new int[geometry.size()];
+		for (auto t: geometry) {
+			glength[i] = getSource(t).size();
+			gsource[i++] = getSource(t).data();
+		}
+		ShaderStitch gStitch{static_cast<int>(geometry.size()), gsource, glength};
+
+		i = 0;
+		const char** fsource = new const char* [fragment.size()];
+		int* flength = new int[fragment.size()];
+		for (auto t: fragment) {
+			flength[i] = getSource(t).size();
+			fsource[i++] = getSource(t).data();
+		}
+		ShaderStitch fStitch{static_cast<int>(fragment.size()), fsource, flength};
+
+		i = 0;
+		const char** csource = new const char* [compute.size()];
+		int* clength = new int[compute.size()];
+		for (auto t: compute) {
+			clength[i] = getSource(t).size();
+			csource[i++] = getSource(t).data();
+		}
+		ShaderStitch cStitch{static_cast<int>(compute.size()), csource, clength};
+
+
+		shaders.emplace(std::piecewise_construct, std::make_tuple(id),
+		                std::make_tuple(vStitch, tcStitch, teStitch, gStitch, fStitch, cStitch));
+
+		delete[] vsource;
+		delete[] tcsource;
+		delete[] tesource;
+		delete[] gsource;
+		delete[] fsource;
+		delete[] csource;
+		delete[] vlength;
+		delete[] tclength;
+		delete[] telength;
+		delete[] glength;
+		delete[] flength;
+		delete[] clength;
+
+		return shaders.at(id);
 	}
 
-	Mesh* AssetManager::getMesh(const string& name) {
-		if (!meshes->contains(name)) {
-			if (meshPaths->contains(name)) {
-				addMesh(name, *loadMeshFile(meshPaths->at(name)));
-			} else return Mesh::getDefault();
-		}
-		return meshes->at(name);
+	Shader& AssetManager::getShader(token id) {
+		if (shaders.contains(id)) return shaders.at(id);
+		return loadShader(id);
 	}
 
-	Texture* AssetManager::getTexture(const string& name) {
-		return nullptr;
-		if (!textures->contains(name)) {
-			if (texturePaths->contains(name)) {
-				addTexture(name, texturePaths->at(name));
-			} else return nullptr; //todo texture
-		}
-		return textures->at(name);
+	void AssetManager::addMeshPath(token id, view path) {
+		meshPaths.emplace(id, path);
 	}
 
-	AssetManager::~AssetManager() {
-		int x = 0;
-		for (const auto& shader: *shaders) {
-			delete shader.second;
-		}
-		delete shaders;
+	RawMesh& AssetManager::loadRawMesh(token id) {
+		if (!meshPaths.contains(id))
+			throw std::runtime_error("Cannot load unknown mesh data " + std::to_string(id));
+		rawMeshes.emplace(id, parseMeshOBJ(readFile(meshPaths.at(id))));
+		return rawMeshes.at(id);
+	}
 
-		for (const auto& mesh: *meshes) {
-			delete mesh.second;
-		}
-		delete meshes;
+	void AssetManager::unloadRawMesh(token id) {
+		rawMeshes.erase(id);
+	}
+
+	RawMesh& AssetManager::getRawMesh(token id) {
+		if (rawMeshes.contains(id)) return rawMeshes.at(id);
+		return loadRawMesh(id);
+	}
+
+	Mesh& AssetManager::getMesh(token id) {
+		if (meshes.contains(id)) return meshes.at(id);
+		return meshes.at(0);
 	}
 
 }

@@ -6,7 +6,7 @@
 #include "engineIO.h"
 
 namespace Amber {
-	std::string DEFAULT_MESH =
+	static std::string DEFAULT_MESH =
 			"o Cube\n"
 			"v 1.000000 1.000000 -1.000000\n"
 			"v 1.000000 -1.000000 -1.000000\n"
@@ -51,21 +51,12 @@ namespace Amber {
 			"f 5/12/6 1/3/6 2/9/6";
 
 	Mesh::Mesh(const RawMesh& data)
-			: data(data) {
-	}
-
-	Mesh* Mesh::getDefault() {
-		static Mesh DEFAULT(parseMesh(DEFAULT_MESH));
-		return &DEFAULT;
-	}
-
-	Mesh* Mesh::build() {
-		if (VAO) return this; //build once
+			: elementCount(data.indices.size()) {
 
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &vertexVBO);
 		glGenBuffers(1, &EBO);
-		glCheckError();
+
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 		glBufferData(GL_ARRAY_BUFFER, data.vertices.size() * sizeof(Vertex), &data.vertices[0], GL_STATIC_DRAW);
@@ -73,7 +64,7 @@ namespace Amber {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(unsigned int), &data.indices[0],
 		             GL_STATIC_DRAW);
-		glCheckError();
+
 		// vertex positions
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position));
@@ -84,16 +75,23 @@ namespace Amber {
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, normal));
 
-		glCheckError();
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glCheckError();
-		return this;
 	}
 
-	void Mesh::linkInstanceAttributes(GLuint vbo) {
+	Mesh::~Mesh() {
+		if (VAO) glDeleteVertexArrays(1, &VAO);
+		if (vertexVBO) glDeleteBuffers(1, &vertexVBO);
+		if (EBO) glDeleteBuffers(1, &EBO);
+	}
+
+	void Mesh::linkInstanceTransforms(GLuint vbo) {
+		GLint boundVAO;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &boundVAO);
+		GLint boundVBO;
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &boundVBO);
+
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		for (int i = 10; i < 14; ++i) {
@@ -101,27 +99,12 @@ namespace Amber {
 			glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*) ((i - 10) * sizeof(glm::vec4)));
 			glVertexAttribDivisor(i, 1);
 		}
-		glCheckError();
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
 
-	Mesh::~Mesh() {
-		if (!VAO) return;
-		glDeleteVertexArrays(1, &VAO);
-		glDeleteBuffers(1, &vertexVBO);
-		glDeleteBuffers(1, &EBO);
+		glBindBuffer(GL_ARRAY_BUFFER, boundVBO);
+		glBindVertexArray(boundVAO);
 	}
 
 	GLuint Mesh::getVao() const {
 		return VAO;
 	}
-
-	GLuint Mesh::getElementCount() const {
-		return data.indices.size();
-	}
-
-	GLuint Mesh::getEbo() const {
-		return EBO;
-	}
-
 }
