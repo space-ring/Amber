@@ -9,35 +9,37 @@
 
 namespace Amber {
 
-	ShaderAttachment::ShaderAttachment(SupportedShaders type, GLuint program, view source)
+	ShaderAttachment::ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source)
 			: program(program) {
 
-		if (!source.empty()) {
-			shader = glCreateShader(type);
-			string str(source);
-			const GLchar* const code = str.c_str();
-			glShaderSource(shader, 1, &code, nullptr);
-			glCompileShader(shader);
+		shader = glCreateShader(type);
+		glShaderSource(shader, source.count, source.string, source.lengths);
+		glCompileShader(shader);
 
-			GLint flag = 0;
-			glGetShaderiv(shader, GL_COMPILE_STATUS, &flag);
-			if (!flag) {
-				std::cout << "Failed to compile shader " << type << std::endl << str << std::endl;
-				GLint logSize = 0;
-				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
-				std::vector<GLchar> log(logSize);
-				glGetShaderInfoLog(shader, logSize, nullptr, &log[0]);
-				// todo logging
-				for (GLchar c: log) {
-					std::cout << c;
+		GLint flag = 0;
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &flag);
+		if (!flag) {
+			std::cout << "Failed to compile shader: " << type << std::endl;
+			for (int i = 0; i < source.count; ++i) {
+				for (int j = 0; j < source.lengths[i]; ++j) {
+					std::cout << source.string[i][j];
 				}
-				glDeleteShader(shader);
-				shader = 0;
-				return;
 			}
-
-			if (program) glAttachShader(type, program);
+			std::cout << std::endl;
+			GLint logSize = 0;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
+			std::vector<GLchar> log(logSize);
+			glGetShaderInfoLog(shader, logSize, nullptr, &log[0]);
+			// todo logging
+			for (GLchar c: log) {
+				std::cout << c;
+			}
+			glDeleteShader(shader);
+			shader = 0;
+			return;
 		}
+
+		if (program) glAttachShader(type, program);
 	}
 
 	ShaderAttachment::~ShaderAttachment() {
@@ -45,12 +47,12 @@ namespace Amber {
 		if (shader) glDeleteShader(shader);
 	}
 
-	Shader::Shader(view srcVertex,
-	               view srcTessControl,
-	               view srcTessEval,
-	               view srcGeometry,
-	               view srcFragment,
-	               view srcCompute) {
+	Shader::Shader(ShaderStitch srcVertex,
+	               ShaderStitch srcTessControl,
+	               ShaderStitch srcTessEval,
+	               ShaderStitch srcGeometry,
+	               ShaderStitch srcFragment,
+	               ShaderStitch srcCompute) {
 
 		program = glCreateProgram();
 

@@ -22,6 +22,12 @@ namespace Amber {
 		COMPUTE = GL_COMPUTE_SHADER
 	};
 
+	struct ShaderStitch {
+		int count;
+		const char** string;
+		const int* lengths;
+	};
+
 	struct ShaderAttachment {
 
 		using string = std::string;
@@ -29,7 +35,7 @@ namespace Amber {
 
 		GLuint program, shader;
 
-		ShaderAttachment(SupportedShaders type, GLuint program, view source);
+		ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source);
 
 		~ShaderAttachment();
 
@@ -46,8 +52,12 @@ namespace Amber {
 		GLuint program;
 
 	public:
-		Shader(view srcVertex, view srcTessControl, view srcTessEval, view srcGeometry, view srcFragment,
-		       view srcCompute);
+		Shader(ShaderStitch srcVertex,
+		       ShaderStitch srcTessControl,
+		       ShaderStitch srcTessEval,
+		       ShaderStitch srcGeometry,
+		       ShaderStitch srcFragment,
+		       ShaderStitch srcCompute);
 
 		~Shader();
 

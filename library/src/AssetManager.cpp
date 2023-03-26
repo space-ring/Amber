@@ -174,36 +174,72 @@ namespace Amber {
 	                                   const list<token>& fragment,
 	                                   const list<token>& compute) {
 
-		string srcVertex;
-		string srcTessControl;
-		string srcTessEval;
-		string srcGeometry;
-		string srcFragment;
-		string srcCompute;
-
 		//todo currently every rawshader has to be recompiled
+		int i = 0;
+		const char** vsource = new const char* [vertex.size()];
+		int* vlength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vsource[i++] = rawShaders[t].c_str();
+		}
+		ShaderStitch vStitch{static_cast<int>(vertex.size()), vsource, vlength};
 
-		for (token t: vertex)
-			srcVertex += getRawShader(t);
 
-		for (token t: tessControl)
-			srcTessControl += getRawShader(t);
+		i = 0;
+		const char** tcsource = new const char* [vertex.size()];
+		int* tclength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vsource[i++] = rawShaders[t].c_str();
+		}
+		ShaderStitch tcStitch{static_cast<int>(vertex.size()), vsource, tclength};
 
-		for (token t: tessEval)
-			srcTessEval += getRawShader(t);
+		i = 0;
+		const char** tesource = new const char* [vertex.size()];
+		int* telength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vsource[i++] = rawShaders[t].c_str();
+		}
+		ShaderStitch teStitch{static_cast<int>(vertex.size()), vsource, telength};
 
-		for (token t: geometry)
-			srcGeometry += getRawShader(t);
+		i = 0;
+		const char** gsource = new const char* [vertex.size()];
+		int* glength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vsource[i++] = rawShaders[t].c_str();
+		}
+		ShaderStitch gStitch{static_cast<int>(vertex.size()), gsource, glength};
 
-		for (token t: fragment)
-			srcFragment += getRawShader(t);
+		i = 0;
+		const char** fsource = new const char* [vertex.size()];
+		int* flength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vsource[i++] = rawShaders[t].c_str();
+		}
+		ShaderStitch fStitch{static_cast<int>(vertex.size()), fsource, flength};
 
-		for (token t: compute)
-			srcCompute += getRawShader(t);
+		i = 0;
+		const char** csource = new const char* [vertex.size()];
+		int* clength = new int[vertex.size()];
+		for (auto t: vertex) {
+			vsource[i++] = rawShaders[t].c_str();
+		}
+		ShaderStitch cStitch{static_cast<int>(vertex.size()), csource, clength};
 
 
 		shaders.emplace(std::piecewise_construct, std::make_tuple(id),
-		                std::make_tuple(srcVertex, srcTessControl, srcTessEval, srcGeometry, srcFragment, srcCompute));
+		                std::make_tuple(vStitch, tcStitch, teStitch, gStitch, fStitch, cStitch));
+
+		delete[] vsource;
+		delete[] tcsource;
+		delete[] tesource;
+		delete[] gsource;
+		delete[] fsource;
+		delete[] csource;
+		delete[] vlength;
+		delete[] tclength;
+		delete[] telength;
+		delete[] glength;
+		delete[] flength;
+		delete[] clength;
 
 		return shaders.at(id);
 	}
