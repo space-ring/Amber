@@ -35,7 +35,7 @@ namespace Amber {
 
 			using string = std::string;
 
-			GLuint program, shader;
+			GLuint program, shader = 0;
 
 			ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source);
 

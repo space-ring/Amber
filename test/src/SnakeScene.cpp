@@ -46,10 +46,8 @@ SnakeScene::~SnakeScene() {
 }
 
 void SnakeScene::build() {
-	auto& assets = stage->engine.assets;
-	assets.buildAll();
 	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
-	models.addMesh(stage->engine.assets.getMesh("plane"), app.R.height * app.R.height+2);
+	models.addMesh(&stage->engine.assets.getMesh(0), app.R.height * app.R.height+2);
 }
 
 void SnakeScene::show() {
@@ -67,7 +65,7 @@ void SnakeScene::update() {
 	SnakeGame::R& game = app.R;
 	segments.clear();
 
-	Amber::Mesh* plane = stage->engine.assets.getMesh("plane")->build();
+	Amber::Mesh* plane = &stage->engine.assets.getMesh(0);
 
 	for (auto& p: game.snake.segments) {
 		auto& segment = segments.emplace_back();
@@ -93,15 +91,15 @@ void SnakeScene::pick(int x, int y) {
 void SnakeScene::render() {
 	auto& assets = stage->engine.assets;
 
-	Amber::Mesh* plane = assets.getMesh("plane")->build();
-	Amber::Shader* shader = assets.getShader("basic")->build()->start();
+	Amber::Mesh* plane = &assets.getMesh(0);
+	Amber::Shader* shader = &assets.getShader(0).start();
 
 	glBindVertexArray(plane->getVao());
 	glUniformMatrix4fv(14, 1, false, glm::value_ptr(camera.getView()));
 	glUniformMatrix4fv(18, 1, false, glm::value_ptr(camera.getOrthogonal()));
 	models.link(plane);
 	glDrawElementsInstanced(GL_TRIANGLES,
-							plane->getElementCount(),
+							plane->elementCount,
 							GL_UNSIGNED_INT, 0,
 							models.getRenderCount(plane));
 	glBindVertexArray(0);

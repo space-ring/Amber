@@ -8,7 +8,7 @@
 #include "Stage.h"
 
 void GroundLayer::build() {
-	Amber::Mesh* mesh = scene->stage->engine.assets.getMesh("plane");
+	auto mesh = &scene->stage->engine.assets.getMesh(0);
 	m1.setMesh(mesh);
 	m2.setMesh(mesh);
 	m3.setMesh(mesh);
@@ -110,9 +110,9 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	//todo render to a framebuffer? don't really need to, not swapping buffers here
 	//todo example of standardised picking (model manager):
 	Amber::Engine& engine = scene->stage->engine;
-	Amber::Mesh* plane = engine.assets.getMesh("plane");
+	auto plane = &engine.assets.getMesh(0);
 
-	Amber::Shader* shader = engine.assets.getShader("pick");
+	auto shader = &engine.assets.getShader(0);
 	shader->start();
 
 	glBindVertexArray(plane->getVao());
@@ -124,7 +124,7 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 	glUniform1i(19, offset);
 
 	//link attributes to vbo
-	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
+	glDrawElementsInstanced(GL_TRIANGLES, plane->elementCount, GL_UNSIGNED_INT, nullptr,
 	                        models.getPickCount(plane));
 
 	glBindVertexArray(0);
@@ -150,9 +150,9 @@ Amber::Model* GroundLayer::pick(int x, int y) {
 
 void GroundLayer::render() {
 	Amber::Engine& engine = scene->stage->engine;;
-	Amber::Mesh* plane = engine.assets.getMesh("plane");
+	Amber::Mesh* plane = &engine.assets.getMesh(0);
 
-	Amber::Shader* shader = engine.assets.getShader("basic")->start();
+	Amber::Shader* shader = &engine.assets.getShader(0).start();
 
 	glBindVertexArray(plane->getVao());
 	glCheckError();
@@ -160,7 +160,7 @@ void GroundLayer::render() {
 	glUniformMatrix4fv(18, 1, false, glm::value_ptr(static_cast<DemoScene*>(scene)->camera.getPerspective()));
 
 	models.link(plane);
-	glDrawElementsInstanced(GL_TRIANGLES, plane->getElementCount(), GL_UNSIGNED_INT, nullptr,
+	glDrawElementsInstanced(GL_TRIANGLES, plane->elementCount, GL_UNSIGNED_INT, nullptr,
 	                        models.getRenderCount(plane));
 	glCheckError();
 	glBindVertexArray(0);

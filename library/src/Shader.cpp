@@ -11,6 +11,8 @@ namespace Amber {
 	Shader::ShaderAttachment::ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source)
 			: program(program) {
 
+		if (!source.count) return;
+
 		shader = glCreateShader(type);
 		glShaderSource(shader, source.count, source.string, source.lengths);
 		glCompileShader(shader);
@@ -38,7 +40,7 @@ namespace Amber {
 			return;
 		}
 
-		if (program) glAttachShader(type, program);
+		if (program) glAttachShader(program, shader);
 	}
 
 	Shader::ShaderAttachment::~ShaderAttachment() {
@@ -58,12 +60,12 @@ namespace Amber {
 		//todo move compilation, linking, attaching and detaching into functions?
 
 		{
-			if (srcVertex.count) ShaderAttachment vertex(VERTEX, program, srcVertex);
-			if (srcTessControl.count) ShaderAttachment tessControl(TESS_CONTROL, program, srcTessControl);
-			if (srcTessEval.count) ShaderAttachment tessEval(TESS_EVALUATION, program, srcTessEval);
-			if (srcGeometry.count) ShaderAttachment geometry(GEOMETRY, program, srcGeometry);
-			if (srcFragment.count) ShaderAttachment fragment(FRAGMENT, program, srcFragment);
-			if (srcCompute.count) ShaderAttachment compute(COMPUTE, program, srcCompute);
+			ShaderAttachment vertex(VERTEX, program, srcVertex);
+			ShaderAttachment tessControl(TESS_CONTROL, program, srcTessControl);
+			ShaderAttachment tessEval(TESS_EVALUATION, program, srcTessEval);
+			ShaderAttachment geometry(GEOMETRY, program, srcGeometry);
+			ShaderAttachment fragment(FRAGMENT, program, srcFragment);
+			ShaderAttachment compute(COMPUTE, program, srcCompute);
 
 			// note pre-linkup here
 			glLinkProgram(program);

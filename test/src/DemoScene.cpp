@@ -47,7 +47,6 @@ DemoScene::~DemoScene() {
 
 void DemoScene::build() {
 	if (built) return;
-	stage->engine.assets.buildAll();
 	Amber::Scene::build();
 }
 

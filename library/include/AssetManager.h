@@ -46,7 +46,7 @@ namespace Amber {
 		// SHADERS //
 		void addSourcePath(token id, view path);
 
-		view loadSource(token id);
+		void loadSource(token id);
 
 		void unloadSource(token id);
 
@@ -54,7 +54,7 @@ namespace Amber {
 
 		void addShaderFormula(token id, const ShaderFormula& formula);
 
-		Shader& loadShader(token id);
+		void loadShader(token id);
 
 		void unloadShader(token id);
 
@@ -63,11 +63,15 @@ namespace Amber {
 		// MESHES //
 		void addMeshPath(token id, view path);
 
-		RawMesh& loadRawMesh(token id);
+		void loadRawMesh(token id);
 
 		void unloadRawMesh(token id);
 
 		RawMesh& getRawMesh(token id);
+
+		void loadMesh(token id);
+
+		void unloadMesh(token id);
 
 		Mesh& getMesh(token id);
 

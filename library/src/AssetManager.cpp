@@ -126,11 +126,10 @@ namespace Amber {
 		sourcePaths.emplace(id, path);
 	}
 
-	view AssetManager::loadSource(token id) {
+	void AssetManager::loadSource(token id) {
 		if (!sourcePaths.contains(id))
 			throw std::runtime_error("Cannot load unknown shader source " + std::to_string(id));
 		sources.emplace(id, readFile(sourcePaths.at(id)));
-		return sources.at(id);
 	}
 
 	void AssetManager::unloadSource(token id) {
@@ -138,27 +137,27 @@ namespace Amber {
 	}
 
 	view AssetManager::getSource(token id) {
-		if (sources.contains(id)) return sources.at(id);
-		return loadSource(id);
+		if (!sources.contains(id)) loadSource(id);
+		return sources.at(id);
 	}
 
 	void AssetManager::addShaderFormula(AssetManager::token id, const AssetManager::ShaderFormula& formula) {
 		shaderFormulas.emplace(id, formula);
 	}
 
-	Shader& AssetManager::loadShader(token id) {
+	void AssetManager::loadShader(token id) {
 
 		if (!shaderFormulas.contains(id))
-			throw std::runtime_error("Cannot create unknown shader " + std::to_string(id));
+			throw std::runtime_error("No formula for shader " + std::to_string(id));
 
-		auto vertex = shaderFormulas.at(id).V;
-		auto tessControl = shaderFormulas.at(id).TC;
-		auto tessEval = shaderFormulas.at(id).TE;
-		auto geometry = shaderFormulas.at(id).G;
-		auto fragment = shaderFormulas.at(id).F;
-		auto compute = shaderFormulas.at(id).C;
+		auto& formula = shaderFormulas.at(id);
+		auto& vertex = formula.V;
+		auto& tessControl = formula.TC;
+		auto& tessEval = formula.TE;
+		auto& geometry = formula.G;
+		auto& fragment = formula.F;
+		auto& compute = formula.C;
 
-		//todo currently every rawshader has to be recompiled
 		int i = 0;
 		const char** vsource = new const char* [vertex.size()];
 		int* vlength = new int[vertex.size()];
@@ -167,7 +166,6 @@ namespace Amber {
 			vsource[i++] = getSource(t).data();
 		}
 		ShaderStitch vStitch{static_cast<int>(vertex.size()), vsource, vlength};
-
 
 		i = 0;
 		const char** tcsource = new const char* [tessControl.size()];
@@ -230,24 +228,21 @@ namespace Amber {
 		delete[] glength;
 		delete[] flength;
 		delete[] clength;
-
-		return shaders.at(id);
 	}
 
 	Shader& AssetManager::getShader(token id) {
-		if (shaders.contains(id)) return shaders.at(id);
-		return loadShader(id);
+		if (!shaders.contains(id)) loadShader(id);
+		return shaders.at(id);
 	}
 
 	void AssetManager::addMeshPath(token id, view path) {
 		meshPaths.emplace(id, path);
 	}
 
-	RawMesh& AssetManager::loadRawMesh(token id) {
+	void AssetManager::loadRawMesh(token id) {
 		if (!meshPaths.contains(id))
 			throw std::runtime_error("Cannot load unknown mesh data " + std::to_string(id));
 		rawMeshes.emplace(id, parseMeshOBJ(readFile(meshPaths.at(id))));
-		return rawMeshes.at(id);
 	}
 
 	void AssetManager::unloadRawMesh(token id) {
@@ -255,13 +250,18 @@ namespace Amber {
 	}
 
 	RawMesh& AssetManager::getRawMesh(token id) {
-		if (rawMeshes.contains(id)) return rawMeshes.at(id);
-		return loadRawMesh(id);
+		if (!rawMeshes.contains(id)) loadRawMesh(id);
+		return rawMeshes.at(id);
+	}
+
+	// from RawMesh create GL Mesh
+	void AssetManager::loadMesh(AssetManager::token id) {
+		meshes.emplace(id, getRawMesh(id));
 	}
 
 	Mesh& AssetManager::getMesh(token id) {
-		if (meshes.contains(id)) return meshes.at(id);
-		return meshes.at(0);
+		if (!meshes.contains(id)) loadMesh(id);
+		return meshes.at(id);
 	}
 
 }

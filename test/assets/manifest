@@ -1,20 +1,7 @@
-# this is a comment
-# asset notation: type name filepath1
-#
-# some assets require more than one file so multiple filepaths
-# can be specified following the first path, separated by a space.
-
-#mesh box assets/meshes/box.obj
-#mesh plane assets/meshes/plane.obj
-#mesh triangle assets/meshes/triangle.obj
-#
-#shader basic assets/shaders/basic.vert assets/shaders/basic.frag
-#shader pick assets/shaders/pick.vert assets/shaders/pick.frag
-#
-##format of shader manifests:
-## shader program name vertex fragment geometry tess control tess eval compute
-##shader wire assets/shaders/wire.vert assets/shaders/wire.frag
-
-shader 1 assets/shaders/basic.vert
-shader 2 assets/shader/basic.frag
-program 1 1 0 0 0 0 2
+shader
+1 assets/shaders/basic.vert
+2 assets/shaders/basic.frag
+program
+0 V 1 F 2
+mesh
+0 assets/meshes/plane.obj
