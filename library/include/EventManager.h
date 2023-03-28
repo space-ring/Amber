@@ -34,14 +34,13 @@ namespace Amber {
 
 		template<class T>
 		void onEvent(T& event) {
+			if (!handlers.contains(typeid(T))) return;
 			for (auto& handler: getHandlers<T>()) {
 				handler(event);
 			}
 		}
 
 		void handleType(std::type_index type, ErasedContainer* erased_vector_events);
-
-		void clear(std::type_index type);
 
 	};
 

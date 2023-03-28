@@ -22,19 +22,18 @@ namespace Amber {
 	void Engine::init() {
 		stage.init();
 
-		handlers.addHandler(
-				window_events::CloseHandler([&](window_events::CloseEvent&) {
-					stage.hide();
-					running = false;
-				})
+		handlers.addHandler(window_events::CloseHandler([&](window_events::CloseEvent&) {
+			                    stage.hide();
+			                    running = false;
+		                    })
 		);
-		handlers.addHandler(
-				window_events::FocusHandler([&](window_events::FocusEvent& e) { stage.focused = e.focused; })
+		handlers.addHandler(window_events::FocusHandler([&](window_events::FocusEvent& e) {
+			                    stage.focused = e.focused;
+		                    })
 		);
-		handlers.addHandler(
-				window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
-					glViewport(0, 0, e.width, e.height);
-				})
+		handlers.addHandler(window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
+			                    glViewport(0, 0, e.width, e.height);
+		                    })
 		);
 
 		stage.show();

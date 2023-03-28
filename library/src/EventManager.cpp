@@ -13,11 +13,9 @@ namespace Amber {
 	}
 
 	void EventManager::handleType(std::type_index type, ErasedContainer* erased_vector_events) {
-		if (handlers.contains(type))
+		auto at = handlers.find(type);
+		if (at != handlers.end()) {
 			handlers.at(type)->handle(erased_vector_events);
-	}
-
-	void EventManager::clear(std::type_index type) {
-		if (handlers.contains(type)) handlers.at(type)->clear();
+		}
 	}
 }

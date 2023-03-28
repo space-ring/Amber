@@ -4,6 +4,9 @@
 
 #include "IMessage.h"
 
-void Amber::IMessage::clearEvents(std::type_index type) {
-	if (events.contains(type)) events.at(type)->clear();
+void Amber::IMessage::clearEvents() {
+	for (auto& [type, list]: events) {
+		delete list;
+	}
+	events.clear();
 }

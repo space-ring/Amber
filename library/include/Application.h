@@ -37,13 +37,12 @@ namespace Amber {
 			game.start();
 			while (game.running) {
 				auto frame_start = now();
-
 				{
 					std::lock_guard lock(mutex);
 					for (auto& [type, e]: events) {
 						game.handlers.handleType(type, e);
-						clearEvents(type);
 					}
+					clearEvents();
 				}
 				game.update();
 				buffer.bufferUpdate();

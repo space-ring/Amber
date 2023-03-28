@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <typeindex>
+#include "events.h"
 
 namespace Amber {
 	struct ErasedContainer {

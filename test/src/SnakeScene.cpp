@@ -9,10 +9,6 @@
 
 SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 		: camera(glm::vec3(0), glm::vec3(0), 70, width, height, 0, 100, 0, 100) {
-	handlers.addHandler(Amber::window_events::FramebufferSizeHandler(
-			[&](Amber::window_events::FramebufferSizeEvent& e) {
-				camera.setAspectRatio((float) e.width, (float) e.height);
-			}));
 
 	handlers.addHandler(Amber::window_events::KeyHandler(
 			[&](Amber::window_events::KeyEvent& e) {
@@ -34,6 +30,10 @@ SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 						case GLFW_KEY_D:
 							app.putEvent(SnakeEvents::DirEvent(RIGHT));
 							break;
+
+						case GLFW_KEY_G:
+							app.putEvent(SnakeEvents::CheatGrow{});
+							break;
 					}
 				}
 			}
@@ -47,7 +47,7 @@ SnakeScene::~SnakeScene() {
 
 void SnakeScene::build() {
 	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
-	models.addMesh(&stage->engine.assets.getMesh(0), app.R.height * app.R.height+2);
+	models.addMesh(&stage->engine.assets.getMesh(0), app.R.height * app.R.height + 2);
 }
 
 void SnakeScene::show() {
@@ -99,9 +99,9 @@ void SnakeScene::render() {
 	glUniformMatrix4fv(18, 1, false, glm::value_ptr(camera.getOrthogonal()));
 	models.link(plane);
 	glDrawElementsInstanced(GL_TRIANGLES,
-							plane->elementCount,
-							GL_UNSIGNED_INT, 0,
-							models.getRenderCount(plane));
+	                        plane->elementCount,
+	                        GL_UNSIGNED_INT, 0,
+	                        models.getRenderCount(plane));
 	glBindVertexArray(0);
 	shader->stop();
 

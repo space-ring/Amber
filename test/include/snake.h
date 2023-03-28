@@ -53,6 +53,13 @@ namespace SnakeEvents {
 
 		DirEvent(const direction direction) : dir(direction) {}
 	};
+
+	struct CheatGrow {
+		bool handled = false;
+		const direction d = UP;
+
+		explicit CheatGrow() {}
+	};
 }
 
 class Snake {
@@ -165,6 +172,19 @@ public:
 					snake.turn(event.dir);
 				})
 		);
+
+//		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
+//				[](SnakeEvents::CheatGrow& e) {
+//					std::cout << "direction" << std::endl;
+//				}
+//		));
+
+		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
+				[](auto& x) {
+					std::cout << "key " << x.handled << std::endl;
+				}
+		));
+
 	}
 
 	void start() {
