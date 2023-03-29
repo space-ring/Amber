@@ -99,7 +99,7 @@ public:
 				next.y -= 1;
 				break;
 		}
-
+		std::cout<<"moving"<<std::endl;
 		for (auto it = --segments.end(); it != segments.begin(); --it) {
 			*it = *std::prev(it);
 		}
@@ -112,7 +112,7 @@ public:
 	}
 
 	void grow(point tail) {
-		segments.push_back(tail);
+//		segments.push_back(tail);
 	}
 
 	point head() {
@@ -202,15 +202,22 @@ public:
 		auto tip = head.x + head.y * width;
 		auto toe = old_tail.x + old_tail.y * width;
 		if (0 <= head.x && head.x < width && 0 <= head.y && head.y < height) {
+			std::cout << "1" << std::endl;
 			if (board[tip] == SNAKE)
 				return false;
+			std::cout << "2" << std::endl;
+
 			if (board[tip] == FRUIT) {
 				snake.grow(old_tail);
 				genFruit();
 			} else board[toe] = EMPTY;
+			std::cout << "3" << std::endl;
+
 			board[tip] = SNAKE;
-			return true;
-		} else return false;
+			std::cout << "4" << std::endl;
+
+		}
+		return true;
 	}
 
 	void update() {

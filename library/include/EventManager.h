@@ -12,7 +12,7 @@
 #include "type_erased.h"
 
 namespace Amber {
-	class EventManager {
+	struct EventManager {
 		using handlerMap = std::map<std::type_index, IHandlerContainer*>;
 		handlerMap handlers;
 

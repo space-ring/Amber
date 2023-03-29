@@ -34,6 +34,8 @@ namespace Amber {
 			unsigned long long int frames = 0;
 			auto start = now();
 
+			auto& handlers = static_cast<EventManager&>(game.handlers);
+
 			game.start();
 			while (game.running) {
 				auto frame_start = now();
