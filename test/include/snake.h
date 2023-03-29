@@ -20,7 +20,7 @@ struct segment : Amber::Object {
 };
 
 enum direction {
-	LEFT, RIGHT, UP, DOWN
+	LEFT, UP, RIGHT, DOWN
 };
 
 static direction opposite(direction d) {
@@ -99,7 +99,7 @@ public:
 				next.y -= 1;
 				break;
 		}
-		std::cout<<"moving"<<std::endl;
+		std::cout << "moving" << std::endl;
 		for (auto it = --segments.end(); it != segments.begin(); --it) {
 			*it = *std::prev(it);
 		}
@@ -112,7 +112,7 @@ public:
 	}
 
 	void grow(point tail) {
-//		segments.push_back(tail);
+		segments.push_back(tail);
 	}
 
 	point head() {
@@ -167,11 +167,11 @@ public:
 
 		genFruit();
 
-		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
-				[&](SnakeEvents::DirEvent& event) {
-					snake.turn(event.dir);
-				})
-		);
+//		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
+//				[&](SnakeEvents::DirEvent& event) {
+//					snake.turn(event.dir);
+//				})
+//		);
 
 //		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
 //				[](SnakeEvents::CheatGrow& e) {
@@ -179,11 +179,25 @@ public:
 //				}
 //		));
 
-		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
-				[](auto& x) {
-					std::cout << "key " << x.handled << std::endl;
+//		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
+//				[](auto& x) {
+//					std::cout << "key " << x.handled << std::endl;
+//				}
+//		));
+
+		handlers.addHandler(0, Amber::Handler<int>(
+				[&](auto& x) {
+					static int i = 0;
+					std::cout << "Event 0" << std::endl;
+					snake.turn(direction(i++ % 4));
 				}
 		));
+
+		handlers.addHandler(1, Amber::Handler<int>(
+				[](auto& x) {
+					std::cout << "Event 1" << std::endl;
+				})
+		);
 
 	}
 
