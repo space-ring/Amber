@@ -71,9 +71,9 @@ namespace Amber {
 
 		template<class T>
 		void onEvent(T& event) {
-//			layers. onEvent(event);
-//			if (event.handled) return;
-			handlers. onEvent(event);
+			layers.onEvent(event);
+			if (event.handled) return;
+			handlers.onEvent(event);
 		}
 
 		LayerStack& getLayers();

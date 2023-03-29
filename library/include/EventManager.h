@@ -18,11 +18,7 @@ namespace Amber {
 
 	public:
 
-		~EventManager() {
-			for (std::pair s: handlers) {
-				delete s.second;
-			}
-		}
+		~EventManager();
 
 		template<class T>
 		std::vector<Handler<T>>& getHandlers() {
@@ -44,12 +40,8 @@ namespace Amber {
 			}
 		}
 
-		void handleType(std::type_index type, EventContainer* erased_vector_events) {
-			auto at = handlers.find(type);
-			if (at != handlers.end()) {
-				handlers.at(type)->handle(erased_vector_events);
-			}
-		}
+		void handleType(std::type_index type, EventContainer* erased_vector_events);
+
 	};
 
 }

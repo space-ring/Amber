@@ -1,6 +1,6 @@
 # Meshes
 
-A mesh is a wrapper for an OpenGL VAO. It contains an object's vertex events: position, texture and normal. The VAO has
+A mesh is a wrapper for an OpenGL VAO. It contains an object's vertex data: position, texture and normal. The VAO has
 attributes at locators:
 
 | Location | Attribute                           |
@@ -12,4 +12,4 @@ attributes at locators:
 | 14 - 17  | uniform mat4f camera transforms     |
 | 18 - 21  | uniform mat4f projection transforms |
 
-The VAO uses a VBO for interleaved vertex events and an EBO.
+The VAO uses a VBO for interleaved vertex data and an EBO.

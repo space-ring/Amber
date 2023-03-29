@@ -62,7 +62,17 @@ add_library(Engine ${depsources}
         src/Shader.cpp
         src/Stage.cpp
         src/Texture.cpp
-        src/Application.cpp include/NoDefaultSingleton.h include/IApplication.h src/IApplication.cpp include/IMessage.h include/IClonable.h include/Object.h include/type_erased.h src/IMessage.cpp include/ITree.h)
+        src/Application.cpp
+        include/NoDefaultSingleton.h
+        include/IApplication.h
+        src/IApplication.cpp
+        include/EventQueue.h
+        include/IClonable.h
+        include/Object.h
+        include/type_erased.h
+        src/EventQueue.cpp
+        include/ITree.h
+        )
 
 add_subdirectory(deps/glfw-3.3.6)
 

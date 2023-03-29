@@ -2,8 +2,8 @@
 // Created by croissant on 09/09/2022.
 //
 
-#ifndef ENGINETEST_IMESSAGE_H
-#define ENGINETEST_IMESSAGE_H
+#ifndef ENGINETEST_EVENTQUEUE_H
+#define ENGINETEST_EVENTQUEUE_H
 
 #include <mutex>
 #include <deque>
@@ -14,9 +14,15 @@
 #include <set>
 
 namespace Amber {
-	struct IMessage {
+	struct EventQueue {
 		using eventMap = std::map<std::type_index, EventContainer*>;
 		eventMap events;
+		virtual ~EventQueue() {
+			for (auto& s: events) {
+				delete s.second;
+			}
+		}
+
 		std::mutex mutex;
 
 		template<class T>
@@ -27,25 +33,14 @@ namespace Amber {
 			return static_cast<EventVector<T>*>(events.at(typeid(T)))->events;
 		}
 
-		virtual ~IMessage() {
-			for (auto& s: events) {
-				delete s.second;
-			}
-		}
-
 		template<class T>
 		void putEvent(const T& event) {
 			std::lock_guard lock(mutex);
 			getEvents<T>().push_back(event);
 		}
 
-		void clearEvents() { //assume mutex
-			for (auto& [type, list]: events) {
-				delete list;
-			}
-			events.clear();
-		}
+		void clearEvents();
 	};
 }
 
-#endif //ENGINETEST_IMESSAGE_H
+#endif //ENGINETEST_EVENTQUEUE_H

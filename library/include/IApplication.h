@@ -9,11 +9,11 @@
 #include <deque>
 #include <mutex>
 #include "events.h"
-#include "IMessage.h"
+#include "EventQueue.h"
 #include <chrono>
 
 namespace Amber {
-	class IApplication : public IMessage {
+	class IApplication : public EventQueue {
 
 	protected:
 		std::jthread gameThread;
@@ -21,6 +21,9 @@ namespace Amber {
 		virtual void gameLoop(std::chrono::milliseconds rate) = 0;
 
 		virtual void renderLoop() = 0;
+
+	public:
+		virtual ~IApplication() = default;
 	};
 }
 

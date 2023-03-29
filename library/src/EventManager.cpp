@@ -5,4 +5,17 @@
 #include "EventManager.h"
 
 namespace Amber {
+
+	EventManager::~EventManager() {
+		for (std::pair s: handlers) {
+			delete s.second;
+		}
+	}
+
+	void EventManager::handleType(std::type_index type, EventContainer* erased_vector_events) {
+		auto at = handlers.find(type);
+		if (at != handlers.end()) {
+			handlers.at(type)->handle(erased_vector_events);
+		}
+	}
 }

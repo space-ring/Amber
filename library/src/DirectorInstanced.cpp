@@ -83,7 +83,7 @@ namespace Amber {
 			Managed& m = managed.at(mesh);
 			m.capacity = limit;
 			//todo might be quicker: copy into new vbo, reallocate storage and map, copy using mapped buffers
-			glm::mat4 copy[limit];
+			glm::mat4* copy = new glm::mat4[limit];
 			glBindBuffer(GL_ARRAY_BUFFER, m.memory);
 			auto* from = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, m.size * sizeof(glm::mat4),
 			                                                      GL_MAP_READ_BIT));
@@ -91,8 +91,10 @@ namespace Amber {
 				copy[i] = from[i];
 			}
 			glUnmapBuffer(GL_ARRAY_BUFFER);
-			glBufferData(GL_ARRAY_BUFFER, limit * sizeof(glm::mat4), &copy, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, limit * sizeof(glm::mat4), copy, GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			delete[] copy;
 
 		} else {
 			//request new block
@@ -185,9 +187,9 @@ namespace Amber {
 		if (!managed.contains(mesh)) return;
 		Managed& m = managed.at(mesh);
 
-		model._directorRemoveCallback = std::function<void(Model&)>();
-		model._directorAddCallback = std::function<void(Model&)>();
-		model.transform._modelChainCallback = std::function<void(Transform&)>();
+		model._directorRemoveCallback = std::function < void(Model & ) > ();
+		model._directorAddCallback = std::function < void(Model & ) > ();
+		model.transform._modelChainCallback = std::function < void(Transform & ) > ();
 		untrack(mesh, model.transform);
 
 		auto* list = indices.at(mesh);

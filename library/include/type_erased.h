@@ -29,7 +29,7 @@ namespace Amber {
 		std::vector<Handler<T>> handlers;
 
 		void handle(EventContainer* erased_events) override {
-			auto& events = dynamic_cast<EventVector<T>*>(erased_events)->events;
+			auto& events = dynamic_cast<EventVector<T>&>(*erased_events).events;
 			for (auto& event: events) {
 				for (auto& handler: handlers) {
 					handler(event);

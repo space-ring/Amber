@@ -26,13 +26,13 @@ public:
 	}
 };
 
-template<typename T>
-void shuffle(std::list<T>& lst) // shuffle contents of a list
-{
-	std::vector<T> temp(lst.begin(), lst.end());
-	std::random_shuffle(temp.begin(), temp.end());
-
-	std::copy(temp.begin(), temp.end(), lst.begin());
-}
+//template<typename T>
+//void shuffle(std::list<T>& lst) // shuffle contents of a list
+//{
+//	std::vector<T> temp(lst.begin(), lst.end());
+//	std::random_shuffle(temp.begin(), temp.end());
+//
+//	std::copy(temp.begin(), temp.end(), lst.begin());
+//}
 
 #endif //ENGINETEST_TIMER_H

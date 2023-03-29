@@ -20,7 +20,7 @@ struct segment : Amber::Object {
 };
 
 enum direction {
-	LEFT, UP, RIGHT, DOWN
+	LEFT, RIGHT, UP, DOWN
 };
 
 static direction opposite(direction d) {
@@ -56,9 +56,6 @@ namespace SnakeEvents {
 
 	struct CheatGrow {
 		bool handled = false;
-		const direction d = UP;
-
-		explicit CheatGrow() {}
 	};
 }
 
@@ -99,7 +96,7 @@ public:
 				next.y -= 1;
 				break;
 		}
-		std::cout << "moving" << std::endl;
+
 		for (auto it = --segments.end(); it != segments.begin(); --it) {
 			*it = *std::prev(it);
 		}
@@ -167,37 +164,19 @@ public:
 
 		genFruit();
 
-//		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
-//				[&](SnakeEvents::DirEvent& event) {
-//					snake.turn(event.dir);
-//				})
-//		);
-
-//		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
-//				[](SnakeEvents::CheatGrow& e) {
-//					std::cout << "direction" << std::endl;
-//				}
-//		));
-
-//		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
-//				[](auto& x) {
-//					std::cout << "key " << x.handled << std::endl;
-//				}
-//		));
-
-		handlers.addHandler(0, Amber::Handler<int>(
-				[&](auto& x) {
-					static int i = 0;
-					std::cout << "Event 0" << std::endl;
-					snake.turn(direction(i++ % 4));
-				}
-		));
-
-		handlers.addHandler(1, Amber::Handler<int>(
-				[](auto& x) {
-					std::cout << "Event 1" << std::endl;
+		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
+				[&](SnakeEvents::DirEvent& event) {
+					snake.turn(event.dir);
 				})
 		);
+
+		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
+				[&](auto& e) {
+					auto p = snake.tail();
+					p.x += 1;
+					snake.grow(p);
+				}
+		));
 
 	}
 
@@ -216,22 +195,15 @@ public:
 		auto tip = head.x + head.y * width;
 		auto toe = old_tail.x + old_tail.y * width;
 		if (0 <= head.x && head.x < width && 0 <= head.y && head.y < height) {
-			std::cout << "1" << std::endl;
 			if (board[tip] == SNAKE)
 				return false;
-			std::cout << "2" << std::endl;
-
 			if (board[tip] == FRUIT) {
 				snake.grow(old_tail);
 				genFruit();
 			} else board[toe] = EMPTY;
-			std::cout << "3" << std::endl;
-
 			board[tip] = SNAKE;
-			std::cout << "4" << std::endl;
-
-		}
-		return true;
+			return true;
+		} else return false;
 	}
 
 	void update() {

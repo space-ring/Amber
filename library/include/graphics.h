@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <iostream>
+#include <windows.h>
 
 GLenum glCheckError_(const char* file, int line);
 

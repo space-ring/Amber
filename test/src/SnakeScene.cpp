@@ -6,45 +6,36 @@
 #include "StateBuffer.h"
 #include "snake.h"
 #include "Application.h"
+#include <windows.h>
 
 SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 		: camera(glm::vec3(0), glm::vec3(0), 70, width, height, 0, 100, 0, 100) {
 
-	handlers.addHandler(1, Amber::Handler<int>(
-			[&](auto& e) {
+	handlers.addHandler(Amber::window_events::KeyHandler(
+			[&](Amber::window_events::KeyEvent& e) {
 				auto& app = stage->engine.application;
-				app.putEvent(1);
-			}
-	));
+				if (e.action == 1) {
+					switch (e.key) {
+						case GLFW_KEY_S:
+							app.putEvent(SnakeEvents::DirEvent(DOWN));
+							break;
 
-	handlers.addHandler(0, Amber::Handler<int>(
-			[&](auto& e) {
-				auto& app = stage->engine.application;
-				app.putEvent(0);
-//				if (e.action == 1) {
-//					auto& app = stage->engine.application;
-//					switch (e.key) {
-//						case GLFW_KEY_S:
-//							app.putEvent(0);
-//							break;
-//
-//						case GLFW_KEY_W:
-//							app.putEvent(0);
-//							break;
-//
-//						case GLFW_KEY_A:
-//							app.putEvent(0);
-//							break;
-//
-//						case GLFW_KEY_D:
-//							app.putEvent(0);
-//							break;
-//
-//						case GLFW_KEY_G:
-//							app.putEvent(1);
-//							break;
-//					}
-//				}
+						case GLFW_KEY_W:
+							app.putEvent(SnakeEvents::DirEvent(UP));
+							break;
+
+						case GLFW_KEY_A:
+							app.putEvent(SnakeEvents::DirEvent(LEFT));
+							break;
+
+						case GLFW_KEY_D:
+							app.putEvent(SnakeEvents::DirEvent(RIGHT));
+							break;
+					}
+				}
+				if (e.key == GLFW_KEY_G && e.action > 0){
+					app.putEvent(SnakeEvents::CheatGrow{});
+				}
 			}
 	));
 
