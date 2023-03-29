@@ -14,29 +14,18 @@
 #include <set>
 
 namespace Amber {
-	class IMessage {
-//		using eventMap = std::map<std::type_index, ErasedContainer*>;
-		using eventMap = std::map<int, std::vector<int>*>;
-
-	protected:
+	struct IMessage {
+		using eventMap = std::map<std::type_index, EventContainer*>;
 		eventMap events;
 		std::mutex mutex;
 
-		std::vector<int>& getEvent(int i) {
-			if (!events.contains(i))
-				events.emplace(i, new std::vector<int>);
-			return *events.at(i);
+		template<class T>
+		std::vector<T>& getEvents() {
+			if (!events.contains(typeid(T))) {
+				events.emplace(typeid(T), new EventVector<T>);
+			}
+			return static_cast<EventVector<T>*>(events.at(typeid(T)))->events;
 		}
-//		template<class T>
-//		std::vector<T>& getEvents() {
-//			if (!events.contains(typeid(T))) {
-//				events.emplace(typeid(T), new Vector<T>);
-//				std::cout << "created " << typeid(T).name() << " queue" << std::endl;
-//			}
-//			return static_cast<Vector<T>*>(events.at(typeid(T)))->data;
-//		}
-
-	public:
 
 		virtual ~IMessage() {
 			for (auto& s: events) {
@@ -44,19 +33,18 @@ namespace Amber {
 			}
 		}
 
-		void putEvent(int i) {
+		template<class T>
+		void putEvent(const T& event) {
 			std::lock_guard lock(mutex);
-			getEvent(i).push_back(i);
-			std::cout << "put " << i << std::endl;
+			getEvents<T>().push_back(event);
 		}
 
-//		template<class T>
-//		void putEvent(const T& event) {
-//			std::lock_guard lock(mutex);
-//			getEvents<T>().push_back(event);
-//		}
-
-		void clearEvents();
+		void clearEvents() { //assume mutex
+			for (auto& [type, list]: events) {
+				delete list;
+			}
+			events.clear();
+		}
 	};
 }
 
