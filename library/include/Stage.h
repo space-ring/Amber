@@ -34,7 +34,7 @@ namespace Amber {
 
 		bool focused = false;
 
-		Stage(Engine& engine, const string& name, int x, int y, int width, int height);
+		Stage(Engine& engine, std::string_view name, int x, int y, int width, int height);
 
 		virtual ~Stage();
 

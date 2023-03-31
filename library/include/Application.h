@@ -10,26 +10,22 @@
 #include "StateBuffer.h"
 #include "Engine.h"
 #include "Stage.h"
-#include "snake.h"
 #include "IApplication.h"
 #include "synchapi.h"
 #include <string>
 #include <chrono>
+
+std::chrono::steady_clock::time_point now();
 
 namespace Amber {
 
 	template<class Game>
 	class Application : public IApplication {
 
-		using string = std::string;
-
 		StateBuffer<Game> buffer;
+		std::jthread gameThread;
 
-		std::chrono::steady_clock::time_point now() {
-			return std::chrono::steady_clock::now();
-		}
-
-		void gameLoop(std::chrono::milliseconds rate) override {
+		void gameLoop(std::chrono::milliseconds rate) {
 			using namespace std::chrono_literals;
 			unsigned long long int frames = 0;
 			auto start = now();
@@ -38,20 +34,20 @@ namespace Amber {
 			while (game.running) {
 				auto frame_start = now();
 				{
-					std::lock_guard lock(mutex);
-					for (auto& [type, e]: events) {
+					std::lock_guard lock(q.mutex);
+					for (auto& [type, e]: q.events) {
 						game.handlers.handleType(type, e);
 					}
-					clearEvents();
+					q.clearEvents();
 				}
 				game.update();
 				buffer.bufferUpdate();
 
 				++frames;
 
-				std::this_thread::sleep_until(frame_start + rate - std::chrono::milliseconds(5));
-				while (frame_start + rate - now() > 0ms) {
-				}
+				std::this_thread::sleep_until(frame_start + rate);
+//			while (frame_start + rate - now() > 0ms) {
+//			}
 
 				if (now() - start >= 1s) {
 					std::cout << "game fps " << frames << std::endl;
@@ -63,7 +59,7 @@ namespace Amber {
 			engine.kill(); //todo remove
 		}
 
-		void renderLoop() override {
+		void renderLoop() {
 			engine.init();
 			unsigned long long int frames = 0;
 
@@ -90,20 +86,16 @@ namespace Amber {
 			}
 
 			std::cout << "render stop" << std::endl;
-		}
+		};
 
 	public:
-		std::chrono::milliseconds rate;
-		Engine engine;
 		Game& game = buffer.getLogicState();
 		typename Game::R& R = buffer.getRenderState();
 
 		template<class... Args>
-		Application(const string& name, int x, int y, int width, int height, std::chrono::milliseconds rate,
-		            Args... args) :
-				rate(rate),
+		Application(std::string_view name, int x, int y, int width, int height, Args... args) :
 				buffer(args...),
-				engine(*this, name, x, y, width, height) {
+				IApplication(name, x, y, width, height) {
 		}
 
 		virtual ~Application() {
@@ -111,10 +103,10 @@ namespace Amber {
 			if (gameThread.joinable()) gameThread.join();
 		}
 
-		void run() {
+		void run(std::chrono::milliseconds rate) {
 			gameThread = std::jthread{&Application::gameLoop, this, rate};
 			renderLoop();
-			game.running = false; //todo remove this
+			game.running = false;
 			if (gameThread.joinable()) gameThread.join();
 		}
 	};

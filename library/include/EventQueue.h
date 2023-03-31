@@ -6,24 +6,21 @@
 #define ENGINETEST_EVENTQUEUE_H
 
 #include <mutex>
-#include <deque>
 #include "events.h"
 #include "type_erased.h"
 #include <map>
 #include <typeindex>
-#include <set>
 
 namespace Amber {
 	struct EventQueue {
-		using eventMap = std::map<std::type_index, EventContainer*>;
-		eventMap events;
+		std::map<std::type_index, EventContainer*> events;
+		std::mutex mutex;
+
 		virtual ~EventQueue() {
 			for (auto& s: events) {
 				delete s.second;
 			}
 		}
-
-		std::mutex mutex;
 
 		template<class T>
 		std::vector<T>& getEvents() {

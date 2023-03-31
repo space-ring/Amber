@@ -17,20 +17,17 @@
 #include "StateBuffer.h"
 #include "EventManager.h"
 #include "AssetManager.h"
-#include "IApplication.h"
 #include "Stage.h"
 
 //todo default members for resources (VAO = 0, etc)
 //todo initialise members that don't depend on constructor in class declaration ^^^
 //todo use references instead of pointers
-//todo circular dependencies with IO
 //todo make everything public?
 //todo move semantics (engine should own almost everything)
 //todo destructor calls destroy (so can terminate graphics manually)
-//todo some vectors need to be changed to lists when random access not needed
-//todo move away from string references
-//todo resource classes should adhere to the big 5.
 namespace Amber {
+
+	struct IApplication;
 
 	class Engine {
 		using string = std::string;
@@ -45,7 +42,7 @@ namespace Amber {
 		EventManager handlers;
 		AssetManager assets;
 
-		Engine(IApplication& app, const string& name, int x, int y, int width, int height);
+		Engine(IApplication& app, std::string_view name, int x, int y, int width, int height);
 
 		virtual ~Engine();
 

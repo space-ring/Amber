@@ -10,7 +10,7 @@ int main() {
 	int bw = 50, bh = 50;
 	int width = 500, height = 500;
 
-	Amber::Application<SnakeGame> app("Worm", 1030, 470, width, height, std::chrono::milliseconds(50), bw, bh);
+	Amber::Application<SnakeGame> app("Worm", 1030, 470, width, height, bw, bh);
 
 	auto& assets = app.engine.assets;
 	assets.addManifest("assets/manifest");
@@ -19,7 +19,7 @@ int main() {
 	stage.addScene("snake", new SnakeScene(bw, bh));
 	stage.setFrontScene("snake");
 
-	app.run();
+	app.run(std::chrono::milliseconds(50));
 
 	// program close
 	return 0;

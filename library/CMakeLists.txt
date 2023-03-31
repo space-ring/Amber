@@ -3,7 +3,9 @@ project(Engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_CXX_FLAGS "-static")
+#set(CMAKE_CXX_FLAGS "-static")
+set(CMAKE_CXX_FLAGS)
+
 # todo GLOB bad
 file(GLOB depsources "deps/glad/src/glad.c" "deps/stb/stb_image.cpp")
 

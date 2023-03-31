@@ -10,20 +10,16 @@
 #include <mutex>
 #include "events.h"
 #include "EventQueue.h"
+#include "Engine.h"
 #include <chrono>
 
 namespace Amber {
-	class IApplication : public EventQueue {
+	struct IApplication {
+		Engine engine;
+		EventQueue q;
 
-	protected:
-		std::jthread gameThread;
-
-		virtual void gameLoop(std::chrono::milliseconds rate) = 0;
-
-		virtual void renderLoop() = 0;
-
-	public:
-		virtual ~IApplication() = default;
+		IApplication(std::string_view name, int x, int y, int width, int height)
+				: engine(*this, name, x, y, width, height) {}
 	};
 }
 

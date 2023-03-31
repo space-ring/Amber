@@ -10,7 +10,7 @@
 
 namespace Amber {
 
-	Engine::Engine(IApplication& app, const string& name, int x, int y, int width, int height)
+	Engine::Engine(IApplication& app, std::string_view name, int x, int y, int width, int height)
 			: application(app), stage(*this, name, x, y, width, height) {
 		std::cout << "engine on thread " << std::this_thread::get_id() << std::endl;
 	}
@@ -22,21 +22,19 @@ namespace Amber {
 	void Engine::init() {
 		stage.init();
 
-		stage.focused = true;
-
-//		handlers.addHandler(window_events::CloseHandler([&](window_events::CloseEvent&) {
-//			                    stage.hide();
-//			                    running = false;
-//		                    })
-//		);
-//		handlers.addHandler(window_events::FocusHandler([&](window_events::FocusEvent& e) {
-//			                    stage.focused = e.focused;
-//		                    })
-//		);
-//		handlers.addHandler(window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
-//			                    glViewport(0, 0, e.width, e.height);
-//		                    })
-//		);
+		handlers.addHandler(window_events::CloseHandler([&](window_events::CloseEvent&) {
+			                    stage.hide();
+			                    running = false;
+		                    })
+		);
+		handlers.addHandler(window_events::FocusHandler([&](window_events::FocusEvent& e) {
+			                    stage.focused = e.focused;
+		                    })
+		);
+		handlers.addHandler(window_events::FramebufferSizeHandler([&](window_events::FramebufferSizeEvent& e) {
+			                    glViewport(0, 0, e.width, e.height);
+		                    })
+		);
 
 		stage.show();
 

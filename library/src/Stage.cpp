@@ -15,30 +15,14 @@ namespace Amber {
 	static void onGLFWevent(GLFWwindow* window, Args... args) {
 		auto* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
 		T event{window, args...};
-//		if (engine->stage.getFront())
-//			engine->stage.getFront()->onEvent<T>(event);
+		if (engine->stage.getFront())
+			engine->stage.getFront()->onEvent<T>(event);
 
 		if (!event.handled)
-			engine->handlers.onEvent(0);
+			engine->handlers.onEvent(event);
 	}
 
-	template<>
-	void onGLFWevent<window_events::KeyEvent, int, int, int, int>(GLFWwindow* window, int key, int, int action, int) {
-		auto* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-		std::cout << "Key event " << key << std::endl;
-		int event = 2;
-		if (key == GLFW_KEY_G) {
-			event = 1;
-		}
-		if (key == GLFW_KEY_A) {
-			event = 0;
-		}
-		if (engine->stage.getFront() && event < 2 && action == 1)
-			engine->stage.getFront()->onEvent(event);
-
-	}
-
-	Stage::Stage(Engine& engine, const string& name, int x, int y, int width, int height)
+	Stage::Stage(Engine& engine, std::string_view name, int x, int y, int width, int height)
 			: engine(engine), name(name), x(x), y(y), width(width), height(height) {}
 
 	Stage::~Stage() {

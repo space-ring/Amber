@@ -17,24 +17,24 @@ SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 				if (e.action == 1) {
 					switch (e.key) {
 						case GLFW_KEY_S:
-							app.putEvent(SnakeEvents::DirEvent(DOWN));
+							app.q.putEvent(SnakeEvents::DirEvent(DOWN));
 							break;
 
 						case GLFW_KEY_W:
-							app.putEvent(SnakeEvents::DirEvent(UP));
+							app.q.putEvent(SnakeEvents::DirEvent(UP));
 							break;
 
 						case GLFW_KEY_A:
-							app.putEvent(SnakeEvents::DirEvent(LEFT));
+							app.q.putEvent(SnakeEvents::DirEvent(LEFT));
 							break;
 
 						case GLFW_KEY_D:
-							app.putEvent(SnakeEvents::DirEvent(RIGHT));
+							app.q.putEvent(SnakeEvents::DirEvent(RIGHT));
 							break;
 					}
 				}
 				if (e.key == GLFW_KEY_G && e.action > 0){
-					app.putEvent(SnakeEvents::CheatGrow{});
+					app.q.putEvent(SnakeEvents::CheatGrow{});
 				}
 			}
 	));
