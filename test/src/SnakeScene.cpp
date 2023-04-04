@@ -33,7 +33,7 @@ SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 							break;
 					}
 				}
-				if (e.key == GLFW_KEY_G && e.action > 0){
+				if (e.key == GLFW_KEY_G && e.action > 0) {
 					app.q.putEvent(SnakeEvents::CheatGrow{});
 				}
 			}
@@ -64,6 +64,7 @@ void SnakeScene::update() {
 
 	SnakeGame::R& game = app.R;
 	segments.clear();
+	colours.clear();
 
 	Amber::Mesh* plane = &stage->engine.assets.getMesh(0);
 
@@ -73,6 +74,7 @@ void SnakeScene::update() {
 		segment.transform.translate(glm::vec3(p.x, p.y, -1));
 		segment.transform.scale(glm::vec3(0.5));
 		models.addModel(segment);
+		colours.push_back((float) 0xff0000 / 0xffffff);
 	}
 
 	auto& fruit = segments.emplace_back();

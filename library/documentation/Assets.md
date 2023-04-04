@@ -44,7 +44,13 @@ where _type_ and _details_ are:
         - F
         - C
 
-    `5 program V 0 1 2 F 9 TC 6 TE 7`
+  `5 program V 0 1 2 F 9 TC 6 TE 7`
 
 - mesh
-    - filepath
+    - _filepath_
+
+- texture
+    - _filepath_
+    - _format_
+    - where _format_ is one of:
+      - 2D

@@ -25,12 +25,19 @@ namespace Amber {
 			list<token> V, TC, TE, G, F, C;
 		};
 
+		struct TextureFormula {
+			string path;
+			SupportedTextures type;
+
+			TextureFormula(view path, SupportedTextures type) :
+					path(path), type(type) {}
+		};
+
 		tokenMap<string> sourcePaths;
 		tokenMap<string> meshPaths;
-		tokenMap<string> texturePaths;
+		tokenMap<TextureFormula> texturePaths;
 
 		tokenMap<string> sources;
-		//todo other raw asset types
 		tokenMap<RawMesh> rawMeshes;
 		tokenMap<RawTexture> rawTextures;
 
@@ -76,13 +83,17 @@ namespace Amber {
 		Mesh& getMesh(token id);
 
 		// TEXTURES //
-		void addTexturePath(token id, view path);
+		void addTexturePath(token id, view path, SupportedTextures type);
 
-		RawTexture& loadRawTexture(token id);
+		void loadRawTexture(token id);
 
 		void unloadRawTexture(token id);
 
 		RawTexture& getRawTexture(token id);
+
+		void loadTexture(token id);
+
+		void unloadTexture(token id);
 
 		Texture& getTexture(token id);
 	};

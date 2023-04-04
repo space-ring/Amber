@@ -8,18 +8,25 @@
 #include <fstream>
 #include <sstream>
 #include "engineUtils.h"
+#include "stb_image.h"
 
-int strToShaderType(std::string_view str) {
-	if (str == "V") return 0;
-	if (str == "TC") return 1;
-	if (str == "TE") return 2;
-	if (str == "G") return 3;
-	if (str == "F") return 4;
-	if (str == "C") return 5;
-	throw std::runtime_error("Unknown shader type " + std::string(str));
-}
 
 namespace Amber {
+
+	int strToShaderType(std::string_view str) {
+		if (str == "V") return 0;
+		if (str == "TC") return 1;
+		if (str == "TE") return 2;
+		if (str == "G") return 3;
+		if (str == "F") return 4;
+		if (str == "C") return 5;
+		throw std::runtime_error("Unknown shader type " + std::string(str));
+	}
+
+	SupportedTextures strToTextureType(std::string_view str) {
+		if (str == "2D") return TEXTURE_2D;
+		throw std::runtime_error("Unknown texture type " + std::string(str));
+	}
 
 	RawMesh parseMeshOBJ(view mesh) {
 		string str(mesh);
@@ -116,9 +123,9 @@ namespace Amber {
 
 			} else if (asset == "mesh") {
 				addMeshPath(id, items[1]);
+			} else if (asset == "texture") {
+				addTexturePath(id, items[1], strToTextureType(items[2]));
 			}
-
-			//todo texture
 		}
 	}
 
@@ -264,4 +271,37 @@ namespace Amber {
 		return meshes.at(id);
 	}
 
+	// TEXTURES //
+	void AssetManager::addTexturePath(AssetManager::token id, view path, SupportedTextures type) {
+		texturePaths.emplace(std::piecewise_construct, std::make_tuple(id),
+		                     std::make_tuple(path, type));
+	}
+
+	void AssetManager::loadRawTexture(AssetManager::token id) {
+		if (!texturePaths.contains(id))
+			throw std::runtime_error("Cannot load unknown texture " + std::to_string(id));
+
+		auto& formula = texturePaths.at(id);
+		int width, height, channels;
+		unsigned char* p = stbi_load(formula.path.c_str(), &width, &height, &channels, 0);
+		if (!p) throw std::runtime_error("Could not load texture " + std::to_string(id));
+		rawTextures.emplace(std::piecewise_construct, std::make_tuple(id),
+		                    std::make_tuple(p, formula.type, width, height, channels));
+
+		stbi_image_free(p);
+	}
+
+	RawTexture& AssetManager::getRawTexture(AssetManager::token id) {
+		if (!rawTextures.contains(id)) loadRawTexture(id);
+		return rawTextures.at(id);
+	}
+
+	void AssetManager::loadTexture(AssetManager::token id) {
+		textures.emplace(id, getRawTexture(id));
+	}
+
+	Texture& AssetManager::getTexture(AssetManager::token id) {
+		if (!textures.contains(id)) loadTexture(id);
+		return textures.at(id);
+	}
 }

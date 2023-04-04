@@ -16,6 +16,8 @@ class SnakeScene : public Amber::Scene {
 
 	std::list<Model> segments;
 
+	std::vector<float> colours;
+
 public:
 
 	SnakeScene(unsigned int width, unsigned int height);

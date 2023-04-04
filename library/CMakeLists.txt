@@ -74,7 +74,7 @@ add_library(Engine ${depsources}
         include/type_erased.h
         src/EventQueue.cpp
         include/ITree.h
-        )
+        src/grahpics.cpp)
 
 add_subdirectory(deps/glfw-3.3.6)
 

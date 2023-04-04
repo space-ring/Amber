@@ -13,23 +13,38 @@ namespace Amber {
 	};
 
 	struct RawTexture {
+		SupportedTextures type;
+		unsigned char* data;
+		int width, height, channels;
+
+		explicit RawTexture(unsigned char* p, SupportedTextures type, int width, int height, int channels)
+				: type(type),
+				  width(width),
+				  height(height),
+				  channels(channels) {
+			memcpy(data, p, width * height * channels);
+		}
 	};
 
 	class Texture {
-		static Texture* DEFAULT;
-
-		unsigned char* texels;
-
-		GLuint texture = 0;
+		SupportedTextures type;
+		int width, height, channels;
+		unsigned int texture;
 
 	public:
-		static Texture* getDefault();
+		Texture(const RawTexture& data);
 
-		static void deleteDefault();
+		~Texture();
 
-		Texture(unsigned char* data);
+		Texture(const Texture&) = delete;
 
-		Texture* build();
+		Texture(Texture&&) = delete;
+
+		Texture& operator=(const Texture&) = delete;
+
+		Texture& operator=(Texture&&) = delete;
+
+
 	};
 
 }
