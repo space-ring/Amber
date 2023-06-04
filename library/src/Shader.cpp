@@ -57,8 +57,6 @@ namespace Amber {
 
 		program = glCreateProgram();
 
-		//todo move compilation, linking, attaching and detaching into functions?
-
 		{
 			ShaderAttachment vertex(VERTEX, program, srcVertex);
 			ShaderAttachment tessControl(TESS_CONTROL, program, srcTessControl);

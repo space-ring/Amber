@@ -1,56 +1,90 @@
-# Asset Manager
+# Assets
 
-The engine relies on a threaded asset manager.
+The engine supports these asset types:
 
-When a scene requests to use an asset from the engine, the engine delegates the task to the manager. The manager then
-returns a pointer to that asset already built in memory or loads the asset from disk using the asset registry.
+- [Shaders](#shaders)
+- [Meshes](#meshes)
+- [Textures](#textures)
 
-# Assets rework:
-
-There is an asset manager per engine which holds all asset object that the engine uses during runtime.
-The manager owns these assets and they are not created on the heap. They are stored in a token map.
-
-todo: use a lock guard to synchronise assets: post get-from-token
+The user can specify which assets are used by an application individually or in
+a [manifest](#manifest-syntax) file. Providing a manifest registers the assets at an [Asset Manager](#asset-manager) and
+does not instantiate any resource objects. Allocating memory for assets can only be done once a context is made when
+requesting assets from Managers by providing tokens. Every asset is given a token unique among others of its type.
 
 ## Shaders
 
-Shader fragments are loaded into raw string representation.
-When constructing a program, shaders are compiled by concatenating string fragments. They are then linked, detached and
-deleted. This means that a fragment must be recompiled for every program it serves.
+Two types of shader assets are used by the engine: shader code and shader programs.
 
-## Manifest syntax:
+Shader code is a raw code string which has no notion of the type of shader it encodes. A type can be given to a code by
+the user when declaring a shader program which allows for reusability.
 
-Every asset is assigned a token. Tokens must be unique among the same asset type.
+A shader program is a chain of up to 6 types of shaders. The user specifies which codes constitute a shader.
+The codes for each shader are concatenated, compiled and linked into a single program. The
+compiled, and concatenated objects exist only temporarily for concatenation and compilation and are deleted right after
+linking. Thus, unnecessary work is done when programs share shaders.
 
-\# this is a comment
+## Meshes
 
-Assets are grouped by type\
-_type_\
-_token details_\
-_token details_
+A mesh is a wrapper for an OpenGL VAO, containing the mesh VAO, VBO for vertex positions, texture coordinates and normals (interleaved) and an EBO. The VAO has
+attributes at locators:
 
-where _type_ and _details_ are:
+| Location |     Type      | Attribute                     |
+|----------|:-------------:|-------------------------------|
+| 0        |     vec3f     | vertex position               |
+| 1        |     vec2f     | vertex texture coordinates    |
+| 2        |     vec3f     | vertex normal                 |
+| 10 - 13  |     mat4f     | __instance__ model transforms |
+| 14 - 17  | uniform mat4f | camera transforms             |
+| 18 - 21  | uniform mat4f | projection transforms         |
 
-- shader
-    - filepath
+While attributes 0-2 are assigned statically to the VAO given the raw mesh vertex data, attributes 10-13 are assigned dynamically to allow multiple groups of instances to use the same vertex data. When a specified group of instances wishes to be drawn using the mesh data, the VAO's attribute pointers are reassigned to the group's VBO (which contains instance transforms).
 
-- program
-    - _shaderType_ tokens
-    - where _shaderType_ can be, in any order, from:
-        - V
-        - TC
-        - TE
-        - G
-        - F
-        - C
+## Textures
 
-  `5 program V 0 1 2 F 9 TC 6 TE 7`
+# Manifest syntax
 
-- mesh
-    - _filepath_
+Assets are grouped by type:
+
+## Shader code
+
+```
+shader 
+[shader code token] [filepath]
+```
+
+## Shader program
+
+```
+program
+[shader program token] ([shader type : V | TC | TE | G | F | C ] [shader code token]*)+
+```
+
+For example:
+
+```
+shader
+0 vertex.v
+1 fragment.f
+2 optional.v
+program
+0 V 0 2 F 1
+```
+
+## Mesh
+
+```
+mesh
+[mesh token] [filepath]
+```
+
+## Texture
 
 - texture
     - _filepath_
     - _format_
     - where _format_ is one of:
-      - 2D
+        - 2D
+
+# Asset Manager
+
+Provides a table of contents and resource paths for assets. Is also responsible for ownership of asset memory.
