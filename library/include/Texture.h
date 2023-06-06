@@ -22,7 +22,12 @@ namespace Amber {
 				  width(width),
 				  height(height),
 				  channels(channels) {
+			data = new unsigned char[width * height * channels];
 			memcpy(data, p, width * height * channels);
+		}
+
+		~RawTexture(){
+			delete[] data;
 		}
 	};
 
@@ -43,6 +48,10 @@ namespace Amber {
 		Texture& operator=(const Texture&) = delete;
 
 		Texture& operator=(Texture&&) = delete;
+
+		void bindToAt(GLenum unit);
+
+		void unbind();
 
 
 	};

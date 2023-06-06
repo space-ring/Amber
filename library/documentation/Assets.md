@@ -19,13 +19,14 @@ Shader code is a raw code string which has no notion of the type of shader it en
 the user when declaring a shader program which allows for reusability.
 
 A shader program is a chain of up to 6 types of shaders. The user specifies which codes constitute a shader.
-The codes for each shader are concatenated, compiled and linked into a single program. The
-compiled, and concatenated objects exist only temporarily for concatenation and compilation and are deleted right after
-linking. Thus, unnecessary work is done when programs share shaders.
+The codes for each shader are concatenated, compiled and linked into a single program. The compiled, and concatenated
+objects exist only temporarily for concatenation and compilation and are deleted right after linking. Thus, unnecessary
+work is done when programs share shaders.
 
 ## Meshes
 
-A mesh is a wrapper for an OpenGL VAO, containing the mesh VAO, VBO for vertex positions, texture coordinates and normals (interleaved) and an EBO. The VAO has
+A mesh is a wrapper for an OpenGL VAO, containing the mesh VAO, VBO for vertex positions, texture coordinates and
+normals (interleaved) and an EBO. The VAO has
 attributes at locators:
 
 | Location |     Type      | Attribute                     |
@@ -37,7 +38,10 @@ attributes at locators:
 | 14 - 17  | uniform mat4f | camera transforms             |
 | 18 - 21  | uniform mat4f | projection transforms         |
 
-While attributes 0-2 are assigned statically to the VAO given the raw mesh vertex data, attributes 10-13 are assigned dynamically to allow multiple groups of instances to use the same vertex data. When a specified group of instances wishes to be drawn using the mesh data, the VAO's attribute pointers are reassigned to the group's VBO (which contains instance transforms).
+While attributes 0-2 are assigned statically to the VAO given the raw mesh vertex data, attributes 10-13 are assigned
+dynamically to allow multiple groups of instances to use the same vertex data. When a specified group of instances
+wishes to be drawn using the mesh data, the VAO's attribute pointers are reassigned to the group's VBO (which contains
+instance transforms).
 
 ## Textures
 
@@ -79,11 +83,10 @@ mesh
 
 ## Texture
 
-- texture
-    - _filepath_
-    - _format_
-    - where _format_ is one of:
-        - 2D
+```
+texture
+[texture token] [filepath] [format : 2D]
+```
 
 # Asset Manager
 
