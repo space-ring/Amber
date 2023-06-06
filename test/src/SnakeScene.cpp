@@ -94,7 +94,12 @@ void SnakeScene::render() {
 	auto& assets = stage->engine.assets;
 
 	Amber::Mesh* plane = &assets.getMesh(0);
-	Amber::Shader* shader = &assets.getShader(0).start();
+	Amber::Shader* shader = &assets.getShader(0);
+	shader->start();
+
+	Amber::Texture& yellow = assets.getTexture(0);
+	yellow.bindToAt(GL_TEXTURE3);
+	glUniform1i(22, 3);
 
 	glBindVertexArray(plane->getVao());
 	glUniformMatrix4fv(14, 1, false, glm::value_ptr(camera.getView()));
