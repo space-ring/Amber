@@ -6,15 +6,15 @@
 
 namespace Amber {
 
-	Frame::Frame() {
+	Framebuffer::Framebuffer() {
 		glGenFramebuffers(1, &fbo);
 	}
 
-	Frame::~Frame() {
+	Framebuffer::~Framebuffer() {
 		glDeleteFramebuffers(1, &fbo);
 	}
 
-	void Frame::attachDraw(SupportedFBOAttachments point, Texture& texture) {
+	void Framebuffer::attachDraw(SupportedFBOAttachments point, Texture& texture) {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 		switch (texture.getType()) {
 			case TEXTURE_2D:
@@ -22,9 +22,10 @@ namespace Amber {
 				                       texture.getTexture(), 0);
 				break;
 		}
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	}
 
-	void Frame::attachRead(SupportedFBOAttachments point, Texture& texture) {
+	void Framebuffer::attachRead(SupportedFBOAttachments point, Texture& texture) {
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 		switch (texture.getType()) {
 			case TEXTURE_2D:
@@ -32,6 +33,7 @@ namespace Amber {
 				                       texture.getTexture(), 0);
 				break;
 		}
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
 
 }

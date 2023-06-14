@@ -42,8 +42,8 @@ namespace Amber {
 				  width(width),
 				  height(height),
 				  channels(channels) {
-			data = new unsigned char[width * height * channels];
-			memcpy(data, p, width * height * channels);
+			data = new unsigned char[width * height * channels]();
+			if (p) memcpy(data, p, width * height * channels);
 		}
 
 		~RawTexture() {

@@ -17,13 +17,13 @@ namespace Amber {
 		DEPTH_STENCIL = GL_DEPTH_STENCIL_ATTACHMENT
 	};
 
-	class Frame {
+	class Framebuffer {
 		unsigned int fbo;
 
 	public:
-		Frame();
+		Framebuffer();
 
-		~Frame();
+		~Framebuffer();
 
 		void attachDraw(SupportedFBOAttachments point, Texture& texture);
 

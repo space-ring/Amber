@@ -10,7 +10,8 @@ namespace Amber {
 			format(data.format),
 			internal(internal),
 			width(data.width),
-			height(data.height) {
+			height(data.height),
+			channels(data.channels) {
 
 		glGenTextures(1, &texture);
 		glBindTexture(type, texture);
