@@ -40,6 +40,11 @@ namespace Amber {
 			}
 		}
 
+		template<class T>
+		void onEvent(T&& event) {
+			onEvent(event);
+		}
+
 		void handleType(std::type_index type, EventContainer* erased_vector_events);
 
 	};
