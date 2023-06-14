@@ -36,6 +36,10 @@ SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 				if (e.key == GLFW_KEY_G && e.action > 0) {
 					app.q.putEvent(SnakeEvents::CheatGrow{});
 				}
+
+				if (e.key == GLFW_KEY_ESCAPE) {
+					stage->engine.handlers.onEvent(window_events::CloseEvent{stage->getWindow()});
+				}
 			}
 	));
 
@@ -91,6 +95,7 @@ void SnakeScene::pick(int x, int y) {
 }
 
 void SnakeScene::render() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	auto& assets = stage->engine.assets;
 
 	Amber::Mesh* plane = &assets.getMesh(0);
@@ -111,5 +116,7 @@ void SnakeScene::render() {
 	                        models.getRenderCount(plane));
 	glBindVertexArray(0);
 	shader->stop();
+
+	glfwSwapBuffers(stage->getWindow());
 
 }

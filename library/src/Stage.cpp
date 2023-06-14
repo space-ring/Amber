@@ -79,11 +79,9 @@ namespace Amber {
 	}
 
 	void Stage::render() {
-		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (front) {
 			front->render();
 		}
-		glfwSwapBuffers(window);
 	}
 
 	void Stage::update() {
@@ -98,6 +96,7 @@ namespace Amber {
 	}
 
 	void Stage::pick() {
+		return;
 		int ww, wh;
 		glfwGetWindowSize(window, &ww, &wh);
 		double dx, dy;
