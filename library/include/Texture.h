@@ -12,13 +12,33 @@ namespace Amber {
 		TEXTURE_2D = GL_TEXTURE_2D
 	};
 
+	enum SupportedDataFormats {
+		R = GL_RED,
+		RG = GL_RG,
+		RGB = GL_RGB,
+		RGBA = GL_RGBA,
+		DEPTH = GL_DEPTH_COMPONENT,
+		STENCIL = GL_DEPTH_STENCIL
+	};
+
+	enum SupportedInternalFormats {
+		R8 = GL_R8,
+		RG8 = GL_RG8,
+		RGB8 = GL_RGB8,
+		RGBA8 = GL_RGBA8
+	};
+
 	struct RawTexture {
 		SupportedTextures type;
+		SupportedDataFormats format;
 		unsigned char* data;
 		int width, height, channels;
 
-		explicit RawTexture(unsigned char* p, SupportedTextures type, int width, int height, int channels)
+		explicit RawTexture(unsigned char* p, SupportedTextures type, SupportedDataFormats format, int width,
+		                    int height,
+		                    int channels)
 				: type(type),
+				  format(format),
 				  width(width),
 				  height(height),
 				  channels(channels) {
@@ -26,18 +46,20 @@ namespace Amber {
 			memcpy(data, p, width * height * channels);
 		}
 
-		~RawTexture(){
+		~RawTexture() {
 			delete[] data;
 		}
 	};
 
 	class Texture {
 		SupportedTextures type;
+		SupportedDataFormats format;
+		SupportedInternalFormats internal;
 		int width, height, channels;
 		unsigned int texture;
 
 	public:
-		Texture(const RawTexture& data);
+		Texture(const RawTexture& data, SupportedInternalFormats format);
 
 		~Texture();
 
@@ -53,7 +75,9 @@ namespace Amber {
 
 		void unbind();
 
+		SupportedTextures getType() const;
 
+		unsigned int getTexture() const;
 	};
 
 }

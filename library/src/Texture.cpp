@@ -5,10 +5,12 @@
 #include "Texture.h"
 
 namespace Amber {
-	Texture::Texture(const RawTexture& data) :
+	Texture::Texture(const RawTexture& data, SupportedInternalFormats internal) :
+			type(data.type),
+			format(data.format),
+			internal(internal),
 			width(data.width),
-			height(data.height),
-			type(data.type) {
+			height(data.height) {
 
 		glGenTextures(1, &texture);
 		glBindTexture(type, texture);
@@ -19,7 +21,7 @@ namespace Amber {
 		glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		switch (type) {
 			case TEXTURE_2D:
-				glTexImage2D(type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data);
+				glTexImage2D(type, 0, internal, width, height, 0, format, GL_UNSIGNED_BYTE, data.data);
 				break;
 		}
 
@@ -38,6 +40,14 @@ namespace Amber {
 
 	void Texture::unbind() {
 		glBindTexture(type, 0);
+	}
+
+	SupportedTextures Texture::getType() const {
+		return type;
+	}
+
+	unsigned int Texture::getTexture() const {
+		return texture;
 	}
 
 }

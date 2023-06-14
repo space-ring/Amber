@@ -220,8 +220,8 @@ namespace Amber {
 		ShaderStitch cStitch{static_cast<int>(compute.size()), csource, clength};
 
 
-		shaders.emplace(std::piecewise_construct, std::make_tuple(id),
-		                std::make_tuple(vStitch, tcStitch, teStitch, gStitch, fStitch, cStitch));
+		shaders.emplace(std::piecewise_construct, std::forward_as_tuple(id),
+		                std::forward_as_tuple(vStitch, tcStitch, teStitch, gStitch, fStitch, cStitch));
 
 		delete[] vsource;
 		delete[] tcsource;
@@ -273,8 +273,8 @@ namespace Amber {
 
 	// TEXTURES //
 	void AssetManager::addTexturePath(AssetManager::token id, view path, SupportedTextures type) {
-		texturePaths.emplace(std::piecewise_construct, std::make_tuple(id),
-		                     std::make_tuple(path, type));
+		texturePaths.emplace(std::piecewise_construct, std::forward_as_tuple(id),
+		                     std::forward_as_tuple(path, type));
 	}
 
 	void AssetManager::loadRawTexture(AssetManager::token id) {
@@ -285,8 +285,8 @@ namespace Amber {
 		int width, height, channels;
 		unsigned char* p = stbi_load(formula.path.c_str(), &width, &height, &channels, 0);
 		if (!p) throw std::runtime_error("Could not load texture " + std::to_string(id));
-		rawTextures.emplace(std::piecewise_construct, std::make_tuple(id),
-		                    std::make_tuple(p, formula.type, width, height, channels));
+		rawTextures.emplace(std::piecewise_construct, std::forward_as_tuple(id),
+		                    std::forward_as_tuple(p, formula.type, SupportedDataFormats::RGBA, width, height, channels));
 
 		stbi_image_free(p);
 	}
@@ -297,7 +297,8 @@ namespace Amber {
 	}
 
 	void AssetManager::loadTexture(AssetManager::token id) {
-		textures.emplace(id, getRawTexture(id));
+		textures.emplace(std::piecewise_construct, std::forward_as_tuple(id),
+		                 std::forward_as_tuple(getRawTexture(id), SupportedInternalFormats::RGBA8));
 	}
 
 	Texture& AssetManager::getTexture(AssetManager::token id) {
