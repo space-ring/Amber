@@ -3,10 +3,9 @@
 //
 
 #include "scenes/demo/SnakeScene.h"
-#include "StateBuffer.h"
 #include "snake.h"
 #include "Application.h"
-#include <windows.h>
+#include "Texture.h"
 
 SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 		: camera(glm::vec3(0), glm::vec3(0), 70, width, height, 0, 100, 0, 100) {
@@ -52,6 +51,14 @@ SnakeScene::~SnakeScene() {
 void SnakeScene::build() {
 	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
 	models.addMesh(&stage->engine.assets.getMesh(0), app.R.height * app.R.height + 2);
+
+
+	static Texture t{Amber::RawTexture{nullptr, Amber::TEXTURE_2D, Amber::SupportedDataFormats::RGBA, 50, 50, 3},
+	                 RGBA8};
+
+	static Framebuffer f;
+
+	f.attachDraw(Amber::SupportedFBOAttachments::COLOUR, *tex);
 }
 
 void SnakeScene::show() {
@@ -96,6 +103,7 @@ void SnakeScene::pick(int x, int y) {
 
 void SnakeScene::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, 500, 500);
 	auto& assets = stage->engine.assets;
 
 	Amber::Mesh* plane = &assets.getMesh(0);
@@ -103,7 +111,7 @@ void SnakeScene::render() {
 	shader->start();
 
 	Amber::Texture& yellow = assets.getTexture(0);
-	yellow.bindToAt(GL_TEXTURE3);
+	yellow.bindToUnit(GL_TEXTURE3);
 	glUniform1i(22, 3);
 
 	glBindVertexArray(plane->getVao());
