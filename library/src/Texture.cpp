@@ -34,7 +34,7 @@ namespace Amber {
 		if (texture) glDeleteTextures(1, &texture);
 	}
 
-	void Texture::bindToAt(GLenum unit) {
+	void Texture::bindToUnit(GLenum unit) {
 		glActiveTexture(unit);
 		glBindTexture(type, texture);
 	}

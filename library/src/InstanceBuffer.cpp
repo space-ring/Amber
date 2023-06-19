@@ -2,13 +2,13 @@
 // Created by Chris on 02/07/2022.
 //
 
-#include "DirectorInstanced.h"
+#include "InstanceBuffer.h"
 #include "Model.h"
 #include "Timer.h"
 
 namespace Amber {
 
-	DirectorInstanced::~DirectorInstanced() {//todo
+	InstanceBuffer::~InstanceBuffer() {//todo
 		models.clear();
 		for (auto& pair: indices) {
 			delete pair.second;
@@ -18,11 +18,11 @@ namespace Amber {
 		}
 	}
 
-	Model& DirectorInstanced::newModel() {
+	Model& InstanceBuffer::newModel() {
 		return models.emplace_back();
 	}
 
-	void DirectorInstanced::moveRef(const Mesh* mesh, index from, index to) {
+	void InstanceBuffer::moveRef(const Mesh* mesh, index from, index to) {
 		auto* refs = references.at(mesh);
 		auto* transform = refs->at(from);
 		refs->erase(from);
@@ -35,7 +35,7 @@ namespace Amber {
 		tracker.untrack(from);
 	}
 
-	glm::mat4 DirectorInstanced::readGPU(const Mesh* mesh, index i) {
+	glm::mat4 InstanceBuffer::readGPU(const Mesh* mesh, index i) {
 		glm::mat4 ret(0);
 		if (indices.contains(mesh) && references.at(mesh)->contains(i)) {
 			glBindBuffer(GL_ARRAY_BUFFER, managed.at(mesh).memory);
@@ -45,14 +45,14 @@ namespace Amber {
 		return ret;
 	}
 
-	void DirectorInstanced::writeGPU(const Mesh* mesh, index i) {
+	void InstanceBuffer::writeGPU(const Mesh* mesh, index i) {
 		if (!indices.contains(mesh) || !references.at(mesh)->contains(i)) return;
 		glBindBuffer(GL_ARRAY_BUFFER, managed.at(mesh).memory);
 		glBufferSubData(GL_ARRAY_BUFFER, i * sizeof(glm::mat4), sizeof(glm::mat4), references.at(mesh)->at(i)->getP());
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void DirectorInstanced::copyGPU(const Mesh* mesh, index from, index to) {
+	void InstanceBuffer::copyGPU(const Mesh* mesh, index from, index to) {
 		if (!indices.contains(mesh)) return;
 		auto& m = managed.at(mesh);
 		GLsizeiptr size = sizeof(glm::mat4);
@@ -63,17 +63,17 @@ namespace Amber {
 		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	}
 
-	void DirectorInstanced::track(const Mesh* m, const Transform& t) {
+	void InstanceBuffer::track(const Mesh* m, const Transform& t) {
 		if (!trackers.contains(m)) return;
 		trackers.at(m).track(indices.at(m)->at(&t));
 	}
 
-	void DirectorInstanced::untrack(const Mesh* m, const Transform& t) {
+	void InstanceBuffer::untrack(const Mesh* m, const Transform& t) {
 		if (!trackers.contains(m)) return;
 		trackers.at(m).untrack(indices.at(m)->at(&t));
 	}
 
-	bool DirectorInstanced::addMesh(const Mesh* mesh, index limit) {
+	bool InstanceBuffer::addMesh(const Mesh* mesh, index limit) {
 		if (indices.contains(mesh)) {
 			if (indices.at(mesh)->size() < limit)
 				//cannot request smaller block
@@ -112,7 +112,7 @@ namespace Amber {
 		return true;
 	}
 
-	bool DirectorInstanced::addModel(Model& model) {
+	bool InstanceBuffer::addModel(Model& model) {
 
 		auto* mesh = model.getMesh();
 		if (!mesh) return false;
@@ -179,7 +179,7 @@ namespace Amber {
 		glCheckError();
 	}
 
-	void DirectorInstanced::removeModel(Model& model) {
+	void InstanceBuffer::removeModel(Model& model) {
 		const Mesh* mesh = model.getMesh();
 		if (!mesh) return;
 
@@ -251,7 +251,7 @@ namespace Amber {
 
 	//upload only changed models
 	//should be called after tree propagation
-	void DirectorInstanced::buffer(const Mesh* mesh) {
+	void InstanceBuffer::buffer(const Mesh* mesh) {
 		auto* refs = references.at(mesh);
 		auto& tracker = trackers.at(mesh);
 		if (tracker.list.empty()) return;
@@ -274,20 +274,20 @@ namespace Amber {
 		tracker.list = std::list<index>();
 	}
 
-	void DirectorInstanced::link(Mesh* mesh) {
+	void InstanceBuffer::link(Mesh* mesh) {
 		if (!mesh) return;
 		if (!managed.contains(mesh)) return;
 		mesh->linkInstanceTransforms(managed.at(mesh).memory);
 	}
 
-	DirectorInstanced::index DirectorInstanced::getRenderCount(Mesh* mesh) {
+	InstanceBuffer::index InstanceBuffer::getRenderCount(Mesh* mesh) {
 		if (!managed.contains(mesh))
 			return 0;
 		Managed& m = managed.at(mesh);
 		return m.solid + m.visible;
 	}
 
-	DirectorInstanced::index DirectorInstanced::getPickCount(Mesh* mesh) {
+	InstanceBuffer::index InstanceBuffer::getPickCount(Mesh* mesh) {
 		if (!managed.contains(mesh))
 			return 0;
 		Managed& m = managed.at(mesh);

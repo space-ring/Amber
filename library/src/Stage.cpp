@@ -57,7 +57,6 @@ namespace Amber {
 
 		int pixWidth, pixHeight;
 		glfwGetFramebufferSize(window, &pixWidth, &pixHeight);
-		glViewport(0, 0, pixWidth, pixHeight);
 
 		glfwSetWindowUserPointer(window, &engine);
 

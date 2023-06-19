@@ -6,7 +6,7 @@
 #define ENGINE_LAYER_H
 
 #include "events.h"
-#include "DirectorInstanced.h"
+#include "InstanceBuffer.h"
 #include "EventManager.h"
 #include <map>
 
@@ -16,7 +16,7 @@ namespace Amber {
 	class Layer {
 
 	protected:
-		DirectorInstanced models;
+		InstanceBuffer models;
 
 	public:
 		Scene* scene;

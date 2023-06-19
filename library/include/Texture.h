@@ -71,7 +71,7 @@ namespace Amber {
 
 		Texture& operator=(Texture&&) = delete;
 
-		void bindToAt(GLenum unit);
+		void bindToUnit(GLenum unit);
 
 		void unbind();
 
