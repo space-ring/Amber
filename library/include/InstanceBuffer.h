@@ -36,7 +36,7 @@ namespace Amber {
 		}
 	};
 
-	class DirectorInstanced {
+	class InstanceBuffer {
 
 		using index = Tracker::index;
 
@@ -74,7 +74,7 @@ namespace Amber {
 
 	public:
 
-		~DirectorInstanced();
+		~InstanceBuffer();
 
 		bool addMesh(const Mesh* mesh, index limit);
 

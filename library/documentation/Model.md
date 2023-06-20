@@ -6,11 +6,11 @@ A transform object is a wrapper around mat4 with extended functionality:
 
 - basic translation, rotation and scaling operations
 - a tree-type structure, each child inheriting its parent's transform (commonly used for scene graphs)
-- instance management under [Model manager](ModelManager.md)
+- instance management under [Model manager]()
 
 ## Models
 
-A model is a composition of a [mesh](Meshes.md), a [transform](#transforms) and a [model manager](#Managers).
+A model is a composition of a [mesh](Assets.md), a [transform](#transforms) and a [model manager](#Managers).
 
 ## Managers
 

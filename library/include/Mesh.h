@@ -24,7 +24,6 @@ namespace Amber {
 	};
 
 	class Mesh {
-	private:
 		/**
 		 * VAO Standard attributes:
 		 * 0 = vertex positions

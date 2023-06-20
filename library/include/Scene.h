@@ -16,7 +16,7 @@
 #include "variadic.h"
 #include "AssetManager.h"
 #include "rendering.h"
-#include "DirectorInstanced.h"
+#include "InstanceBuffer.h"
 #include "LayerStack.h"
 #include <set>
 #include "events.h"
@@ -40,7 +40,7 @@ namespace Amber {
 		bool built = false;
 		LayerStack layers;
 		EventManager handlers;
-		DirectorInstanced models;
+		InstanceBuffer models;
 
 		Transform* last_picked = nullptr;
 		Transform* dragged = nullptr;

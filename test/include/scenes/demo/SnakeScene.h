@@ -7,6 +7,7 @@
 
 #include "Scene.h"
 #include "NoDefaultSingleton.h"
+#include "Framebuffer.h"
 
 using namespace Amber;
 
@@ -15,6 +16,8 @@ class SnakeScene : public Amber::Scene {
 	Camera camera;
 
 	std::list<Model> segments;
+
+	std::vector<float> colours;
 
 public:
 

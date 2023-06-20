@@ -23,14 +23,17 @@ namespace Amber {
 		COMPUTE = GL_COMPUTE_SHADER
 	};
 
+	//concatenated shader
 	struct ShaderStitch {
 		int count;
 		const char** string;
 		const int* lengths;
 	};
 
+	//shader program
 	class Shader {
 
+		//compiled shader
 		struct ShaderAttachment {
 
 			using string = std::string;

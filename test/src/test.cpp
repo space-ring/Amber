@@ -21,6 +21,5 @@ int main() {
 
 	app.run(std::chrono::milliseconds(50));
 
-	// program close
 	return 0;
 }

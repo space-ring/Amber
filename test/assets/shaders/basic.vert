@@ -8,9 +8,9 @@ layout (location = 10) in mat4 M;
 layout (location = 14) uniform mat4 V;
 layout (location = 18) uniform mat4 P;
 
-out vec3 frag_position;
+out vec2 frag_position;
 
 void main(void){
-    frag_position = position;
+    frag_position = uv;
     gl_Position = P * V * M * vec4(position, 1.0);
 }

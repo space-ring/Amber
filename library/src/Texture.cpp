@@ -5,19 +5,50 @@
 #include "Texture.h"
 
 namespace Amber {
-	Texture* Amber::Texture::getDefault() {
-		return nullptr;
+	Texture::Texture(const RawTexture& data, SupportedInternalFormats internal) :
+			type(data.type),
+			format(data.format),
+			internal(internal),
+			width(data.width),
+			height(data.height),
+			channels(data.channels) {
+
+		glGenTextures(1, &texture);
+		glBindTexture(type, texture);
+
+		glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		switch (type) {
+			case TEXTURE_2D:
+				glTexImage2D(type, 0, internal, width, height, 0, format, GL_UNSIGNED_BYTE, data.data);
+				break;
+		}
+
+		glGenerateMipmap(type);
+		glBindTexture(type, 0);
 	}
 
-	void Texture::deleteDefault() {
-
+	Texture::~Texture() {
+		if (texture) glDeleteTextures(1, &texture);
 	}
 
-	Texture::Texture(unsigned char* data) {
-
+	void Texture::bindToUnit(GLenum unit) {
+		glActiveTexture(unit);
+		glBindTexture(type, texture);
 	}
 
-	Texture* Amber::Texture::build() {
-		return nullptr;
+	void Texture::unbind() {
+		glBindTexture(type, 0);
 	}
+
+	SupportedTextures Texture::getType() const {
+		return type;
+	}
+
+	unsigned int Texture::getTexture() const {
+		return texture;
+	}
+
 }

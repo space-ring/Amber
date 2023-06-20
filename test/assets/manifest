@@ -1,7 +1,10 @@
 shader
 1 assets/shaders/basic.vert
 2 assets/shaders/basic.frag
+3 assets/shaders/texture.frag
 program
-0 V 1 F 2
+0 V 1 F 3
 mesh
 0 assets/meshes/plane.obj
+texture
+0 assets/textures/yellow.png 2D

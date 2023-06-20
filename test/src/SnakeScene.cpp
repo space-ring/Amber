@@ -3,10 +3,9 @@
 //
 
 #include "scenes/demo/SnakeScene.h"
-#include "StateBuffer.h"
 #include "snake.h"
 #include "Application.h"
-#include <windows.h>
+#include "Texture.h"
 
 SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 		: camera(glm::vec3(0), glm::vec3(0), 70, width, height, 0, 100, 0, 100) {
@@ -33,8 +32,12 @@ SnakeScene::SnakeScene(unsigned int width, unsigned int height)
 							break;
 					}
 				}
-				if (e.key == GLFW_KEY_G && e.action > 0){
+				if (e.key == GLFW_KEY_G && e.action > 0) {
 					app.q.putEvent(SnakeEvents::CheatGrow{});
+				}
+
+				if (e.key == GLFW_KEY_ESCAPE) {
+					stage->engine.handlers.onEvent(window_events::CloseEvent{stage->getWindow()});
 				}
 			}
 	));
@@ -48,6 +51,14 @@ SnakeScene::~SnakeScene() {
 void SnakeScene::build() {
 	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
 	models.addMesh(&stage->engine.assets.getMesh(0), app.R.height * app.R.height + 2);
+
+
+	static Texture t{Amber::RawTexture{nullptr, Amber::TEXTURE_2D, Amber::SupportedDataFormats::RGBA, 50, 50, 3},
+	                 RGBA8};
+
+	static Framebuffer f;
+
+	f.attachDraw(Amber::SupportedFBOAttachments::COLOUR, *tex);
 }
 
 void SnakeScene::show() {
@@ -64,6 +75,7 @@ void SnakeScene::update() {
 
 	SnakeGame::R& game = app.R;
 	segments.clear();
+	colours.clear();
 
 	Amber::Mesh* plane = &stage->engine.assets.getMesh(0);
 
@@ -73,6 +85,7 @@ void SnakeScene::update() {
 		segment.transform.translate(glm::vec3(p.x, p.y, -1));
 		segment.transform.scale(glm::vec3(0.5));
 		models.addModel(segment);
+		colours.push_back((float) 0xff0000 / 0xffffff);
 	}
 
 	auto& fruit = segments.emplace_back();
@@ -89,10 +102,17 @@ void SnakeScene::pick(int x, int y) {
 }
 
 void SnakeScene::render() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, 500, 500);
 	auto& assets = stage->engine.assets;
 
 	Amber::Mesh* plane = &assets.getMesh(0);
-	Amber::Shader* shader = &assets.getShader(0).start();
+	Amber::Shader* shader = &assets.getShader(0);
+	shader->start();
+
+	Amber::Texture& yellow = assets.getTexture(0);
+	yellow.bindToUnit(GL_TEXTURE3);
+	glUniform1i(22, 3);
 
 	glBindVertexArray(plane->getVao());
 	glUniformMatrix4fv(14, 1, false, glm::value_ptr(camera.getView()));
@@ -104,5 +124,7 @@ void SnakeScene::render() {
 	                        models.getRenderCount(plane));
 	glBindVertexArray(0);
 	shader->stop();
+
+	glfwSwapBuffers(stage->getWindow());
 
 }

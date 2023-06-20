@@ -31,7 +31,7 @@ add_library(Engine ${depsources}
         include/maths.h
         include/Mesh.h
         include/Model.h
-        include/DirectorInstanced.h
+        include/InstanceBuffer.h
         include/Transform.h
         include/rendering.h
         include/Scene.h
@@ -57,7 +57,7 @@ add_library(Engine ${depsources}
         src/LayerStack.cpp
         src/Mesh.cpp
         src/Model.cpp
-        src/DirectorInstanced.cpp
+        src/InstanceBuffer.cpp
         src/Transform.cpp
         src/rendering.cpp
         src/Scene.cpp
@@ -74,7 +74,7 @@ add_library(Engine ${depsources}
         include/type_erased.h
         src/EventQueue.cpp
         include/ITree.h
-        )
+        src/Framebuffer.cpp include/Framebuffer.h)
 
 add_subdirectory(deps/glfw-3.3.6)
 
