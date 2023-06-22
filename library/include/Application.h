@@ -8,23 +8,33 @@
 #include <mutex>
 #include <thread>
 #include "StateBuffer.h"
-#include "Engine.h"
+#include "EventQueue.h"
 #include "Stage.h"
-#include "IApplication.h"
 #include "synchapi.h"
 #include <string>
 #include <chrono>
 
-std::chrono::steady_clock::time_point now();
+inline std::chrono::steady_clock::time_point now() {
+	return std::chrono::steady_clock::now();
+}
 
 namespace Amber {
 
 	template<class Game>
-	class Application : public IApplication {
+	class Application {
 
 		StateBuffer<Game> buffer;
 		std::jthread gameThread;
 
+		Game& game = buffer.getLogicState();
+		typename Game::R& R = buffer.getRenderState();
+
+	protected:
+		Stage stage;
+		EventQueue eventsFromLogic;
+		EventQueue eventsFromRenderer;
+
+	private:
 		void gameLoop(std::chrono::milliseconds rate) {
 			using namespace std::chrono_literals;
 			unsigned long long int frames = 0;
@@ -34,11 +44,11 @@ namespace Amber {
 			while (game.running) {
 				auto frame_start = now();
 				{
-					std::lock_guard lock(q.mutex);
-					for (auto& [type, e]: q.events) {
+					std::lock_guard lock(eventsFromLogic.mutex);
+					for (auto& [type, e]: eventsFromLogic.events) {
 						game.handlers.handleType(type, e);
 					}
-					q.clearEvents();
+					eventsFromLogic.clearEvents();
 				}
 				game.update();
 				buffer.bufferUpdate();
@@ -56,20 +66,18 @@ namespace Amber {
 				}
 			}
 			std::cout << "game stop" << std::endl;
-			engine.kill(); //todo remove
 		}
 
 		void renderLoop() {
-			engine.init();
 			unsigned long long int frames = 0;
 
 			std::cout << "running engine on thread " << std::this_thread::get_id() << std::endl;
 
 			std::time_t start = std::time(nullptr);
 
-			Amber::Stage& stage = engine.stage;
+			stage.show();
 
-			while (engine.getRunning()) {
+			while (stage.isRunning()) {
 				buffer.bufferCopy();
 				stage.update();
 				stage.pick();
@@ -89,19 +97,26 @@ namespace Amber {
 		};
 
 	public:
-		Game& game = buffer.getLogicState();
-		typename Game::R& R = buffer.getRenderState();
 
 		template<class... Args>
-		Application(std::string_view name, int x, int y, int width, int height, Args... args) :
+		Application(Scene& frontScene, std::string_view manifest, std::string_view name, int x, int y, int width,
+		            int height, Args... args) :
 				buffer(args...),
-				IApplication(name, x, y, width, height) {
+				stage(frontScene, eventsFromRenderer, manifest, name, x, y, width, height) {
 		}
 
 		virtual ~Application() {
 			game.running = false;
 			if (gameThread.joinable()) gameThread.join();
 		}
+
+		Application(const Application&) = delete;
+
+		Application(Application&&) = delete;
+
+		Application& operator=(const Application&) = delete;
+
+		Application& operator=(Application&&) = delete;
 
 		void run(std::chrono::milliseconds rate) {
 			gameThread = std::jthread{&Application::gameLoop, this, rate};

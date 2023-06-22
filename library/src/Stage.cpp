@@ -3,52 +3,43 @@
 //
 
 #include "Stage.h"
+#include "Scene.h"
 #include "graphics.h"
 #include "EventManager.h"
 #include <iostream>
-#include <ctime>
-#include "Engine.h"
 
 namespace Amber {
 
 	template<class T, class... Args>
 	static void onGLFWevent(GLFWwindow* window, Args... args) {
-		auto* engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
+		auto* stage = static_cast<Stage*>(glfwGetWindowUserPointer(window));
 		T event{window, args...};
-		if (engine->stage.getFront())
-			engine->stage.getFront()->onEvent<T>(event);
+		stage->front.onEvent<T>(event);
 
 		if (!event.handled)
-			engine->handlers.onEvent(event);
+			stage->handlers.onEvent(event);
 	}
 
-	Stage::Stage(Engine& engine, std::string_view name, int x, int y, int width, int height)
-			: engine(engine), name(name), x(x), y(y), width(width), height(height) {}
+	Stage::Stage(Scene& front, EventQueue& stream, std::string_view manifest, std::string_view name, int x, int y, int width, int height)
+			: front(front), assets(manifest), eventOutStream(stream), name(name), x(x), y(y), width(width), height(height) {
 
-	Stage::~Stage() {
-		//todo remove delete scene here. ownership.
-		delete scenes;
-		glfwTerminate();
-	}
-
-	void Stage::init() {
 		std::cout << "GL on thread " << std::this_thread::get_id() << std::endl;
 		// set up GL context
 		if (!glfwInit()) {
-			exit(1);
+			throw std::runtime_error("Failed to create a GL context");
 		}
 
 		glfwWindowHint(GLFW_VISIBLE, 0);
 
-		window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+		window = glfwCreateWindow(width, height, std::string{name}.c_str(), nullptr, nullptr);
 		if (!window) {
 			glfwTerminate();
-			exit(2);
+			throw std::runtime_error("Failed to create a GLFW window");
 		}
 
 		glfwMakeContextCurrent(window);
 		if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-			exit(3);
+			throw std::runtime_error("Failed to load GLAD");
 		}
 
 		glfwSetWindowPos(window, x, y);
@@ -58,7 +49,20 @@ namespace Amber {
 		int pixWidth, pixHeight;
 		glfwGetFramebufferSize(window, &pixWidth, &pixHeight);
 
-		glfwSetWindowUserPointer(window, &engine);
+		glfwSetWindowUserPointer(window, this);
+
+		//default window handlers
+/*
+		handlers.addHandler(window_events::CloseHandler([&](window_events::CloseEvent&) {
+			                    stage.hide();
+			                    running = false;
+		                    })
+		);
+		handlers.addHandler(window_events::FocusHandler([&](window_events::FocusEvent& e) {
+			                    stage.focused = e.focused;
+		                    })
+		);
+*/
 
 		//game_events
 		glfwSetCursorEnterCallback(window, onGLFWevent<window_events::EnterEvent, int>);
@@ -73,20 +77,18 @@ namespace Amber {
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+	}
 
-		if (front) front->build();
+	Stage::~Stage() {
+		glfwTerminate();
 	}
 
 	void Stage::render() {
-		if (front) {
-			front->render();
-		}
+		front.render();
 	}
 
 	void Stage::update() {
-		if (front) {
-			front->update();
-		}
+		front.update();
 	}
 
 	void Stage::poll() {
@@ -95,28 +97,27 @@ namespace Amber {
 	}
 
 	void Stage::pick() {
-		return;
-		int ww, wh;
-		glfwGetWindowSize(window, &ww, &wh);
-		double dx, dy;
-		glfwGetCursorPos(window, &dx, &dy);
-		int mx = dx, my = dy;
-		if (0 <= mx && mx < ww && 0 <= my && my < wh)
-			if (front) {
-				//save old clear values
-				float colour[4];
-				double depth;
-				int stencil;
-				glGetFloatv(GL_COLOR_CLEAR_VALUE, &colour[0]);
-				glGetDoublev(GL_DEPTH_CLEAR_VALUE, &depth);
-				glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencil);
-				front->pick(mx, height - my);
-				//restore old clear values
-				glClearColor(colour[0], colour[1], colour[2], colour[3]);
-				glClearDepth(depth);
-				glClearStencil(stencil);
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			}
+		//todo
+//		int ww, wh;
+//		glfwGetWindowSize(window, &ww, &wh);
+//		double dx, dy;
+//		glfwGetCursorPos(window, &dx, &dy);
+//		int mx = dx, my = dy;
+//		if (0 <= mx && mx < ww && 0 <= my && my < wh) {
+//			//save old clear values
+//			float colour[4];
+//			double depth;
+//			int stencil;
+//			glGetFloatv(GL_COLOR_CLEAR_VALUE, &colour[0]);
+//			glGetDoublev(GL_DEPTH_CLEAR_VALUE, &depth);
+//			glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencil);
+//			front.pick(mx, height - my);
+//			//restore old clear values
+//			glClearColor(colour[0], colour[1], colour[2], colour[3]);
+//			glClearDepth(depth);
+//			glClearStencil(stencil);
+//			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+//		}
 	}
 
 	void Stage::show() {
@@ -131,22 +132,11 @@ namespace Amber {
 		return window;
 	}
 
-	void Stage::addScene(const string& id, Scene* scene) {
-		scenes->insert(std::pair(id, scene));
-		scene->stage = this;
+	bool Stage::isRunning() const {
+		return running;
 	}
 
-	void Stage::setFrontScene(const string& scene) {
-		if (scenes->contains(scene)) {
-			if (front) front->hide();
-			front = scenes->at(scene);
-			if (window) front->build();
-			front->show();
-		}
+	void Stage::kill() {
+		running = false;
 	}
-
-	Scene* Stage::getFront() const {
-		return front;
-	}
-
 }

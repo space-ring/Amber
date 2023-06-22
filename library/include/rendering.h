@@ -11,8 +11,6 @@
 namespace Amber {
 	class Scene;
 
-	class Engine;
-
 	template<class... Args>
 	class RenderCall {
 		using f = std::function<Frame(Args...)>;

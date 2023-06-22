@@ -21,11 +21,9 @@ class SnakeScene : public Amber::Scene {
 
 public:
 
-	SnakeScene(unsigned int width, unsigned int height);
+	SnakeScene(Stage& stage, unsigned int imWidth, unsigned int imHeight);
 
 	~SnakeScene();
-
-	void build() override;
 
 	void show() override;
 

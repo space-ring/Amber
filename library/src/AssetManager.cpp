@@ -87,7 +87,7 @@ namespace Amber {
 		return {vertices, indices};
 	}
 
-	void AssetManager::addManifest(view path) {
+	AssetManager::AssetManager(view path) {
 		string manifest = readFile(path);
 
 		if (manifest.empty()) return;

@@ -34,30 +34,24 @@ namespace Amber {
 	class Scene {
 	protected:
 
-		using id = unsigned long;
-		using string = std::string;
-
-		bool built = false;
 		LayerStack layers;
 		EventManager handlers;
 		InstanceBuffer models;
 
-		Transform* last_picked = nullptr;
+		Transform* lastPicked = nullptr;
 		Transform* dragged = nullptr;
 		Transform* primed = nullptr;
-		Transform* last_focused = nullptr;
+		Transform* lastFocused = nullptr;
 
-	public:
-
-		Stage* stage;
+		Stage& stage;
 
 		KeyRegistry keys;
 
-		Scene();
+	public:
+
+		explicit Scene(Stage& stage);
 
 		virtual ~Scene() = default;
-
-		virtual void build() = 0;
 
 		virtual void show() = 0;
 
@@ -76,7 +70,6 @@ namespace Amber {
 			handlers.onEvent(event);
 		}
 
-		LayerStack& getLayers();
 	};
 
 //	template<>

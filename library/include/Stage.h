@@ -11,35 +11,42 @@
 #include <list>
 #include <queue>
 #include <map>
+#include <thread>
 #include "EventManager.h"
+#include "EventQueue.h"
+#include "AssetManager.h"
 
 namespace Amber {
 
-	class Engine;
-
 	class Scene;
 
-	class Stage {
-		using string = std::string;
+	class Stage final {
 
-	private:
-		string name;
+		std::string name;
 		int x, y, width, height;
 		GLFWwindow* window = nullptr;
-		std::map<string, Scene*>* scenes = new std::map<string, Scene*>;
-		Scene* front = nullptr;
-	public:
-
-		Engine& engine;
 
 		bool focused = false;
+		bool running = true;
 
-		Stage(Engine& engine, std::string_view name, int x, int y, int width, int height);
+	public:
 
-		virtual ~Stage();
+		EventQueue& eventOutStream;
+		EventManager handlers;
+		AssetManager assets;
+		Scene& front;
 
-		/* Initialises GLFW window and OpenGL context */
-		void init();
+		Stage(Scene& front, EventQueue& stream, std::string_view manifest, std::string_view name, int x, int y, int width, int height);
+
+		~Stage();
+
+		Stage(const Stage&) = delete;
+
+		Stage(Stage&&) = delete;
+
+		Stage& operator=(const Stage&) = delete;
+
+		Stage& operator=(Stage&&) = delete;
 
 		void render();
 
@@ -55,12 +62,9 @@ namespace Amber {
 
 		GLFWwindow* getWindow() const;
 
-		void addScene(const string& id, Scene* scene);
+		bool isRunning() const;
 
-		void setFrontScene(const string& scene);
-
-		Scene* getFront() const;
-
+		void kill();
 	};
 }
 
