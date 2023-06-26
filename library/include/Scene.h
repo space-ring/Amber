@@ -35,7 +35,6 @@ namespace Amber {
 	protected:
 
 		LayerStack layers;
-		EventManager handlers;
 		InstanceBuffer models;
 
 		Transform* lastPicked = nullptr;
@@ -48,6 +47,8 @@ namespace Amber {
 		KeyRegistry keys;
 
 	public:
+
+		EventManager handlers;
 
 		explicit Scene(Stage& stage);
 

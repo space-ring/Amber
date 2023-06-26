@@ -8,6 +8,7 @@
 #include <list>
 #include "IClonable.h"
 #include "Object.h"
+#include "EventQueue.h"
 #include <chrono>
 
 using uint = unsigned int;
@@ -48,12 +49,21 @@ enum cell {
 
 namespace SnakeEvents {
 	//
+	struct Spawn {
+		bool handled;
+		const int x, y;
+
+		Spawn(const int x, const int y) : x(x), y(y) {}
+	};
+
 	struct DirEvent {
 		bool handled = false;
 		const direction dir;
 
 		DirEvent(const direction direction) : dir(direction) {}
 	};
+
+	using Move = DirEvent;
 
 	struct CheatGrow {
 		bool handled = false;
@@ -74,6 +84,10 @@ public:
 
 	R getR() {
 		return R{segments, dir};
+	}
+
+	direction getDir() const {
+		return dir;
 	}
 
 	Snake(const point& point) {
@@ -102,6 +116,8 @@ public:
 			*it = *std::prev(it);
 		}
 		segments.front() = next;
+
+
 	}
 
 	void turn(direction d) {
@@ -132,6 +148,8 @@ class SnakeGame final {
 	Snake snake;
 	point fruit;
 
+	Amber::EventQueue& stream;
+
 	void genFruit() {
 		board[fruit.x + fruit.y * height] = EMPTY;
 		fruit.x = 2 + std::rand() % (width - 4);
@@ -154,16 +172,19 @@ public:
 		                                                                        snake(snake), fruit(fruit) {}
 	};
 
-	SnakeGame(uint width, uint height)
-			: width(width), height(height),
+	SnakeGame(Amber::EventQueue& outEventStream, uint width, uint height)
+			: stream(outEventStream),
+			  width(width), height(height),
 			  board(new cell[width * height]),
-			  snake({(int) width / 2, (int) height}),
+			  snake({(int) width / 2, (int) height - 3}),
 			  fruit({0, 0}) {
 		std::srand(time(nullptr));
 		auto head = snake.head();
 		board[head.y * width + head.x] = SNAKE;
 
 		genFruit();
+
+		stream.putEvent(SnakeEvents::Spawn(snake.head().x, snake.head().y));
 
 		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
 				[&](SnakeEvents::DirEvent& event) {
@@ -178,6 +199,7 @@ public:
 					snake.grow(p);
 				}
 		));
+
 
 	}
 
@@ -203,6 +225,8 @@ public:
 				genFruit();
 			} else board[toe] = EMPTY;
 			board[tip] = SNAKE;
+			stream.putEvent(SnakeEvents::Move(snake.getDir()));
+			std::cout<<"MOVED"<<std::endl;
 			return true;
 		} else return false;
 	}

@@ -42,6 +42,59 @@ SnakeScene::SnakeScene(Stage& stage, unsigned int imWidth, unsigned int imHeight
 			}
 	));
 
+	auto& plane = stage.assets.getMesh(0);
+	models.addMesh(&plane, 50 * 50 + 2);
+
+
+	handlers.addHandler(Amber::Handler<SnakeEvents::Spawn>(
+			[&](SnakeEvents::Spawn& e) {
+//				auto& segment = segments.emplace_front();
+//				segment.setMesh(&plane);
+//				segment.transform.translate(glm::vec3(e.x, e.y, -1));
+//				segment.transform.scale(glm::vec3(0.5));
+//				models.addModel(segment);
+//				colours.push_back((float) 0xff0000 / 0xffffff);
+//				std::cout << "spawned" << std::endl;
+//				models.buffer(&plane);
+
+				auto& m = models.newModel();
+				m.setMesh(&plane);
+				models.addModel(m);
+				m.transform.setTranslation({25, 25, -1});
+				models.buffer(&plane);
+			}
+	));
+
+	handlers.addHandler(Amber::Handler<SnakeEvents::Move>(
+			[&](SnakeEvents::Move& e) {
+				return;
+				auto headT = glm::vec3{};
+				switch (e.dir) {
+					case LEFT:
+						headT = {-1, 0, 0};
+						break;
+					case RIGHT:
+						headT = {1, 0, 0};
+						break;
+					case UP:
+						headT = {0, 1, 0};
+						break;
+					case DOWN:
+						headT = {0, -1, 0};
+						break;
+				}
+				segments.front().transform.translate(headT);
+				std::cout << "move" << std::endl;
+				std::list<Model>::iterator it;
+				auto& current = segments.front().transform;
+				for (it = --segments.end(); it != segments.begin(); --it) {
+					auto& segment = *it;
+					segment.transform.setTranslation(current.getTranslation());
+				}
+				models.buffer(&stage.assets.getMesh(0));
+			}
+	));
+
 //	auto& app = static_cast<Application<SnakeGame>&>(stage->engine.application);
 //	models.addMesh(stage.assets.getMesh(0), app.R.height * app.R.height + 2);
 //
@@ -107,7 +160,7 @@ void SnakeScene::render() {
 	shader->start();
 
 	Amber::Texture& yellow = assets.getTexture(0);
-	yellow.bindToUnit(GL_TEXTURE3);
+	yellow.bindToUnit(GL_TEXTURE0+3);
 	glUniform1i(22, 3);
 
 	glBindVertexArray(plane->getVao());

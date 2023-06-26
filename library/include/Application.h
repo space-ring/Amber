@@ -13,6 +13,7 @@
 #include "synchapi.h"
 #include <string>
 #include <chrono>
+#include "Scene.h"
 
 inline std::chrono::steady_clock::time_point now() {
 	return std::chrono::steady_clock::now();
@@ -23,16 +24,13 @@ namespace Amber {
 	template<class Game>
 	class Application {
 
-		StateBuffer<Game> buffer;
 		std::jthread gameThread;
 
-		Game& game = buffer.getLogicState();
-		typename Game::R& R = buffer.getRenderState();
-
 	protected:
-		Stage stage;
 		EventQueue eventsFromLogic;
 		EventQueue eventsFromRenderer;
+		Game game;
+		Stage stage;
 
 	private:
 		void gameLoop(std::chrono::milliseconds rate) {
@@ -44,14 +42,13 @@ namespace Amber {
 			while (game.running) {
 				auto frame_start = now();
 				{
-					std::lock_guard lock(eventsFromLogic.mutex);
-					for (auto& [type, e]: eventsFromLogic.events) {
+					std::lock_guard lock(eventsFromRenderer.mutex);
+					for (auto& [type, e]: eventsFromRenderer.events) {
 						game.handlers.handleType(type, e);
 					}
-					eventsFromLogic.clearEvents();
+					eventsFromRenderer.clearEvents();
 				}
 				game.update();
-				buffer.bufferUpdate();
 
 				++frames;
 
@@ -78,7 +75,15 @@ namespace Amber {
 			stage.show();
 
 			while (stage.isRunning()) {
-				buffer.bufferCopy();
+
+				{
+					std::lock_guard(eventsFromLogic.mutex);
+					for (auto& [type, e]: eventsFromLogic.events) {
+						stage.handlers.handleType(type, e);
+						stage.front.handlers.handleType(type, e);
+					}
+					eventsFromLogic.clearEvents();
+				}
 				stage.update();
 				stage.pick();
 				stage.poll();
@@ -101,7 +106,7 @@ namespace Amber {
 		template<class... Args>
 		Application(Scene& frontScene, std::string_view manifest, std::string_view name, int x, int y, int width,
 		            int height, Args... args) :
-				buffer(args...),
+				game(eventsFromLogic, args...),
 				stage(frontScene, eventsFromRenderer, manifest, name, x, y, width, height) {
 		}
 
