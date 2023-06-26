@@ -86,7 +86,7 @@ namespace Amber {
 			glm::mat4* copy = new glm::mat4[limit];
 			glBindBuffer(GL_ARRAY_BUFFER, m.memory);
 			auto* from = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, m.size * sizeof(glm::mat4),
-			                                                      GL_MAP_READ_BIT));
+																  GL_MAP_READ_BIT));
 			for (int i = 0; i < m.memory; ++i) {
 				copy[i] = from[i];
 			}
@@ -175,6 +175,8 @@ namespace Amber {
 		references.at(mesh)->emplace(position, &model.transform);
 		++m.size;
 		writeGPU(mesh, position);
+		track(mesh,
+			  model.transform); //todo why is the instance not already tracked? what is tracking for? DOCUMENTATION!
 		return true;
 		glCheckError();
 	}
@@ -261,17 +263,15 @@ namespace Amber {
 		Managed& m = managed.at(mesh);
 		glBindBuffer(GL_ARRAY_BUFFER, m.memory);
 		auto* video = static_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, tracker.min,
-		                                                       tracker.max - tracker.min + 1,
-		                                                       GL_MAP_WRITE_BIT)); //todo off by 1
+															   tracker.max - tracker.min + 1,
+															   GL_MAP_WRITE_BIT));
 		for (auto i: tracker.list) {
 //			memcpy(video + i, &refs->at(i)->chained, sizeof(glm::mat4));
-			video[i] = *refs->at(i)->getP();
+			auto& p = *refs->at(i);
+			video[i] = *p.getP();
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		tracker.min = m.capacity;
-		tracker.max = 0;
-		tracker.list = std::list<index>();
 	}
 
 	void InstanceBuffer::link(Mesh* mesh) {

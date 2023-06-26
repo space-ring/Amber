@@ -127,7 +127,7 @@ namespace Amber {
 
 	void Stage::hide() {
 		glfwHideWindow(window);
-		focused = true;
+		focused = false;
 	}
 
 	GLFWwindow* Stage::getWindow() const {

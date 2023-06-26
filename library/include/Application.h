@@ -98,6 +98,8 @@ namespace Amber {
 				}
 			}
 
+			stage.hide();
+
 			std::cout << "render stop" << std::endl;
 		};
 

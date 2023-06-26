@@ -63,9 +63,28 @@ namespace SnakeEvents {
 		DirEvent(const direction direction) : dir(direction) {}
 	};
 
-	using Move = DirEvent;
+	struct Move {
+		bool handled = false;
+		const direction dir;
 
-	struct CheatGrow {
+		Move(const direction direction) : dir(direction) {}
+	};
+
+	struct Grow {
+		bool handled;
+		const int x, y;
+
+		Grow(const int x, const int y) : x(x), y(y) {}
+	};
+
+	struct Fruit {
+		bool handled = false;
+		const int x, y;
+
+		Fruit(const int x, const int y) : x(x), y(y) {}
+	};
+
+	struct Death {
 		bool handled = false;
 	};
 }
@@ -169,7 +188,7 @@ public:
 		point fruit;
 
 		R(uint width, uint height, const Snake::R& snake, const point& fruit) : width(width), height(height),
-		                                                                        snake(snake), fruit(fruit) {}
+																				snake(snake), fruit(fruit) {}
 	};
 
 	SnakeGame(Amber::EventQueue& outEventStream, uint width, uint height)
@@ -183,6 +202,7 @@ public:
 		board[head.y * width + head.x] = SNAKE;
 
 		genFruit();
+		stream.putEvent(SnakeEvents::Fruit{fruit.x, fruit.y});
 
 		stream.putEvent(SnakeEvents::Spawn(snake.head().x, snake.head().y));
 
@@ -192,7 +212,7 @@ public:
 				})
 		);
 
-		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
+		handlers.addHandler(Amber::Handler<SnakeEvents::Grow>(
 				[&](auto& e) {
 					auto p = snake.tail();
 					p.x += 1;
@@ -214,19 +234,22 @@ public:
 	bool step() {
 		auto old_tail = snake.tail();
 		snake.move();
+		std::cout << snake.head().x << " " << snake.head().y << std::endl;
+		std::cout << fruit.x << " " << fruit.y << std::endl;
 		auto head = snake.head();
 		auto tip = head.x + head.y * width;
 		auto toe = old_tail.x + old_tail.y * width;
 		if (0 <= head.x && head.x < width && 0 <= head.y && head.y < height) {
 			if (board[tip] == SNAKE)
 				return false;
+			stream.putEvent(SnakeEvents::Move(snake.getDir()));
 			if (board[tip] == FRUIT) {
 				snake.grow(old_tail);
+				stream.putEvent(SnakeEvents::Grow{old_tail.x, old_tail.y});
 				genFruit();
+				stream.putEvent(SnakeEvents::Fruit{fruit.x, fruit.y});
 			} else board[toe] = EMPTY;
 			board[tip] = SNAKE;
-			stream.putEvent(SnakeEvents::Move(snake.getDir()));
-			std::cout<<"MOVED"<<std::endl;
 			return true;
 		} else return false;
 	}
@@ -240,6 +263,8 @@ public:
 		if (snake.length() > 20) ts = 0.08s;
 		if (now - start >= ts) {
 			running = step();
+			if (!running)
+				stream.putEvent(SnakeEvents::Death{});
 			start = now;
 		}
 	}
