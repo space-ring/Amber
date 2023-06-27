@@ -6,6 +6,7 @@
 #include "snake.h"
 #include "Application.h"
 #include "Texture.h"
+#include "manifest.h"
 
 SnakeScene::SnakeScene(Stage& stage, unsigned int imWidth, unsigned int imHeight)
 		: Scene(stage), camera(glm::vec3(0), glm::vec3(0), 70, imWidth, imHeight, 0, 100, 0, 100) {
@@ -39,7 +40,7 @@ SnakeScene::SnakeScene(Stage& stage, unsigned int imWidth, unsigned int imHeight
 			}
 	));
 
-	auto& plane = stage.assets.getMesh(0);
+	auto& plane = stage.assets.getMesh(SnakeAssets::PLANE);
 	models.addMesh(&plane, 50 * 50 + 2);
 
 	auto& fruit = models.newModel();
@@ -146,11 +147,11 @@ void SnakeScene::render() {
 	glViewport(0, 0, 500, 500);
 	auto& assets = stage.assets;
 
-	Amber::Mesh* plane = &assets.getMesh(0);
-	Amber::Shader* shader = &assets.getShader(0);
+	Amber::Mesh* plane = &assets.getMesh(SnakeAssets::PLANE);
+	Amber::Shader* shader = &assets.getShader(SnakeAssets::SHADER1);
 	shader->start();
 
-	Amber::Texture& yellow = assets.getTexture(0);
+	Amber::Texture& yellow = assets.getTexture(SnakeAssets::YELLOW_SQUARE);
 	yellow.bindToUnit(GL_TEXTURE0 + 3);
 	glUniform1i(22, 3);
 

@@ -10,7 +10,7 @@ add_executable(Test
         src/test.cpp
         include/snake.h
         src/SnakeScene.cpp
-        include/scenes/demo/SnakeScene.h)
+        include/scenes/demo/SnakeScene.h include/manifest.h)
 
 target_include_directories(Test PRIVATE include)
 

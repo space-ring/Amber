@@ -77,7 +77,7 @@ namespace Amber {
 			while (stage.isRunning()) {
 
 				{
-					std::lock_guard(eventsFromLogic.mutex);
+					std::lock_guard lock(eventsFromLogic.mutex);
 					for (auto& [type, e]: eventsFromLogic.events) {
 						stage.handlers.handleType(type, e);
 						stage.front.handlers.handleType(type, e);
