@@ -41,13 +41,16 @@ namespace Amber {
 			game.start();
 			while (game.running) {
 				auto frame_start = now();
+				EventQueue* clone;
 				{
 					std::lock_guard lock(eventsFromRenderer.mutex);
-					for (auto& [type, e]: eventsFromRenderer.events) {
-						game.handlers.handleType(type, e);
-					}
+					clone = new EventQueue(eventsFromRenderer);
 					eventsFromRenderer.clearEvents();
 				}
+				for (auto& [type, e]: clone->events) {
+					game.handlers.handleType(type, e);
+				}
+				delete clone;
 				game.update();
 
 				++frames;
@@ -76,14 +79,17 @@ namespace Amber {
 
 			while (stage.isRunning()) {
 
+				EventQueue* clone;
 				{
 					std::lock_guard lock(eventsFromLogic.mutex);
-					for (auto& [type, e]: eventsFromLogic.events) {
-						stage.handlers.handleType(type, e);
-						stage.front.handlers.handleType(type, e);
-					}
+					clone = new EventQueue(eventsFromLogic);
 					eventsFromLogic.clearEvents();
 				}
+				for (auto& [type, e]: clone->events) {
+					stage.handlers.handleType(type, e);
+					stage.front.handlers.handleType(type, e);
+				}
+				delete clone;
 				stage.update();
 				stage.pick();
 				stage.poll();
@@ -107,7 +113,7 @@ namespace Amber {
 
 		template<class... Args>
 		Application(Scene& frontScene, std::string_view manifest, std::string_view name, int x, int y, int width,
-		            int height, Args... args) :
+					int height, Args... args) :
 				game(eventsFromLogic, args...),
 				stage(frontScene, eventsFromRenderer, manifest, name, x, y, width, height) {
 		}

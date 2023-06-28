@@ -13,11 +13,16 @@ namespace Amber {
 
 	struct EventContainer {
 		virtual ~EventContainer() = default;
+		virtual EventContainer* clone() = 0;
 	};
 
 	template<class T>
 	struct EventVector : EventContainer { //e.g. used for handlers T = Event
 		std::vector<T> events;
+
+		EventVector<T>* clone() override {
+			return new EventVector(*this);
+		}
 	};
 
 	struct HandlerContainer {

@@ -16,9 +16,17 @@ namespace Amber {
 		std::map<std::type_index, EventContainer*> events;
 		std::mutex mutex;
 
+		EventQueue() = default;
+
 		virtual ~EventQueue() {
 			for (auto& s: events) {
 				delete s.second;
+			}
+		}
+
+		EventQueue(const EventQueue& q) {
+			for (auto& [type, container]: q.events) {
+				events.insert({type, container->clone()});
 			}
 		}
 
