@@ -24,22 +24,22 @@ inventory screen and user game_events pass through to the engine.
 
 The scene altogether defines the textures seen in both layers.
 
-The engine should allow any event to be passed to the back demoLayer if not handled by the front. This means that if
-there was a pickable model (still pickable with the top demoLayer active) in the bottom left corner in the back
-demoLayer, it should respond to mouse clicks even when the front demoLayer is active. This allows for non-obscuring
-layers. This also allows optimisation - the back demoLayer only renders pickable models if the front demoLayer does not
-find a picked model instead of all models in the scene being rendered. For this to happen, the back demoLayer must be
+The engine should allow any event to be passed to the back layer if not handled by the front. This means that if
+there was a pickable model (still pickable with the top layer active) in the bottom left corner in the back
+layer, it should respond to mouse clicks even when the front layer is active. This allows for non-obscuring
+layers. This also allows optimisation - the back layer only renders pickable models if the front layer does not
+find a picked model instead of all models in the scene being rendered. For this to happen, the back layer must be
 able to renderState its own content separately from other layers' content and store and manipulate the renderState image
 
-A scene will have models, a demoLayer layers and frames. There will be 2 passes on the demoLayer layers: forwards and
+A scene will have models, a layer layers and frames. There will be 2 passes on the layer layers: forwards and
 backwards. On the forward pass (on renderState call), the layers will operate on any frame, compositing them to build
 the final images. On the backward pass (on poll call), the layers will handle game_events or pass any unhandled to the
-next demoLayer, then finally to the event manager.
+next layer, then finally to the event manager.
 
-One might think: if there are two independent frames, why should one demoLayer operate on them both? (both frames are
+One might think: if there are two independent frames, why should one layer operate on them both? (both frames are
 rendered for event handling, not necessary) An intuitive solution would be to give each frame its own layerstack.
-Suppose now the client wants to darken the whole scene, now every frame needs an additional 'darken' demoLayer. This
-creates unnecessary complications. Alternatively, we can create a demoLayer for frame 1 and another for frame 2.
+Suppose now the client wants to darken the whole scene, now every frame needs an additional 'darken' layer. This
+creates unnecessary complications. Alternatively, we can create a layer for frame 1 and another for frame 2.
 
 The enforcement of frames as textures seems unfair in the case of rendering to renderbuffers and glviewporting.
 Consequently, it's better not to use frames as textures to blit and renderState together unless designed to do so.
