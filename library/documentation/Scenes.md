@@ -31,7 +31,7 @@ layers. This also allows optimisation - the back layer only renders pickable mod
 find a picked model instead of all models in the scene being rendered. For this to happen, the back layer must be
 able to renderState its own content separately from other layers' content and store and manipulate the renderState image
 
-A scene will have models, a layer layers and frames. There will be 2 passes on the layer layers: forwards and
+A scene will have models, a layers and frames. There will be 2 passes on the layers: forwards and
 backwards. On the forward pass (on renderState call), the layers will operate on any frame, compositing them to build
 the final images. On the backward pass (on poll call), the layers will handle game_events or pass any unhandled to the
 next layer, then finally to the event manager.
