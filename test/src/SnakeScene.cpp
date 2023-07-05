@@ -136,6 +136,13 @@ void SnakeScene::hide() {
 }
 
 void SnakeScene::update() {
+	if (stage.keys.down[GLFW_KEY_W]) {
+		camera.move({0, 0, 0.1});
+		std::cout<<camera.position.z<<std::endl;
+	}
+	if (stage.keys.down[GLFW_KEY_S]) {
+		camera.move({0, 0, -0.1});
+	}
 }
 
 void SnakeScene::pick(int x, int y) {

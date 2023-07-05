@@ -25,12 +25,6 @@ namespace Amber {
 
 	class Stage;
 
-	struct KeyRegistry {
-		std::set<int> pressed;
-		std::set<int> down;
-		std::set<int> released;
-	};
-
 	class Scene {
 	protected:
 
@@ -43,8 +37,6 @@ namespace Amber {
 		Transform* lastFocused = nullptr;
 
 		Stage& stage;
-
-		KeyRegistry keys;
 
 	public:
 

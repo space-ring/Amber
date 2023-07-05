@@ -7,7 +7,7 @@
 
 #include "graphics.h"
 #include "variadic.h"
-#include  <iostream>
+#include <bitset>
 #include "IClonable.h"
 
 namespace Amber {
@@ -141,5 +141,9 @@ namespace Amber {
 		using ScrollHandler = Handler<ScrollEvent>;
 		using FramebufferSizeHandler = Handler<FramebufferSizeEvent>;
 	}
+
+	struct KeyRegistry {
+		std::bitset<GLFW_KEY_LAST> last, pressed, released, down;
+	};
 }
 #endif //ENGINE_EVENT_H

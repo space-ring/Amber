@@ -20,8 +20,10 @@ namespace Amber {
 			stage->handlers.onEvent(event);
 	}
 
-	Stage::Stage(Scene& front, EventQueue& stream, std::string_view manifest, std::string_view name, int x, int y, int width, int height)
-			: front(front), assets(manifest), eventOutStream(stream), name(name), x(x), y(y), width(width), height(height) {
+	Stage::Stage(Scene& front, EventQueue& stream, std::string_view manifest, std::string_view name, int x, int y,
+				 int width, int height)
+			: front(front), assets(manifest), eventOutStream(stream), name(name), x(x), y(y), width(width),
+			  height(height) {
 
 		std::cout << "GL on thread " << std::this_thread::get_id() << std::endl;
 		// set up GL context
@@ -52,17 +54,31 @@ namespace Amber {
 		glfwSetWindowUserPointer(window, this);
 
 		//default window handlers
-/*
+
 		handlers.addHandler(window_events::CloseHandler([&](window_events::CloseEvent&) {
-			                    stage.hide();
-			                    running = false;
-		                    })
+								hide();
+								running = false;
+							})
 		);
 		handlers.addHandler(window_events::FocusHandler([&](window_events::FocusEvent& e) {
-			                    stage.focused = e.focused;
-		                    })
+								Stage::focused = e.focused;
+							})
 		);
-*/
+
+		handlers.addHandler(window_events::KeyHandler([&](window_events::KeyEvent& e) {
+								switch (e.action) {
+									case GLFW_PRESS:
+										keys.pressed[e.key] = true;
+										keys.last[e.key] = true;
+										break;
+									case GLFW_RELEASE:
+										keys.released[e.key] = true;
+										keys.last[e.key] = false;
+										break;
+								}
+							})
+		);
+
 
 		//game_events
 		glfwSetCursorEnterCallback(window, onGLFWevent<window_events::EnterEvent, int>);
@@ -88,10 +104,32 @@ namespace Amber {
 	}
 
 	void Stage::update() {
+		keys.down = (keys.pressed & keys.released & keys.last)
+					| (keys.down & ~keys.pressed & ~keys.released)
+					| (~keys.down & keys.pressed & ~keys.released);
+
+		/*
+		D	P	R	L
+		1	1	1	1	->	1
+		1	1	1	0	->	0
+		1	0	1	1	->	0
+		1	0	1	0	->	0
+		1	0	0	1	->	1
+		1	0	0	0	->	1
+		0	1	1	1	->	1
+		0	1	0	1	->	1
+		0	1	1	0	->	0
+		0	1	0	0	->	1
+		0	0	0	1	->	0
+		0	0	0	0	->	0
+		 */
 		front.update();
 	}
 
 	void Stage::poll() {
+		keys.pressed.reset();
+		keys.released.reset();
+
 		if (focused) glfwPollEvents();
 		else glfwWaitEvents();
 	}

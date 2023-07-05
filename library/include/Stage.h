@@ -36,6 +36,8 @@ namespace Amber {
 		AssetManager assets;
 		Scene& front;
 
+		KeyRegistry keys;
+
 		Stage(Scene& front, EventQueue& stream, std::string_view manifest, std::string_view name, int x, int y, int width, int height);
 
 		~Stage();

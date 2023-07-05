@@ -234,8 +234,6 @@ public:
 	bool step() {
 		auto old_tail = snake.tail();
 		snake.move();
-		std::cout << snake.head().x << " " << snake.head().y << std::endl;
-		std::cout << fruit.x << " " << fruit.y << std::endl;
 		auto head = snake.head();
 		auto tip = head.x + head.y * width;
 		auto toe = old_tail.x + old_tail.y * width;
