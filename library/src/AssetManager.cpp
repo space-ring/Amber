@@ -87,7 +87,7 @@ namespace Amber {
 		return {vertices, indices};
 	}
 
-	void AssetManager::addManifest(view path) {
+	AssetManager::AssetManager(view path) {
 		string manifest = readFile(path);
 
 		if (manifest.empty()) return;
@@ -281,6 +281,7 @@ namespace Amber {
 		if (!texturePaths.contains(id))
 			throw std::runtime_error("Cannot load unknown texture " + std::to_string(id));
 
+		stbi_set_flip_vertically_on_load(true);
 		auto& formula = texturePaths.at(id);
 		int width, height, channels;
 		unsigned char* p = stbi_load(formula.path.c_str(), &width, &height, &channels, 0);

@@ -48,7 +48,7 @@ namespace Amber {
 
 	public:
 
-		void addManifest(view path);
+		explicit AssetManager(view path);
 
 		// SHADERS //
 		void addSourcePath(token id, view path);

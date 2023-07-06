@@ -8,6 +8,7 @@
 #include <list>
 #include "IClonable.h"
 #include "Object.h"
+#include "EventQueue.h"
 #include <chrono>
 
 using uint = unsigned int;
@@ -48,6 +49,13 @@ enum cell {
 
 namespace SnakeEvents {
 	//
+	struct Spawn {
+		bool handled;
+		const int x, y;
+
+		Spawn(const int x, const int y) : x(x), y(y) {}
+	};
+
 	struct DirEvent {
 		bool handled = false;
 		const direction dir;
@@ -55,7 +63,28 @@ namespace SnakeEvents {
 		DirEvent(const direction direction) : dir(direction) {}
 	};
 
-	struct CheatGrow {
+	struct Move {
+		bool handled = false;
+		const direction dir;
+
+		Move(const direction direction) : dir(direction) {}
+	};
+
+	struct Grow {
+		bool handled;
+		const int x, y;
+
+		Grow(const int x, const int y) : x(x), y(y) {}
+	};
+
+	struct Fruit {
+		bool handled = false;
+		const int x, y;
+
+		Fruit(const int x, const int y) : x(x), y(y) {}
+	};
+
+	struct Death {
 		bool handled = false;
 	};
 }
@@ -74,6 +103,10 @@ public:
 
 	R getR() {
 		return R{segments, dir};
+	}
+
+	direction getDir() const {
+		return dir;
 	}
 
 	Snake(const point& point) {
@@ -102,6 +135,8 @@ public:
 			*it = *std::prev(it);
 		}
 		segments.front() = next;
+
+
 	}
 
 	void turn(direction d) {
@@ -132,6 +167,8 @@ class SnakeGame final {
 	Snake snake;
 	point fruit;
 
+	Amber::EventQueue& stream;
+
 	void genFruit() {
 		board[fruit.x + fruit.y * height] = EMPTY;
 		fruit.x = 2 + std::rand() % (width - 4);
@@ -151,19 +188,23 @@ public:
 		point fruit;
 
 		R(uint width, uint height, const Snake::R& snake, const point& fruit) : width(width), height(height),
-		                                                                        snake(snake), fruit(fruit) {}
+																				snake(snake), fruit(fruit) {}
 	};
 
-	SnakeGame(uint width, uint height)
-			: width(width), height(height),
+	SnakeGame(Amber::EventQueue& outEventStream, uint width, uint height)
+			: stream(outEventStream),
+			  width(width), height(height),
 			  board(new cell[width * height]),
-			  snake({(int) width / 2, (int) height}),
+			  snake({(int) width / 2, (int) height - 3}),
 			  fruit({0, 0}) {
 		std::srand(time(nullptr));
 		auto head = snake.head();
 		board[head.y * width + head.x] = SNAKE;
 
 		genFruit();
+		stream.putEvent(SnakeEvents::Fruit{fruit.x, fruit.y});
+
+		stream.putEvent(SnakeEvents::Spawn(snake.head().x, snake.head().y));
 
 		handlers.addHandler(Amber::Handler<SnakeEvents::DirEvent>(
 				[&](SnakeEvents::DirEvent& event) {
@@ -171,13 +212,14 @@ public:
 				})
 		);
 
-		handlers.addHandler(Amber::Handler<SnakeEvents::CheatGrow>(
+		handlers.addHandler(Amber::Handler<SnakeEvents::Grow>(
 				[&](auto& e) {
 					auto p = snake.tail();
 					p.x += 1;
 					snake.grow(p);
 				}
 		));
+
 
 	}
 
@@ -198,9 +240,12 @@ public:
 		if (0 <= head.x && head.x < width && 0 <= head.y && head.y < height) {
 			if (board[tip] == SNAKE)
 				return false;
+			stream.putEvent(SnakeEvents::Move(snake.getDir()));
 			if (board[tip] == FRUIT) {
 				snake.grow(old_tail);
+				stream.putEvent(SnakeEvents::Grow{old_tail.x, old_tail.y});
 				genFruit();
+				stream.putEvent(SnakeEvents::Fruit{fruit.x, fruit.y});
 			} else board[toe] = EMPTY;
 			board[tip] = SNAKE;
 			return true;
@@ -216,6 +261,8 @@ public:
 		if (snake.length() > 20) ts = 0.08s;
 		if (now - start >= ts) {
 			running = step();
+			if (!running)
+				stream.putEvent(SnakeEvents::Death{});
 			start = now;
 		}
 	}

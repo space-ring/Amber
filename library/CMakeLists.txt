@@ -16,8 +16,6 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
 add_library(Engine ${depsources}
         include/AssetManager.h
         include/Camera.h
-        include/CaptureMethod.h
-        include/Engine.h
         include/engineIO.h
         include/engineUtils.h
         include/events.h
@@ -45,8 +43,6 @@ add_library(Engine ${depsources}
         include/variadic.h
         src/AssetManager.cpp
         src/Camera.cpp
-        src/CaptureMethod.cpp
-        src/Engine.cpp
         src/engineIO.cpp
         src/engineUtils.cpp
         src/events.cpp
@@ -64,10 +60,7 @@ add_library(Engine ${depsources}
         src/Shader.cpp
         src/Stage.cpp
         src/Texture.cpp
-        src/Application.cpp
         include/NoDefaultSingleton.h
-        include/IApplication.h
-        src/IApplication.cpp
         include/EventQueue.h
         include/IClonable.h
         include/Object.h

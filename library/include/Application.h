@@ -8,23 +8,31 @@
 #include <mutex>
 #include <thread>
 #include "StateBuffer.h"
-#include "Engine.h"
+#include "EventQueue.h"
 #include "Stage.h"
-#include "IApplication.h"
 #include "synchapi.h"
 #include <string>
 #include <chrono>
+#include "Scene.h"
 
-std::chrono::steady_clock::time_point now();
+inline std::chrono::steady_clock::time_point now() {
+	return std::chrono::steady_clock::now();
+}
 
 namespace Amber {
 
 	template<class Game>
-	class Application : public IApplication {
+	class Application {
 
-		StateBuffer<Game> buffer;
 		std::jthread gameThread;
 
+	protected:
+		EventQueue eventsFromLogic;
+		EventQueue eventsFromRenderer;
+		Game game;
+		Stage stage;
+
+	private:
 		void gameLoop(std::chrono::milliseconds rate) {
 			using namespace std::chrono_literals;
 			unsigned long long int frames = 0;
@@ -33,15 +41,17 @@ namespace Amber {
 			game.start();
 			while (game.running) {
 				auto frame_start = now();
+				EventQueue* clone;
 				{
-					std::lock_guard lock(q.mutex);
-					for (auto& [type, e]: q.events) {
-						game.handlers.handleType(type, e);
-					}
-					q.clearEvents();
+					std::lock_guard lock(eventsFromRenderer.mutex);
+					clone = new EventQueue(eventsFromRenderer);
+					eventsFromRenderer.clearEvents();
 				}
+				for (auto& [type, e]: clone->events) {
+					game.handlers.handleType(type, e);
+				}
+				delete clone;
 				game.update();
-				buffer.bufferUpdate();
 
 				++frames;
 
@@ -56,21 +66,30 @@ namespace Amber {
 				}
 			}
 			std::cout << "game stop" << std::endl;
-			engine.kill(); //todo remove
 		}
 
 		void renderLoop() {
-			engine.init();
 			unsigned long long int frames = 0;
 
 			std::cout << "running engine on thread " << std::this_thread::get_id() << std::endl;
 
 			std::time_t start = std::time(nullptr);
 
-			Amber::Stage& stage = engine.stage;
+			stage.show();
 
-			while (engine.getRunning()) {
-				buffer.bufferCopy();
+			while (stage.isRunning()) {
+
+				EventQueue* clone;
+				{
+					std::lock_guard lock(eventsFromLogic.mutex);
+					clone = new EventQueue(eventsFromLogic);
+					eventsFromLogic.clearEvents();
+				}
+				for (auto& [type, e]: clone->events) {
+					stage.handlers.handleType(type, e);
+					stage.front.handlers.handleType(type, e);
+				}
+				delete clone;
 				stage.update();
 				stage.pick();
 				stage.poll();
@@ -85,23 +104,32 @@ namespace Amber {
 				}
 			}
 
+			stage.hide();
+
 			std::cout << "render stop" << std::endl;
 		};
 
 	public:
-		Game& game = buffer.getLogicState();
-		typename Game::R& R = buffer.getRenderState();
 
 		template<class... Args>
-		Application(std::string_view name, int x, int y, int width, int height, Args... args) :
-				buffer(args...),
-				IApplication(name, x, y, width, height) {
+		Application(Scene& frontScene, std::string_view manifest, std::string_view name, int x, int y, int width,
+					int height, Args... args) :
+				game(eventsFromLogic, args...),
+				stage(frontScene, eventsFromRenderer, manifest, name, x, y, width, height) {
 		}
 
 		virtual ~Application() {
 			game.running = false;
 			if (gameThread.joinable()) gameThread.join();
 		}
+
+		Application(const Application&) = delete;
+
+		Application(Application&&) = delete;
+
+		Application& operator=(const Application&) = delete;
+
+		Application& operator=(Application&&) = delete;
 
 		void run(std::chrono::milliseconds rate) {
 			gameThread = std::jthread{&Application::gameLoop, this, rate};
