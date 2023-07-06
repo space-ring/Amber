@@ -8,8 +8,8 @@ The engine supports these asset types:
 
 The user can specify which assets are used by an application individually or in
 a [manifest](#manifest-syntax) file. Providing a manifest registers the assets at an [Asset Manager](#asset-manager) and
-does not instantiate any resource objects. Allocating memory for assets can only be done once a context is made when
-requesting assets from Managers by providing tokens. Every asset is given a token unique among others of its type.
+does not instantiate any resource objects. Allocating memory for assets can only be done once a context is made. Every
+asset is given a token unique among others of its type.
 
 ## Shaders
 
@@ -18,10 +18,10 @@ Two types of shader assets are used by the engine: shader code and shader progra
 Shader code is a raw code string which has no notion of the type of shader it encodes. A type can be given to a code by
 the user when declaring a shader program which allows for reusability.
 
-A shader program is a chain of up to 6 types of shaders. The user specifies which codes constitute a shader.
-The codes for each shader are concatenated, compiled and linked into a single program. The compiled, and concatenated
-objects exist only temporarily for concatenation and compilation and are deleted right after linking. Thus, unnecessary
-work is done when programs share shaders.
+A shader program is a chain of up to 6 types of shaders. The user specifies which codes constitute each shader.
+The codes for each shader are concatenated and compiled, then linked into a single program. The compiled, and
+concatenated objects exist only temporarily for concatenation and compilation and are deleted right after linking. Thus,
+unnecessary work is done when programs share shaders.
 
 ## Meshes
 

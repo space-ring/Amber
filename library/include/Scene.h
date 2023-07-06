@@ -10,12 +10,9 @@
 #include <vector>
 #include "Camera.h"
 #include "light.h"
-#include "Frame.h"
 #include "Mesh.h"
 #include "Transform.h"
-#include "variadic.h"
 #include "AssetManager.h"
-#include "rendering.h"
 #include "InstanceBuffer.h"
 #include "LayerStack.h"
 #include <set>

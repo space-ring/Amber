@@ -49,11 +49,11 @@ namespace Amber {
 	}
 
 	Shader::Shader(ShaderStitch srcVertex,
-	               ShaderStitch srcTessControl,
-	               ShaderStitch srcTessEval,
-	               ShaderStitch srcGeometry,
-	               ShaderStitch srcFragment,
-	               ShaderStitch srcCompute) {
+				   ShaderStitch srcTessControl,
+				   ShaderStitch srcTessEval,
+				   ShaderStitch srcGeometry,
+				   ShaderStitch srcFragment,
+				   ShaderStitch srcCompute) {
 
 		program = glCreateProgram();
 

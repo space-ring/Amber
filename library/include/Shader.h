@@ -38,7 +38,8 @@ namespace Amber {
 
 			using string = std::string;
 
-			GLuint program, shader = 0;
+			GLuint program;
+			GLuint shader = 0;
 
 			ShaderAttachment(SupportedShaders type, GLuint program, ShaderStitch source);
 
@@ -51,15 +52,15 @@ namespace Amber {
 
 		using string = std::string;
 
-		GLuint program;
+		GLuint program = 0;
 
 	public:
 		Shader(ShaderStitch srcVertex,
-		       ShaderStitch srcTessControl,
-		       ShaderStitch srcTessEval,
-		       ShaderStitch srcGeometry,
-		       ShaderStitch srcFragment,
-		       ShaderStitch srcCompute);
+			   ShaderStitch srcTessControl,
+			   ShaderStitch srcTessEval,
+			   ShaderStitch srcGeometry,
+			   ShaderStitch srcFragment,
+			   ShaderStitch srcCompute);
 
 		~Shader();
 

@@ -299,7 +299,7 @@ namespace Amber {
 
 	void AssetManager::loadTexture(AssetManager::token id) {
 		textures.emplace(std::piecewise_construct, std::forward_as_tuple(id),
-		                 std::forward_as_tuple(getRawTexture(id), SupportedInternalFormats::RGBA8));
+		                 std::forward_as_tuple(getRawTexture(id), SupportedImageFormats::RGBA8));
 	}
 
 	Texture& AssetManager::getTexture(AssetManager::token id) {

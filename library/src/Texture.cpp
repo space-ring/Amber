@@ -5,13 +5,11 @@
 #include "Texture.h"
 
 namespace Amber {
-	Texture::Texture(const RawTexture& data, SupportedInternalFormats internal) :
+	Texture::Texture(const RawTexture& data, SupportedImageFormats internal, int levels) :
 			type(data.type),
-			format(data.format),
 			internal(internal),
 			width(data.width),
-			height(data.height),
-			channels(data.channels) {
+			height(data.height) {
 
 		glGenTextures(1, &texture);
 		glBindTexture(type, texture);
@@ -22,7 +20,8 @@ namespace Amber {
 		glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		switch (type) {
 			case TEXTURE_2D:
-				glTexImage2D(type, 0, internal, width, height, 0, format, GL_UNSIGNED_BYTE, data.data);
+				glTexStorage2D(type, levels, internal, width, height);
+				glTexSubImage2D(type, 0, 0, 0, width, height, data.format, GL_UNSIGNED_BYTE, data.data);
 				break;
 		}
 

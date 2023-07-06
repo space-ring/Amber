@@ -21,7 +21,7 @@ namespace Amber {
 		STENCIL = GL_DEPTH_STENCIL
 	};
 
-	enum SupportedInternalFormats {
+	enum SupportedImageFormats {
 		R8 = GL_R8,
 		RG8 = GL_RG8,
 		RGB8 = GL_RGB8,
@@ -53,13 +53,12 @@ namespace Amber {
 
 	class Texture {
 		SupportedTextures type;
-		SupportedDataFormats format;
-		SupportedInternalFormats internal;
-		int width, height, channels;
-		unsigned int texture;
+		SupportedImageFormats internal;
+		int width, height;
+		unsigned int texture = 0;
 
 	public:
-		Texture(const RawTexture& data, SupportedInternalFormats format);
+		Texture(const RawTexture& data, SupportedImageFormats format, int levels = 3);
 
 		~Texture();
 

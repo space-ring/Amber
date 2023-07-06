@@ -6,8 +6,8 @@
 #define ENGINE_EVENT_H
 
 #include "graphics.h"
-#include "variadic.h"
 #include <bitset>
+#include <functional>
 #include "IClonable.h"
 
 namespace Amber {

@@ -20,7 +20,6 @@ add_library(Engine ${depsources}
         include/engineUtils.h
         include/events.h
         include/EventManager.h
-        include/Frame.h
         include/graphics.h
         include/ITransformable.h
         include/Layer.h
@@ -31,7 +30,6 @@ add_library(Engine ${depsources}
         include/Model.h
         include/InstanceBuffer.h
         include/Transform.h
-        include/rendering.h
         include/Scene.h
         include/Shader.h
         include/Singleton.h
@@ -40,14 +38,12 @@ add_library(Engine ${depsources}
         include/Texture.h
         include/Application.h
         include/Timer.h
-        include/variadic.h
         src/AssetManager.cpp
         src/Camera.cpp
         src/engineIO.cpp
         src/engineUtils.cpp
         src/events.cpp
         src/EventManager.cpp
-        src/Frame.cpp
         src/graphics.cpp
         src/Layer.cpp
         src/LayerStack.cpp
@@ -55,7 +51,6 @@ add_library(Engine ${depsources}
         src/Model.cpp
         src/InstanceBuffer.cpp
         src/Transform.cpp
-        src/rendering.cpp
         src/Scene.cpp
         src/Shader.cpp
         src/Stage.cpp

@@ -33,12 +33,12 @@ namespace Amber {
 		 * 14 - 17 = camera transforms
 		 * 18 - 21 = projection transforms
 		 */
-		GLuint VAO, vertexVBO, EBO;
+		GLuint VAO = 0, vertexVBO = 0, EBO = 0;
 
 	public:
 		const unsigned int elementCount;
 
-		Mesh(const RawMesh& data);
+		explicit Mesh(const RawMesh& data);
 
 		~Mesh();
 
