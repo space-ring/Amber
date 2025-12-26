@@ -73,6 +73,8 @@ namespace amber::core {
 
     DECLARE_SIGNAL(hasButton, button)
     DECLARE_SIGNAL(hasKey, key)
+
+    #undef DECLARE_SIGNAL
 }
 
 
